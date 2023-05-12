@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Practies.h"
+#include "CameraSetData.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
@@ -33,6 +34,12 @@ private:
 	float WalkSpeed;
 #pragma endregion PlayerStat
 
+#pragma region CameraSet
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	FCameraSetData CameraData;
+
+#pragma endregion CameraSet
+
 
 #pragma endregion variable
 
@@ -60,6 +67,10 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	//camera
+	FORCEINLINE FCameraSetData GetCameraData() const { return CameraData; }
+	
 
 #pragma region InitPlayer
 private:

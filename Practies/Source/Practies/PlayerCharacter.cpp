@@ -52,12 +52,22 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
+
 	//카메라 막대? 설정
+
+	CameraData.MaxLength = 1000.0f;
+	CameraData.MinLength = 500.0f;
+	CameraData.LengthUnit = 20.0f;
+
+	CameraData.MinRoation = 0.0f;
+	CameraData.MaxRoation = -60.0f;
+	CameraData.RoationUnit = 2.4f;
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.f;
-	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
+	CameraBoom->TargetArmLength = CameraData.MaxLength;
+	CameraBoom->SetRelativeRotation(FRotator(CameraData.MaxRoation, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 	// 카메라 설정

@@ -5,7 +5,8 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
-#include "PlayerCharacter.h"
+
+#include "GameFramework/SpringArmComponent.h"
 #include "Engine/World.h"
 
 AMainPlayerController::AMainPlayerController()
@@ -54,8 +55,13 @@ void AMainPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
+
 	InputComponent->BindAction("MoveAction", IE_Pressed, this, &AMainPlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("MoveAction", IE_Released, this, &AMainPlayerController::OnSetDestinationReleased);
+
+	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &AMainPlayerController::ZoomIn);
+	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &AMainPlayerController::ZoomOut);
+
 
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AMainPlayerController::OnTouchPressed);
@@ -101,4 +107,47 @@ void AMainPlayerController::OnTouchReleased(const ETouchIndex::Type FingerIndex,
 {
 	bIsTouch = false;
 	OnSetDestinationReleased();
+}
+
+void AMainPlayerController::ZoomIn()
+{
+	TLOG_E(TEXT("ZOOM IN"));
+	//auto Player = Cast<APlayerCharacter>(GetPawn());
+
+	Player = Cast<APlayerCharacter>(GetPawn());
+	if (Player != nullptr) {
+
+		auto CameraLength = Player->GetCameraBoom()->TargetArmLength;
+		auto CameraRoationPitch = Player->GetCameraBoom()->GetRelativeRotation().Pitch;
+		if (CameraLength > Player->GetCameraData().MinLength && CameraRoationPitch < Player->GetCameraData().MinRoation)
+		{
+
+			
+			Player->GetCameraBoom()->TargetArmLength -= Player->GetCameraData().LengthUnit;
+			CameraRoationPitch += Player->GetCameraData().RoationUnit;
+			Player->GetCameraBoom()->SetRelativeRotation(FRotator(CameraRoationPitch, 0.0f, 0.0f));
+
+			
+	    }
+	}
+}
+
+void AMainPlayerController::ZoomOut()
+{
+	TLOG_E(TEXT("ZOOM OUT"));
+
+	//auto Player = Cast<APlayerCharacter>(GetPawn());
+
+	Player = Cast<APlayerCharacter>(GetPawn());
+	if (Player != nullptr) {
+
+		auto CameraLength = Player->GetCameraBoom()->TargetArmLength;
+		auto CameraRoationPitch = Player->GetCameraBoom()->GetRelativeRotation().Pitch;
+		if (CameraLength < Player->GetCameraData().MaxLength&& CameraRoationPitch > Player->GetCameraData().MaxRoation)
+		{
+			Player->GetCameraBoom()->TargetArmLength += Player->GetCameraData().LengthUnit;
+			CameraRoationPitch -= Player->GetCameraData().RoationUnit;
+			Player->GetCameraBoom()->SetRelativeRotation(FRotator(CameraRoationPitch, 0.0f, 0.0f));
+		}
+	}
 }

@@ -4,6 +4,7 @@
 
 #include "Practies.h"
 #include "Templates/SubclassOf.h"
+#include "PlayerCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "MainPlayerController.generated.h"
 
@@ -41,10 +42,15 @@ protected:
 	void OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location);
 	void OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location);
 
+	void ZoomIn();
+	void ZoomOut();
 private:
 	bool bInputPressed; // Input is bring pressed
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
+
+
+	APlayerCharacter* Player;
 };
 
 
