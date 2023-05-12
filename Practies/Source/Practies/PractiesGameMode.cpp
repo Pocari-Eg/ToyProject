@@ -1,14 +1,14 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "PractiesGameMode.h"
-#include "PractiesPlayerController.h"
-#include "PractiesCharacter.h"
+#include "MainPlayerController.h"
+#include "PlayerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 APractiesGameMode::APractiesGameMode()
 {
 	// use our custom PlayerController class
-	PlayerControllerClass = APractiesPlayerController::StaticClass();
+	PlayerControllerClass = AMainPlayerController::StaticClass();
 
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprint/Player/BP_PlayerCharacter"));
@@ -18,7 +18,7 @@ APractiesGameMode::APractiesGameMode()
 	}
 
 	// set default controller to our Blueprinted controller
-	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(TEXT("/Game/Blueprint/Player/BP_TopDownPlayerController"));
+	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(TEXT("/Game/Blueprint/Player/BP_PlayerController"));
 	if(PlayerControllerBPClass.Class != NULL)
 	{
 		PlayerControllerClass = PlayerControllerBPClass.Class;
