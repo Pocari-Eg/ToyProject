@@ -43,6 +43,11 @@ APractiesCharacter::APractiesCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	LOG_E();
+	LOG_W();
+	TLOG_E(TEXT("Error"));
+	TLOG_W(TEXT("Warning"));
 }
 
 void APractiesCharacter::Tick(float DeltaSeconds)

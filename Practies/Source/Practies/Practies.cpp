@@ -5,5 +5,4 @@
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Practies, "Practies" );
 
-DEFINE_LOG_CATEGORY(LogPracties)
- 
+DEFINE_LOG_CATEGORY(TOY_LOG)
