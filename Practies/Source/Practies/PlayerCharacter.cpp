@@ -19,7 +19,27 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	// 플레이어 캡슐 크기 설정
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	GetCapsuleComponent()->InitCapsuleSize(21.0f, 70.0f);
+
+
+	// 스켈레톤 메쉬 설정
+	const ConstructorHelpers::FObjectFinder<USkeletalMesh>CharacterMesh(TEXT("/Game/Characters/player/mesh/Idle.Idle"));
+	if (CharacterMesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(CharacterMesh.Object);
+		GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -67.0f));
+		
+
+
+		// 블루프린트 애니메이션 적용
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		ConstructorHelpers::FClassFinder<UAnimInstance>CharacterAnimInstance(TEXT("/Game/Blueprint/Player/BP_PlayerAnimBlueprint.BP_PlayerAnimBlueprint_C"));
+
+		if (CharacterAnimInstance.Succeeded())
+			GetMesh()->SetAnimClass(CharacterAnimInstance.Class);
+	}
+
 
 	// 카메라가 회전하지 않도록
 	bUseControllerRotationPitch = false;
@@ -46,6 +66,9 @@ APlayerCharacter::APlayerCharacter()
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Activate ticking in order to update the cursor every frame.
+	WalkSpeed = 250.0f;
+
+   
 
 }
 
@@ -63,10 +86,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APlayerCharacter::PostInitializeComponents()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	Super::PostInitializeComponents();
+	PlayerInit();
+}
 
+
+
+void APlayerCharacter::PlayerInit()
+{
+	TLOG_W(TEXT("Player Init"));
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 

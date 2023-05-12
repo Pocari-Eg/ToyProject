@@ -54,8 +54,8 @@ void APractiesPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &APractiesPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &APractiesPlayerController::OnSetDestinationReleased);
+	InputComponent->BindAction("MoveAction", IE_Pressed, this, &APractiesPlayerController::OnSetDestinationPressed);
+	InputComponent->BindAction("MoveAction", IE_Released, this, &APractiesPlayerController::OnSetDestinationReleased);
 
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &APractiesPlayerController::OnTouchPressed);
