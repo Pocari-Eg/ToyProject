@@ -21,12 +21,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
 	float LengthUnit;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
-	float  MaxRoation;
+	float  MaxRotation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
-	float MinRoation;
+	float MinRotation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
-	float RoationUnit;
+	float RotationUnit;
 
+
+	float LengthDiffernece;
+	float RotationDiffernece;
 
 
 };

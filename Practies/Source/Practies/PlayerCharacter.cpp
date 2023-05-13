@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MainPlayerController.h"
+#include "PlayerAnimInstance.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
@@ -55,19 +56,13 @@ APlayerCharacter::APlayerCharacter()
 
 	//카메라 막대? 설정
 
-	CameraData.MaxLength = 1000.0f;
-	CameraData.MinLength = 500.0f;
-	CameraData.LengthUnit = 20.0f;
-
-	CameraData.MinRoation = 0.0f;
-	CameraData.MaxRoation = -60.0f;
-	CameraData.RoationUnit = 2.4f;
+	CameraInit();
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = CameraData.MaxLength;
-	CameraBoom->SetRelativeRotation(FRotator(CameraData.MaxRoation, 0.f, 0.f));
+	CameraBoom->SetRelativeRotation(FRotator(CameraData.MaxRotation, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 	// 카메라 설정
@@ -75,10 +70,12 @@ APlayerCharacter::APlayerCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+
+
 	// Activate ticking in order to update the cursor every frame.
 	WalkSpeed = 250.0f;
+	PlayerCurState = EPState::idle;
 
-   
 
 }
 
@@ -94,15 +91,62 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+
 }
 
 void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	PlayerInit();
+	PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	PlayerAnimInstance->Init(this);
 }
 
 
+
+void APlayerCharacter::CameraInit()
+{
+	CameraData.MaxLength = 1000.0f;
+	CameraData.MinLength = 500.0f;
+	CameraData.MinRotation = 0.0f;
+	CameraData.MaxRotation = -60.0f;
+	CameraData.RotationDiffernece = CameraData.MaxRotation - CameraData.MinRotation;
+	CameraData.LengthDiffernece = CameraData.MaxLength - CameraData.MinLength;
+
+	bIsCameraMoving = false;
+}
+
+void APlayerCharacter::CameraZoomin(float Time)
+{
+
+
+
+	float Value = Time / CameraZoomTime; // 시간 정규화 0 ~ 1 이 되도록 
+	float ChangeLengthVal = CameraData.LengthDiffernece * Value;
+	GetCameraBoom()->TargetArmLength = CameraData.MaxLength - ChangeLengthVal;
+
+
+
+	float ChangeRotationVal = CameraData.RotationDiffernece * Value;   //-6~ -60
+	float NewPitch = CameraData.MaxRotation - ChangeRotationVal;
+	GetCameraBoom()->SetRelativeRotation(FRotator(NewPitch, 0.0f, 0.0f));
+
+}
+
+void APlayerCharacter::CameraZoomOut(float Time)
+{
+	float Value = Time / CameraZoomTime;
+
+	float ChangeLengthVal = CameraData.LengthDiffernece * Value;
+	GetCameraBoom()->TargetArmLength = CameraData.MinLength + ChangeLengthVal;
+
+	float ChangeRotationVal = CameraData.RotationDiffernece * Value;   //-6~ -60
+
+	float NewPitch = CameraData.MinRotation + ChangeRotationVal;
+
+	GetCameraBoom()->SetRelativeRotation(FRotator(NewPitch, 0.0f, 0.0f));
+}
 
 void APlayerCharacter::PlayerInit()
 {

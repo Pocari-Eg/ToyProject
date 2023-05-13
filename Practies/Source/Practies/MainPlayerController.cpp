@@ -74,7 +74,13 @@ void AMainPlayerController::OnSetDestinationPressed()
 	// We flag that the input is being pressed
 	bInputPressed = true;
 	// Just in case the character was moving because of a previous short press we stop it
-	StopMovement();
+	Player = Cast<APlayerCharacter>(GetPawn());
+	if (Player != nullptr)
+	{
+		Player->SetPlayerState(EPState::walk);
+	}
+	
+	//StopMovement();
 }
 
 void AMainPlayerController::OnSetDestinationReleased()
@@ -92,7 +98,11 @@ void AMainPlayerController::OnSetDestinationReleased()
 		HitLocation = Hit.Location;
 
 		// We move there and spawn some particles
+		
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
+		
+		
+	    
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}
 }
@@ -111,43 +121,26 @@ void AMainPlayerController::OnTouchReleased(const ETouchIndex::Type FingerIndex,
 
 void AMainPlayerController::ZoomIn()
 {
-	TLOG_E(TEXT("ZOOM IN"));
-	//auto Player = Cast<APlayerCharacter>(GetPawn());
-
 	Player = Cast<APlayerCharacter>(GetPawn());
 	if (Player != nullptr) {
-
-		auto CameraLength = Player->GetCameraBoom()->TargetArmLength;
-		auto CameraRoationPitch = Player->GetCameraBoom()->GetRelativeRotation().Pitch;
-		if (CameraLength > Player->GetCameraData().MinLength && CameraRoationPitch < Player->GetCameraData().MinRoation)
+		if (!Player->GetCameraState() && Player->GetCameraBoom()->TargetArmLength > Player->GetCameraData().MinLength)
 		{
-
-			
-			Player->GetCameraBoom()->TargetArmLength -= Player->GetCameraData().LengthUnit;
-			CameraRoationPitch += Player->GetCameraData().RoationUnit;
-			Player->GetCameraBoom()->SetRelativeRotation(FRotator(CameraRoationPitch, 0.0f, 0.0f));
-
-			
-	    }
+			TLOG_E(TEXT("ZOOM IN"));
+			Player->SetCameraState(true);
+			Player->CameraZoomInEvent();
+		}
 	}
 }
 
 void AMainPlayerController::ZoomOut()
 {
-	TLOG_E(TEXT("ZOOM OUT"));
-
-	//auto Player = Cast<APlayerCharacter>(GetPawn());
-
 	Player = Cast<APlayerCharacter>(GetPawn());
 	if (Player != nullptr) {
-
-		auto CameraLength = Player->GetCameraBoom()->TargetArmLength;
-		auto CameraRoationPitch = Player->GetCameraBoom()->GetRelativeRotation().Pitch;
-		if (CameraLength < Player->GetCameraData().MaxLength&& CameraRoationPitch > Player->GetCameraData().MaxRoation)
+		if (!Player->GetCameraState()&&Player->GetCameraBoom()->TargetArmLength<Player->GetCameraData().MaxLength)
 		{
-			Player->GetCameraBoom()->TargetArmLength += Player->GetCameraData().LengthUnit;
-			CameraRoationPitch -= Player->GetCameraData().RoationUnit;
-			Player->GetCameraBoom()->SetRelativeRotation(FRotator(CameraRoationPitch, 0.0f, 0.0f));
+			TLOG_E(TEXT("ZOOM OUT"));
+			Player->SetCameraState(true);
+			Player->CameraZoomOutEvent();
 		}
 	}
 }

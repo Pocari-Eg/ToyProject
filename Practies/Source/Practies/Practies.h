@@ -13,3 +13,13 @@ DECLARE_LOG_CATEGORY_EXTERN(TOY_LOG, Log, All);
 #define TLOG_E(Format, ...) UE_LOG(TOY_LOG, Error, TEXT("%s %s"), *LOG_CALLINFO, *FString::Printf(Format, ##__VA_ARGS__))//TEXT Error Log
 
 #define CHECK(Expr, ...) {if(!(Expr)) {BBLOG(Error, TEXT("ASSERTION : %s"), TEXT("'"#Expr"'")); return __VA_ARGS__;}}
+
+
+UENUM(BlueprintType)
+enum class EPState : uint8
+{
+    idle UMETA(DisplayName = "IDLE"),
+    walk UMETA(DisplayName = "WALK"),
+    attack UMETA(DisplayName = "ATTACK"),
+    skill UMETA(DisplayName = "SKILL"),
+};
