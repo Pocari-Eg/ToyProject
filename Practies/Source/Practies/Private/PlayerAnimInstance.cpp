@@ -18,6 +18,8 @@ if (Value != nullptr) {
 void UPlayerAnimInstance::AnimNotify_Setidle() const
 {
 	if (Player != nullptr) {
-		Player->SetPlayerState(EPState::idle);
+
+			Player->GetFSM()->ChangeState(UIdleState::GetInstance());
+
 	}
 }

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "../Practies.h"
-#include "../PlayerCharacter.h"
+#include "../Player/PlayerCharacter.h"
 #include "Animation/AnimInstance.h"
 #include "PlayerAnimInstance.generated.h"
 

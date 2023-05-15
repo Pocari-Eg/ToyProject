@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "PractiesGameMode.h"
-#include "MainPlayerController.h"
-#include "PlayerCharacter.h"
+#include "Player/MainPlayerController.h"
+#include "Player/PlayerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 APractiesGameMode::APractiesGameMode()

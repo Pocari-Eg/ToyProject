@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CameraSetData.generated.h"
 
+#include "CameraSetData.generated.h"
 /**
  * 
  */
