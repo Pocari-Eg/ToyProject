@@ -97,8 +97,7 @@ APlayerCharacter::APlayerCharacter()
 
 	// Activate ticking in order to update the cursor every frame.
 	WalkSpeed = 250.0f;
-
-
+	Debuging = false;
 
 }
 
@@ -186,9 +185,15 @@ void APlayerCharacter::InitWeapon()
 {
 	if (PlayerWeapon != nullptr) {
 		PlayerWeapon->SetWeaponData(WeaponData);
+		PlayerWeapon->SetOwner(this);
 	}
 	else {
 		TLOG_E(TEXT("Weapon Null"));
 	}
 }
 
+void APlayerCharacter::AttackCheck()
+{
+	PlayerWeapon->AttackCheck(Debuging);
+
+}

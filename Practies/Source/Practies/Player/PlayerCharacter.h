@@ -52,7 +52,9 @@ private:
     float CameraZoomTime;
 	bool bIsCameraMoving;
 
-
+	//debug
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DEBUG, meta = (AllowPrivateAccess = "true"))
+	bool Debuging;
 #pragma endregion Variable
 
 
@@ -119,7 +121,12 @@ public:
 	//Instance
 	 UPlayerAnimInstance* GetAnimInstance() { return PlayerAnimInstance; }
 	 UPlayerFSM* GetFSM() const { return PlayerFSMInstance; }
+
+	 public:
+		 UFUNCTION(blueprintcallable)
+		 void AttackCheck		 		 		 ();
 };
 #pragma endregion GetSet
 
 #pragma endregion Function
+

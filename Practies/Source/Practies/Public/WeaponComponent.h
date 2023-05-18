@@ -8,6 +8,8 @@
 #include "Components/SceneComponent.h"
 #include "WeaponComponent.generated.h"
 
+
+class AActor;
 USTRUCT(Atomic, BlueprintType)
 struct FWeaponData
 {
@@ -39,12 +41,16 @@ class USkeletalMeshComponent* MeshComponent;
 #pragma region Data
 public:
 FWeaponData Data;
+
+UPROPERTY()
+ class AActor* Owner;
+
 	#pragma endregion Data
 		
 	//function
 public:
 UFUNCTION(BlueprintCallable)
- TArray<AActor*> AttackCheck();
+ void AttackCheck(bool bisDebug);
 		
 UFUNCTION(BlueprintCallable)
 void SetVisible(bool Set);
@@ -58,6 +64,7 @@ void SetVisible(bool Set);
 	}
 	FORCEINLINE FWeaponData GetWeaponData() { return Data; }
 		
+	void SetOwner(AActor* Value);
 		
 #pragma endregion GetSet
 

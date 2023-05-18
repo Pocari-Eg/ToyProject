@@ -69,7 +69,7 @@ UWalkState* UWalkState::GetInstance()
 void UWalkState::Enter(IBaseGameEntity* CurState)
 {
 	CurState->SetStateEnum(EPState::walk);
-	if(CurState->Player!=nullptr)CurState->Player->SetWeaponVisible(true);
+	//if(CurState->Player!=nullptr)CurState->Player->SetWeaponVisible(true);
 }
 
 void UWalkState::Execute(IBaseGameEntity* CurState)
@@ -94,7 +94,7 @@ UIdleState* UIdleState::GetInstance()
 void UIdleState::Enter(IBaseGameEntity* CurState)
 {
 	CurState->SetStateEnum(EPState::idle);
-	if (CurState->Player != nullptr)CurState->Player->SetWeaponVisible(false);
+	//if (CurState->Player != nullptr)CurState->Player->SetWeaponVisible(false);
 	
 }
 

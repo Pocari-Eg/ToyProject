@@ -3,6 +3,9 @@
 
 #include "WeaponComponent.h"
 #include "Engine/SkeletalMesh.h"
+#include"DebugAPI.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/Actor.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values for this component's properties
@@ -16,14 +19,131 @@ UWeaponComponent::UWeaponComponent(const FObjectInitializer& ObjectInitializer):
 }
 
 
-TArray<AActor*> UWeaponComponent::AttackCheck()
+void UWeaponComponent::AttackCheck(bool bisDebug)
 {
-	return TArray<AActor*>();
+	if (bisDebug)
+	{
+		FTransform BottomLine = Owner->GetTransform();
+		BottomLine.SetLocation(BottomLine.GetLocation()+FVector(0.0f, 0.0f, -50.0f));
+
+
+		FRotator Rotation = FRotator::ZeroRotator;
+		Rotation = Owner->GetActorRotation() + FRotator(0.0f, 0.0f, 0.0f);
+		Rotation.Pitch = 0;
+		BottomLine.SetRotation(FQuat(Rotation));
+
+
+		FTransform TopLine = BottomLine;
+		TopLine.SetLocation(TopLine.GetLocation() + FVector(0.0f, 0.0f, Data.AttackHeight));
+
+
+
+		FMatrix BottomDebugMatrix = BottomLine.ToMatrixNoScale();
+		FMatrix TopDebugMatrix = TopLine.ToMatrixNoScale();
+
+	  DebugAPI::DrawRadial(GetWorld(), BottomDebugMatrix, Data.AttackRadius, Data.AttackAngle, FColor::Red, 10, 0.5f, false, 0, 2);
+	  DebugAPI::DrawRadial(GetWorld(), TopDebugMatrix, Data.AttackRadius, Data.AttackAngle, FColor::Red, 10, 0.5f, false, 0, 2);
+	
+	}
+
+	FVector ForwardVector = Owner->GetActorForwardVector();
+	ForwardVector.Normalize();
+	FVector AttackDirection = ForwardVector;
+	AttackDirection.Normalize();
+
+
+	float HalfRadius = Data.AttackRadius * 0.5;
+	FVector Center = Owner->GetActorLocation();
+
+
+	FVector Box = FVector(Data.AttackRadius, Data.AttackRadius, Data.AttackHeight);
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, Owner);
+	bool bResult = GetWorld()->OverlapMultiByChannel( // 지정된 Collision FCollisionShape와 충돌한 액터 감지 
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel1,
+		FCollisionShape::MakeCapsule(Box),
+		CollisionQueryParam
+	);
+	if (bResult)
+	{
+		for (auto const& OverlapResult : OverlapResults)
+		{
+			//플레이어 클래스 정보를 가져오고 OwnerController를 소유하고 있는가 확인
+			//STARRYLOG(Warning, TEXT("%s"), *OverlapResult.GetActor()->GetName());
+		
+				TArray<FHitResult> Hits;
+				TArray<AActor*> ActorsToIgnore;
+				bool bTraceResult;
+
+					bTraceResult = UKismetSystemLibrary::SphereTraceMulti(
+					GetWorld(),
+					Owner->GetActorLocation(), // SphereTrace 시작 위치
+					Owner->GetActorLocation(), // SphereTrace 종료 위치
+					Data.AttackRadius,
+					ETraceTypeQuery::TraceTypeQuery4,
+					false,
+					ActorsToIgnore,
+					EDrawDebugTrace::None,
+					Hits,
+					true
+				);
+				
+				if (bTraceResult && !(nullptr == Owner))
+				{
+				//	auto HitActor = Cast<AActor>(Hits[0].GetActor());
+					for (int i=0;i<Hits.Num();i++)
+					{
+						AActor* HitActor = Cast<AActor>(Hits[i].GetActor());
+							if (HitActor != Owner) {
+								
+
+							
+               					FVector TargetDir = HitActor->GetActorLocation() - Owner->GetActorLocation();
+								TargetDir = TargetDir.GetSafeNormal();
+								/*
+								TLOG_W(TEXT("HitActor  : %s"), *HitActor->GetActorLabel())
+								TLOG_W(TEXT("HitActor Location : %f, %f,%f "), HitActor->GetActorLocation().X, HitActor->GetActorLocation().Y, HitActor->GetActorLocation().Z);
+								UKismetSystemLibrary::DrawDebugArrow(this, Owner->GetActorLocation(), Owner->GetActorLocation() + (AttackDirection * 100), 300.0f, FLinearColor::Red, 1.0f, 3.0f);
+								UKismetSystemLibrary::DrawDebugArrow(this, Owner->GetActorLocation(), Owner->GetActorLocation() + (TargetDir * 100), 300.0f, FLinearColor::Blue, 1.0f, 3.0f);
+								TLOG_W(TEXT("AttackDirection : %f "), AttackDirection.X, AttackDirection.Y, AttackDirection.Z);
+								TLOG_W(TEXT("TargetDirection : %f , %f , %f "), TargetDir.X, TargetDir.Y, TargetDir.Z);
+								*/
+
+								float Radian = FVector::DotProduct(AttackDirection, TargetDir);
+								//내적 결과값은 Cos{^-1}(A dot B / |A||B|)이기 때문에 아크코사인 함수를 사용해주고 Degree로 변환해준다.
+								float TargetAngle = FMath::RadiansToDegrees(FMath::Acos(Radian));
+								
+
+								
+								//TLOG_W(TEXT("TargetAngle : %f "), TargetAngle);
+
+								if (TargetAngle <= (Data.AttackAngle * 0.5f))
+								{
+									TLOG_E(TEXT("Attack Hit"));
+									GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Attack Hit"));
+
+								}
+								break;
+							}
+					}
+
+				}
+		}
+	}
+
 }
 
 void UWeaponComponent::SetVisible(bool Set)
 {
 	MeshComponent->SetVisibility(Set);
+}
+
+void UWeaponComponent::SetOwner(AActor* Value)
+{
+	Owner = Value;
 }
 
 // Called when the game starts

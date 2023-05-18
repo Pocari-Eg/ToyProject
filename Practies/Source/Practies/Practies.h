@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+
 DECLARE_LOG_CATEGORY_EXTERN(TOY_LOG, Log, All);
 #define LOG_CALLINFO (FString(__FUNCTION__) + TEXT("(") + FString::FromInt(__LINE__) + TEXT(")"))
 #define LOG_W() UE_LOG(TOY_LOG, Warning, TEXT("%s"), *LOG_CALLINFO) // warning Log 
