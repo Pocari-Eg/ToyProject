@@ -6,6 +6,7 @@
 #include "CameraSetData.h"
 #include "GameFramework/Character.h"
 #include "FSM/PlayerFSM.h"
+#include "WeaponComponent.h"
 #include "PlayerCharacter.generated.h"
 
 /* Region
@@ -33,13 +34,15 @@ private:
 	class UPlayerAnimInstance* PlayerAnimInstance;
 	class UPlayerFSM* PlayerFSMInstance;
 
-
 	//Player
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	UWeaponComponent* PlayerWeapon;
+
 private:
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
+	FWeaponData WeaponData;
 
 
 	//Ä«¸Þ¶ó
@@ -86,11 +89,14 @@ public:
 	UFUNCTION(blueprintcallable)
 	void CameraZoomOut(float Time);
 
-
+	//Weapon
+	UFUNCTION(blueprintcallable)
+	void SetWeaponVisible(bool Set);
 
 private:
+	//intiy
 	void PlayerInit();
-
+	void InitWeapon();
 
 #pragma region GetSet
 public:

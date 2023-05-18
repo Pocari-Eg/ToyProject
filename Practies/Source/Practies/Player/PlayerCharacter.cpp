@@ -23,8 +23,7 @@ APlayerCharacter::APlayerCharacter()
 	// 플레이어 캡슐 크기 설정
 	GetCapsuleComponent()->InitCapsuleSize(21.0f, 70.0f);
 
-
-	// 스켈레톤 메쉬 설정
+	//// 스켈레톤 메쉬 설정
 	const ConstructorHelpers::FObjectFinder<USkeletalMesh>CharacterMesh(TEXT("/Game/Characters/player/mesh/Idle.Idle"));
 	if (CharacterMesh.Succeeded())
 	{
@@ -37,7 +36,6 @@ APlayerCharacter::APlayerCharacter()
 		// 블루프린트 애니메이션 적용
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 		ConstructorHelpers::FClassFinder<UAnimInstance>CharacterAnimInstance(TEXT("/Game/Blueprint/Player/BP_PlayerAnimBlueprint.BP_PlayerAnimBlueprint_C"));
-
 		if (CharacterAnimInstance.Succeeded())
 			GetMesh()->SetAnimClass(CharacterAnimInstance.Class);
 	}
@@ -55,7 +53,7 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
 
-	//카메라 막대? 설정
+	//SpringArm Set
 
 	CameraData.MaxLength = 1000.0f;
 	CameraData.MinLength = 500.0f;
@@ -68,12 +66,34 @@ APlayerCharacter::APlayerCharacter()
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
-	// 카메라 설정
+	// Camera Set
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	//WeaponSet
 
+	PlayerWeapon = CreateDefaultSubobject<UWeaponComponent>(TEXT("PlayerWeapon"));
+	FName WeaponSocket(TEXT("RHandSocket"));
+	if (GetMesh()->DoesSocketExist(WeaponSocket)) {
+		const ConstructorHelpers::FObjectFinder<USkeletalMesh>WeaponMesh(TEXT("/Game/Characters/Weapon/Sword.Sword"));
+		if (WeaponMesh.Succeeded())
+		{
+			PlayerWeapon->MeshComponent->SetSkeletalMesh(WeaponMesh.Object);
+
+		}
+
+		PlayerWeapon->MeshComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
+		PlayerWeapon->MeshComponent->SetupAttachment(GetMesh(), WeaponSocket);
+    }
+
+
+	WeaponData.AttackAngle = 120.0f;
+	WeaponData.AttackHeight = 100.0f;
+	WeaponData.AttackRadius = 100.0f;
+	WeaponData.Damage = 100.0f;
+
+	
 
 	// Activate ticking in order to update the cursor every frame.
 	WalkSpeed = 250.0f;
@@ -86,7 +106,6 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -107,7 +126,8 @@ void APlayerCharacter::PostInitializeComponents()
 	PlayerAnimInstance->Init(this);
 	PlayerFSMInstance = NewObject<UPlayerFSM>();
 	PlayerFSMInstance->SetPlayer(this);
-
+	SetWeaponVisible(false);
+	InitWeapon();
 }
 
 
@@ -151,9 +171,24 @@ void APlayerCharacter::CameraZoomOut(float Time)
 	GetCameraBoom()->SetRelativeRotation(FRotator(NewPitch, 0.0f, 0.0f));
 }
 
+void APlayerCharacter::SetWeaponVisible(bool Set)
+{
+	PlayerWeapon->SetVisible(Set);
+}
+
 void APlayerCharacter::PlayerInit()
 {
 	TLOG_W(TEXT("Player Init"));
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+}
+
+void APlayerCharacter::InitWeapon()
+{
+	if (PlayerWeapon != nullptr) {
+		PlayerWeapon->SetWeaponData(WeaponData);
+	}
+	else {
+		TLOG_E(TEXT("Weapon Null"));
+	}
 }
 
