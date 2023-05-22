@@ -50,7 +50,7 @@ UPROPERTY()
 	//function
 public:
 UFUNCTION(BlueprintCallable)
- void AttackCheck(bool bisDebug);
+void AttackCheck(bool bisDebug,FTransform OwnerTransform, FVector OwnerFowardVector);
 		
 UFUNCTION(BlueprintCallable)
 void SetVisible(bool Set);

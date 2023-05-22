@@ -39,7 +39,7 @@ class IBaseGameEntity//need UBaseGameEntity Interface
 {
 	GENERATED_BODY()
 public:
-	APlayerCharacter* Player;
+	TScriptInterface<APlayerCharacter> Player;
 
 public:
 	virtual void Update() = 0;

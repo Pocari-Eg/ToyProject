@@ -30,13 +30,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-	//Instance
-	class UPlayerAnimInstance* PlayerAnimInstance;
-	class UPlayerFSM* PlayerFSMInstance;
-
 	//Player
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	UWeaponComponent* PlayerWeapon;
+public:
+	UPROPERTY(BlueprintReadWrite)
+	class UPlayerAnimInstance* PlayerAnimInstance;
+	UPROPERTY(BlueprintReadWrite)
+	class UPlayerFSM* PlayerFSMInstance;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
@@ -55,6 +56,20 @@ private:
 	//debug
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DEBUG, meta = (AllowPrivateAccess = "true"))
 	bool Debuging;
+
+	//attack
+	FTransform AttackTransform;
+	FVector AttackForwardVector;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
+	bool CanNextCombo;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
+	bool IsComboInputOn;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
+	int32 CurrentCombo;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
+	int32 MaxCombo;
+
 #pragma endregion Variable
 
 
@@ -74,9 +89,9 @@ public:
 	//After Component Init 
 	virtual void PostInitializeComponents() override;
 
-
-
-
+	//attack
+	UFUNCTION()
+	void Attack();
 
 	//camera
 	FORCEINLINE void CameraInit();
@@ -95,6 +110,11 @@ public:
 	UFUNCTION(blueprintcallable)
 	void SetWeaponVisible(bool Set);
 
+	//animation
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrpted);
+	void AttackStartComboState();
+	void AttackEndComboState();
 private:
 	//intiy
 	void PlayerInit();
@@ -108,8 +128,7 @@ public:
 
 	//Player
 	FORCEINLINE  EPState GetPlayerState() const { return GetFSM()->GetCurState(); }
-
-
+	void ChangeState(IState* NewState);
 
 	//Camera
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -123,8 +142,8 @@ public:
 	 UPlayerFSM* GetFSM() const { return PlayerFSMInstance; }
 
 	 public:
-		 UFUNCTION(blueprintcallable)
-		 void AttackCheck		 		 		 ();
+	 UFUNCTION(blueprintcallable)
+	 void AttackCheck		 		 		 ();
 };
 #pragma endregion GetSet
 

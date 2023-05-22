@@ -26,7 +26,8 @@ public:
 	/** FX Class that we will spawn when clicking */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UNiagaraSystem* FXCursor;
-
+public:
+	void PlayerInit(APlayerCharacter* Value) { Player = Value; }
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -44,11 +45,15 @@ protected:
 
 	void ZoomIn();
 	void ZoomOut();
+
+	void Attack();
 private:
 	bool bInputPressed; // Input is bring pressed
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
 
+
+	bool bIsShortClickWalk;
 
 	APlayerCharacter* Player;
 };

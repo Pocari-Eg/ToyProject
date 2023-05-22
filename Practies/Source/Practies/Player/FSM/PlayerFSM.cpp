@@ -14,12 +14,13 @@ void UPlayerFSM::Update()
 
 void UPlayerFSM::ChangeState(IState* NewState)
 {
-	
-	if (StateValue != NewState) {
-		StateValue->Exit(this);
-		StateValue = NewState;
-		StateValue->Enter(this);
-		TLOG_E(TEXT("state change to %s"), *GetStateToString());
+	if (this != nullptr) {
+		if (NewState != StateValue) {
+			StateValue->Exit(this);
+			StateValue = NewState;
+			StateValue->Enter(this);
+			TLOG_E(TEXT("state change to %s"), *GetStateToString());
+		}
 	}
 }
 
@@ -29,12 +30,17 @@ void UPlayerFSM::ThrowState(IState* NewState)
 	NewState->Exit(this);
 }
 
+void UPlayerFSM::SetPlayer(APlayerCharacter* Value)
+{
+	Player = Value;
+	StateValue = UIdleState::GetInstance();
+	CurState = EPState::idle;
+}
+
 
 void UPlayerFSM::SetStateEnum(EPState Value)
 {
 	CurState = Value;
-	
-	
 }
 
 FString UPlayerFSM::GetStateToString() const
@@ -69,7 +75,7 @@ UWalkState* UWalkState::GetInstance()
 void UWalkState::Enter(IBaseGameEntity* CurState)
 {
 	CurState->SetStateEnum(EPState::walk);
-	//if(CurState->Player!=nullptr)CurState->Player->SetWeaponVisible(true);
+	if(CurState->Player!=nullptr)CurState->Player->SetWeaponVisible(true);
 }
 
 void UWalkState::Execute(IBaseGameEntity* CurState)
@@ -94,10 +100,10 @@ UIdleState* UIdleState::GetInstance()
 void UIdleState::Enter(IBaseGameEntity* CurState)
 {
 	CurState->SetStateEnum(EPState::idle);
-	//if (CurState->Player != nullptr)CurState->Player->SetWeaponVisible(false);
-	
-}
 
+	if (CurState->Player != nullptr)CurState->Player->SetWeaponVisible(false);
+
+}
 void UIdleState::Execute(IBaseGameEntity* CurState)
 {
 }
@@ -106,3 +112,29 @@ void UIdleState::Exit(IBaseGameEntity* CurState)
 {
 }
 #pragma endregion IdleState
+
+#pragma region AttackState
+UAttackState* UAttackState::GetInstance()
+{
+	static UAttackState* Instance;
+	if (Instance == nullptr) {
+		Instance = NewObject<UAttackState>();
+		Instance->AddToRoot();
+	}
+	return Instance;
+}
+void UAttackState::Enter(IBaseGameEntity* CurState)
+{
+	CurState->SetStateEnum(EPState::attack);
+	if (CurState->Player != nullptr)CurState->Player->SetWeaponVisible(true);
+}
+
+void UAttackState::Execute(IBaseGameEntity* CurState)
+{
+}
+
+void UAttackState::Exit(IBaseGameEntity* CurState)
+{
+
+}
+#pragma endregion WalkState

@@ -4,6 +4,7 @@
 
 #include "StateInterface.h"
 #include "../../Practies.h"
+
 #include "PlayerFSM.generated.h"
 /**
  * 
@@ -30,7 +31,17 @@ class UWalkState final :public UObject, public IState
 	virtual void Exit(IBaseGameEntity* CurState) override;
 
 };
+UCLASS()
+class UAttackState final :public UObject, public IState
+{
+	GENERATED_BODY()
+	public:
+	static UAttackState* GetInstance();
+	virtual void Enter(IBaseGameEntity* CurState) override;
+	virtual void Execute(IBaseGameEntity* CurState) override;
+	virtual void Exit(IBaseGameEntity* CurState) override;
 
+};
 UCLASS()
 class PRACTIES_API UPlayerFSM final :public UObject, public IBaseGameEntity
 {
@@ -41,18 +52,14 @@ private:
 public:
 	UPlayerFSM():StateValue(UIdleState::GetInstance()), CurState(EPState::idle)
 	{	
-		StateValue->Enter(this);
 	}
 
 	virtual void Update() override;
 	virtual void ChangeState(IState* NewState) override;
 	virtual void ThrowState(IState* NewState) override;
 
-	void SetPlayer(APlayerCharacter* Value) 
-	{
-		Player = Value;
-		ChangeState(UIdleState::GetInstance());
-	}
+	void SetPlayer(APlayerCharacter* Value);
+
 
 	virtual void SetStateEnum(EPState Value)  override;
 	EPState GetCurState() const { return CurState; }

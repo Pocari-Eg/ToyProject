@@ -99,12 +99,17 @@ APlayerCharacter::APlayerCharacter()
 	WalkSpeed = 250.0f;
 	Debuging = false;
 
+	MaxCombo = 3;
+	AttackEndComboState();
+
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	auto PlayerController = Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController());
+	PlayerController->PlayerInit(this);
 }
 
 // Called every frame
@@ -127,6 +132,45 @@ void APlayerCharacter::PostInitializeComponents()
 	PlayerFSMInstance->SetPlayer(this);
 	SetWeaponVisible(false);
 	InitWeapon();
+
+
+
+	PlayerAnimInstance->OnMontageEnded.AddDynamic(this, &APlayerCharacter::OnAttackMontageEnded);
+	PlayerAnimInstance->OnAttackCheck.AddUObject(this, &APlayerCharacter::AttackCheck);
+	PlayerAnimInstance->OnNextAttackCheck.AddLambda([this]()->void {
+
+		CanNextCombo = false;
+		if (IsComboInputOn)
+		{
+			AttackStartComboState();
+			PlayerAnimInstance->JumpToAttackMontageSecion(CurrentCombo);
+		}
+		});
+
+}
+
+void APlayerCharacter::Attack()
+{
+
+
+	if (GetFSM()->GetCurState() == EPState::attack)
+	{
+		if (FMath::IsWithinInclusive<int32>(CurrentCombo, 1, MaxCombo))
+		{
+			if (CanNextCombo)IsComboInputOn = true;
+		}
+	}
+	else if(GetFSM()->GetCurState() == EPState::idle) {
+
+		if (CurrentCombo == 0)
+		{
+			AttackTransform = GetActorTransform();
+			AttackForwardVector = GetActorForwardVector();
+			AttackStartComboState();
+			PlayerAnimInstance->PlayAttackMontage();
+			PlayerAnimInstance->JumpToAttackMontageSecion(CurrentCombo);
+		}
+	}
 }
 
 
@@ -175,6 +219,27 @@ void APlayerCharacter::SetWeaponVisible(bool Set)
 	PlayerWeapon->SetVisible(Set);
 }
 
+void APlayerCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrpted)
+{
+	PlayerFSMInstance->ChangeState(UIdleState::GetInstance());
+	AttackEndComboState();
+}
+
+void APlayerCharacter::AttackStartComboState()
+{
+	CanNextCombo = true;
+	IsComboInputOn = false;
+	if(FMath::IsWithinInclusive<int32>(CurrentCombo, 0, MaxCombo - 1))
+	CurrentCombo = FMath::Clamp<int32>(CurrentCombo + 1, 1, MaxCombo);
+}
+
+void APlayerCharacter::AttackEndComboState()
+{
+	IsComboInputOn = false;
+	CanNextCombo = false;
+	CurrentCombo = 0;
+}
+
 void APlayerCharacter::PlayerInit()
 {
 	TLOG_W(TEXT("Player Init"));
@@ -192,8 +257,14 @@ void APlayerCharacter::InitWeapon()
 	}
 }
 
+void APlayerCharacter::ChangeState(IState* NewState)
+{
+	PlayerFSMInstance->ChangeState(NewState);
+}
+
 void APlayerCharacter::AttackCheck()
 {
-	PlayerWeapon->AttackCheck(Debuging);
+
+	PlayerWeapon->AttackCheck(Debuging, AttackTransform, AttackForwardVector);
 
 }

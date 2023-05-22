@@ -19,16 +19,16 @@ UWeaponComponent::UWeaponComponent(const FObjectInitializer& ObjectInitializer):
 }
 
 
-void UWeaponComponent::AttackCheck(bool bisDebug)
+void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVector OwnerFowardVector)
 {
 	if (bisDebug)
 	{
-		FTransform BottomLine = Owner->GetTransform();
+		FTransform BottomLine = OwnerTransform;
 		BottomLine.SetLocation(BottomLine.GetLocation()+FVector(0.0f, 0.0f, -50.0f));
 
 
 		FRotator Rotation = FRotator::ZeroRotator;
-		Rotation = Owner->GetActorRotation() + FRotator(0.0f, 0.0f, 0.0f);
+		Rotation = OwnerTransform.GetRotation().Rotator() + FRotator(0.0f, 0.0f, 0.0f);
 		Rotation.Pitch = 0;
 		BottomLine.SetRotation(FQuat(Rotation));
 
@@ -46,14 +46,14 @@ void UWeaponComponent::AttackCheck(bool bisDebug)
 	
 	}
 
-	FVector ForwardVector = Owner->GetActorForwardVector();
+	FVector ForwardVector = OwnerFowardVector;
 	ForwardVector.Normalize();
 	FVector AttackDirection = ForwardVector;
 	AttackDirection.Normalize();
 
 
 	float HalfRadius = Data.AttackRadius * 0.5;
-	FVector Center = Owner->GetActorLocation();
+	FVector Center = OwnerTransform.GetLocation();
 
 
 	FVector Box = FVector(Data.AttackRadius, Data.AttackRadius, Data.AttackHeight);
@@ -80,8 +80,8 @@ void UWeaponComponent::AttackCheck(bool bisDebug)
 
 					bTraceResult = UKismetSystemLibrary::SphereTraceMulti(
 					GetWorld(),
-					Owner->GetActorLocation(), // SphereTrace 시작 위치
-					Owner->GetActorLocation(), // SphereTrace 종료 위치
+						OwnerTransform.GetLocation(), // SphereTrace 시작 위치
+						OwnerTransform.GetLocation(), // SphereTrace 종료 위치
 					Data.AttackRadius,
 					ETraceTypeQuery::TraceTypeQuery4,
 					false,
@@ -101,7 +101,7 @@ void UWeaponComponent::AttackCheck(bool bisDebug)
 								
 
 							
-               					FVector TargetDir = HitActor->GetActorLocation() - Owner->GetActorLocation();
+               					FVector TargetDir = HitActor->GetActorLocation() - OwnerTransform.GetLocation();
 								TargetDir = TargetDir.GetSafeNormal();
 								/*
 								TLOG_W(TEXT("HitActor  : %s"), *HitActor->GetActorLabel())
