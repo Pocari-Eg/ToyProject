@@ -7,6 +7,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "FSM/PlayerFSM.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Engine/World.h"
 
 AMainPlayerController::AMainPlayerController()
@@ -157,6 +158,23 @@ void AMainPlayerController::Attack()
 {
 	if (Player != nullptr) {
 		StopMovement();
+
+		FVector HitLocation = FVector::ZeroVector;
+		FHitResult Hit;
+		GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+		HitLocation = Hit.Location;
+		FVector PlayerVec = Player->GetActorForwardVector();
+		FVector HitVector = HitLocation - Player->GetActorLocation();
+
+
+		HitVector.Normalize();
+		PlayerVec.Normalize();
+		float Dot = FVector::DotProduct(PlayerVec, HitVector);
+		float Acos = FMath::Acos(Dot);
+		float Angle = FMath::RadiansToDegrees(Acos);  
+
+
+		Player->SetNewAttackAngle(Angle);
 		Player->Attack();
 	}
 }

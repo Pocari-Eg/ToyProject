@@ -61,6 +61,8 @@ private:
 	FTransform AttackTransform;
 	FVector AttackForwardVector;
 
+	float AttackAngle;
+
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
 	bool CanNextCombo;
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
@@ -92,6 +94,10 @@ public:
 	//attack
 	UFUNCTION()
 	void Attack();
+	UFUNCTION()
+	void AttackCheck();
+	UFUNCTION()
+	void SetAttackTransform();
 
 	//camera
 	FORCEINLINE void CameraInit();
@@ -141,9 +147,8 @@ public:
 	 UPlayerAnimInstance* GetAnimInstance() { return PlayerAnimInstance; }
 	 UPlayerFSM* GetFSM() const { return PlayerFSMInstance; }
 
-	 public:
-	 UFUNCTION(blueprintcallable)
-	 void AttackCheck		 		 		 ();
+
+	 void SetNewAttackAngle(float NewAngle) { AttackAngle = NewAngle; }
 };
 #pragma endregion GetSet
 

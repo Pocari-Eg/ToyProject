@@ -157,6 +157,7 @@ void APlayerCharacter::Attack()
 	{
 		if (FMath::IsWithinInclusive<int32>(CurrentCombo, 1, MaxCombo))
 		{
+	
 			if (CanNextCombo)IsComboInputOn = true;
 		}
 	}
@@ -164,8 +165,8 @@ void APlayerCharacter::Attack()
 
 		if (CurrentCombo == 0)
 		{
-			AttackTransform = GetActorTransform();
-			AttackForwardVector = GetActorForwardVector();
+			SetAttackTransform();
+
 			AttackStartComboState();
 			PlayerAnimInstance->PlayAttackMontage();
 			PlayerAnimInstance->JumpToAttackMontageSecion(CurrentCombo);
@@ -267,4 +268,11 @@ void APlayerCharacter::AttackCheck()
 
 	PlayerWeapon->AttackCheck(Debuging, AttackTransform, AttackForwardVector);
 
+}
+
+void APlayerCharacter::SetAttackTransform()
+{
+	AddActorWorldRotation(FRotator(0.0f,AttackAngle,0.0f));
+	AttackTransform = GetActorTransform();
+	AttackForwardVector = GetActorForwardVector();
 }
