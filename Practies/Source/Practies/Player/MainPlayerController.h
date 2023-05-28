@@ -46,12 +46,19 @@ protected:
 	void ZoomIn();
 	void ZoomOut();
 
-	void Attack();
-private:
-	bool bInputPressed; // Input is bring pressed
-	bool bIsTouch; // Is it a touch device
-	float FollowTime; // For how long it has been pressed
+	void OnSetAttackPressed();
+	void OnSetAttackReleased();
 
+	void MoveClickCheck(float DeltaTime);
+	void AttackClickCheck(float DeltaTime);
+private:
+	bool bMoveInputPressed; // Input is bring pressed
+	bool bIsTouch; // Is it a touch device
+	float MoveFollowTime; // For how long it has been pressed
+
+	float AttackFollowTime;
+
+	bool bAttackInputPressed; // Input is bring pressed
 
 	bool bIsShortClickWalk;
 

@@ -19,48 +19,9 @@ AMainPlayerController::AMainPlayerController()
 void AMainPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
-	
-	
-		if (bInputPressed)
-		{
-			if (Player != nullptr) {
-				if (Player->GetPlayerState() == EPState::idle || Player->GetPlayerState() == EPState::walk) {
-					FollowTime += DeltaTime;
-					if (FollowTime > ShortPressThreshold * 0.45f && bIsShortClickWalk)
-					{
-						StopMovement();
-						bIsShortClickWalk = false;
-					}
+	MoveClickCheck(DeltaTime);
 
 
-					// Look for the touch location
-					FVector HitLocation = FVector::ZeroVector;
-					FHitResult Hit;
-					if (bIsTouch)
-					{
-						GetHitResultUnderFinger(ETouchIndex::Touch1, ECC_Visibility, true, Hit);
-					}
-					else
-					{
-						GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-					}
-					HitLocation = Hit.Location;
-
-					// Direct the Pawn towards that location
-					APawn* const MyPawn = GetPawn();
-					if (MyPawn)
-					{
-						Player->ChangeState(UWalkState::GetInstance());
-						FVector WorldDirection = (HitLocation - MyPawn->GetActorLocation()).GetSafeNormal();
-						MyPawn->AddMovementInput(WorldDirection, 1.f, false);
-					}
-				}
-			}
-		}
-		else
-		{
-			FollowTime = 0.f;
-		}
 }
 
 
@@ -75,8 +36,8 @@ void AMainPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &AMainPlayerController::ZoomIn);
 	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &AMainPlayerController::ZoomOut);
 
-	InputComponent->BindAction("Attack", IE_Pressed, this, &AMainPlayerController::Attack);
-
+	InputComponent->BindAction("Attack", IE_Pressed, this, &AMainPlayerController::OnSetAttackPressed);
+	InputComponent->BindAction("Attack", IE_Released, this, &AMainPlayerController::OnSetAttackReleased);
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AMainPlayerController::OnTouchPressed);
 	InputComponent->BindTouch(EInputEvent::IE_Released, this, &AMainPlayerController::OnTouchReleased);
@@ -86,21 +47,18 @@ void AMainPlayerController::SetupInputComponent()
 void AMainPlayerController::OnSetDestinationPressed()
 {
 			// We flag that the input is being pressed
-		bInputPressed = true;
+	bMoveInputPressed = true;
 			// Just in case the character was moving because of a previous short press we stop it
-
-	
-
 	
 }
 
 void AMainPlayerController::OnSetDestinationReleased()
 {
 	// Player is no longer pressing the input
-	bInputPressed = false;
+	bMoveInputPressed = false;
 	
 	// If it was a short press
-	if(FollowTime <= ShortPressThreshold)
+	if(MoveFollowTime <= ShortPressThreshold)
 	{
 		if (Player->GetPlayerState() == EPState::idle || Player->GetPlayerState() == EPState::walk) {
 			// We look for the location in the world where the player has pressed the input
@@ -154,27 +112,107 @@ void AMainPlayerController::ZoomOut()
 	}
 }
 
-void AMainPlayerController::Attack()
+void AMainPlayerController::OnSetAttackPressed()
 {
+	bAttackInputPressed = true;
+}
+
+void AMainPlayerController::OnSetAttackReleased()
+{
+	bAttackInputPressed = false;
 	if (Player != nullptr) {
-		StopMovement();
+		// If it was a short press
+		if (AttackFollowTime <= ShortPressThreshold)
+		{
+			StopMovement();
 
-		FVector HitLocation = FVector::ZeroVector;
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-		HitLocation = Hit.Location;
-		FVector PlayerVec = Player->GetActorForwardVector();
-		FVector HitVector = HitLocation - Player->GetActorLocation();
+			FVector HitLocation = FVector::ZeroVector;
+			FHitResult Hit;
+			GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+			HitLocation = Hit.Location;
+			FVector PlayerVec = Player->GetActorForwardVector();
+			FVector HitVector = HitLocation - Player->GetActorLocation();
+
+			//클릭한 위치와 플레이어의 FrontVector 사이 각 계산
+			HitVector.Normalize();
+			PlayerVec.Normalize();
+			float Dot = FVector::DotProduct(PlayerVec, HitVector);
+			float Acos = FMath::Acos(Dot);
+			float Angle = FMath::RadiansToDegrees(Acos);
 
 
-		HitVector.Normalize();
-		PlayerVec.Normalize();
-		float Dot = FVector::DotProduct(PlayerVec, HitVector);
-		float Acos = FMath::Acos(Dot);
-		float Angle = FMath::RadiansToDegrees(Acos);  
+		 // 클릭한 위치가 플레이어의 FrontVector기준으로 좌,우 어느쪽인지 판별해서 
+			FVector Corss = FVector::CrossProduct(PlayerVec, HitVector);
+			float CheckDot = FVector::DotProduct(Player->GetActorUpVector(), Corss);
+
+			//왼쪽이면 각도에 -를 붙여 넘겨줌 그렇지 않으면 왼쪽 오른쪽 둘다 양수 값이 넘어가 회전이 이상해짐
+			if (CheckDot < 0)Angle = -1.0f * Angle;
 
 
-		Player->SetNewAttackAngle(Angle);
-		Player->Attack();
+			TLOG_W(TEXT("ANGLE : %f"), Angle);
+			Player->SetNewAttackAngle(Angle);
+			Player->Attack();
+		}
 	}
+}
+
+void AMainPlayerController::MoveClickCheck(float DeltaTime)
+{
+
+	if (bMoveInputPressed)
+	{
+		if (Player != nullptr) {
+			if (Player->GetPlayerState() == EPState::idle || Player->GetPlayerState() == EPState::walk) {
+				MoveFollowTime += DeltaTime;
+				if (MoveFollowTime > ShortPressThreshold * 0.45f && bIsShortClickWalk)
+				{
+					StopMovement();
+					bIsShortClickWalk = false;
+				}
+
+
+				// Look for the touch location
+				FVector HitLocation = FVector::ZeroVector;
+				FHitResult Hit;
+				if (bIsTouch)
+				{
+					GetHitResultUnderFinger(ETouchIndex::Touch1, ECC_Visibility, true, Hit);
+				}
+				else
+				{
+					GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+				}
+				HitLocation = Hit.Location;
+
+				// Direct the Pawn towards that location
+				APawn* const MyPawn = GetPawn();
+				if (MyPawn)
+				{
+					Player->ChangeState(UWalkState::GetInstance());
+					FVector WorldDirection = (HitLocation - MyPawn->GetActorLocation()).GetSafeNormal();
+					MyPawn->AddMovementInput(WorldDirection, 1.f, false);
+				}
+			}
+		}
+	}
+	else
+	{
+		MoveFollowTime = 0.f;
+	}
+}
+
+void AMainPlayerController::AttackClickCheck(float DeltaTime)
+{
+	if (bAttackInputPressed)
+	{
+		if (Player != nullptr) {
+			AttackFollowTime += DeltaTime;
+
+		}
+	}
+	else
+	{
+		AttackFollowTime = 0.f;
+	}
+
 }
