@@ -51,6 +51,10 @@ protected:
 
 	void MoveClickCheck(float DeltaTime);
 	void AttackClickCheck(float DeltaTime);
+
+	void Dodge();
+
+	void RotateAttack();
 private:
 	bool bMoveInputPressed; // Input is bring pressed
 	bool bIsTouch; // Is it a touch device
@@ -61,6 +65,8 @@ private:
 	bool bAttackInputPressed; // Input is bring pressed
 
 	bool bIsShortClickWalk;
+
+	void SetMouseCursorAngle();
 
 	APlayerCharacter* Player;
 };

@@ -43,6 +43,23 @@ class UAttackState final :public UObject, public IState
 
 };
 UCLASS()
+class UDodgeState final :public UObject, public IState
+{
+	GENERATED_BODY()
+	public:
+	static UDodgeState* GetInstance();
+	virtual void Enter(IBaseGameEntity* CurState) override;
+	virtual void Execute(IBaseGameEntity* CurState) override;
+	virtual void Exit(IBaseGameEntity* CurState) override;
+
+};
+
+
+
+
+
+
+UCLASS()
 class PRACTIES_API UPlayerFSM final :public UObject, public IBaseGameEntity
 {
 	GENERATED_BODY()

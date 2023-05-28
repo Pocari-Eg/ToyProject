@@ -23,4 +23,5 @@ enum class EPState : uint8
     walk UMETA(DisplayName = "WALK"),
     attack UMETA(DisplayName = "ATTACK"),
     skill UMETA(DisplayName = "SKILL"),
+    dodge UMETA(DisplayName = "DODGE"),
 };

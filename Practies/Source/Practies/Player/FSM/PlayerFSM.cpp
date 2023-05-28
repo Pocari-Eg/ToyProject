@@ -55,6 +55,8 @@ FString UPlayerFSM::GetStateToString() const
 		return FString("ATTACK");
 	case EPState::skill:
 		return FString("SKIIL");
+	case EPState::dodge:
+		return FString("Dodge");
 	}
 
 	return FString("Error");
@@ -138,3 +140,29 @@ void UAttackState::Exit(IBaseGameEntity* CurState)
 
 }
 #pragma endregion WalkState
+
+
+#pragma region DodgeState
+UDodgeState* UDodgeState::GetInstance()
+{
+	static UDodgeState* Instance;
+	if (Instance == nullptr) {
+		Instance = NewObject<UDodgeState>();
+		Instance->AddToRoot();
+	}
+	return Instance;
+}
+void UDodgeState::Enter(IBaseGameEntity* CurState)
+{
+	CurState->SetStateEnum(EPState::dodge);
+	if (CurState->Player != nullptr)CurState->Player->SetWeaponVisible(true);
+}
+
+void UDodgeState::Execute(IBaseGameEntity* CurState)
+{
+}
+
+void UDodgeState::Exit(IBaseGameEntity* CurState)
+{
+}
+#pragma endregion DodgeState

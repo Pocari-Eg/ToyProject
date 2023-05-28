@@ -7,14 +7,17 @@
 #include "GameFramework/Character.h"
 #include "FSM/PlayerFSM.h"
 #include "WeaponComponent.h"
+
+
+#include "Curves/CurveFloat.h"
+#include "Components/TimeLineComponent.h"
+
 #include "PlayerCharacter.generated.h"
 
 /* Region
 #pragma region PlayerStat
 #pragma endregion variable
 */
-
-
 
 
 UCLASS()
@@ -57,11 +60,32 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DEBUG, meta = (AllowPrivateAccess = "true"))
 	bool Debuging;
 
+
+	//common
+	float NewAngle;
+
 	//attack
 	FTransform AttackTransform;
 	FVector AttackForwardVector;
 
-	float AttackAngle;
+
+	//Dodge
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dodge, meta = (AllowPrivateAccess = "true"))
+	float DodgeDistance;
+	UPROPERTY()
+	UCurveFloat* DodgeCurve;
+	UPROPERTY()
+	UTimelineComponent* DodgeTimeLine;
+	UPROPERTY()
+	FOnTimelineFloat DodgeCallBack;
+	UPROPERTY()
+	FOnTimelineEvent DodgeFinishCallback;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
+	float DodgeCoolTime;
+	float DodgeCoolTimer;
+	bool bIsDodGeCool;
+
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
 	bool CanNextCombo;
@@ -99,6 +123,13 @@ public:
 	UFUNCTION()
 	void SetAttackTransform();
 
+	//dodge
+	void Dodge();
+	UFUNCTION()
+	void MovingDodge(float Value);
+	UFUNCTION()
+	void FinishDodge();
+
 	//camera
 	FORCEINLINE void CameraInit();
 	UFUNCTION(blueprintcallable)
@@ -121,10 +152,14 @@ public:
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrpted);
 	void AttackStartComboState();
 	void AttackEndComboState();
+
+
 private:
-	//intiy
+	//inti
 	void PlayerInit();
 	void InitWeapon();
+
+	void DodgeCurveInit();
 
 #pragma region GetSet
 public:
@@ -148,7 +183,14 @@ public:
 	 UPlayerFSM* GetFSM() const { return PlayerFSMInstance; }
 
 
-	 void SetNewAttackAngle(float NewAngle) { AttackAngle = NewAngle; }
+	 void SetNewAngle(float Angle) { NewAngle = Angle; }
+
+	 //Dodge
+	 UFUNCTION(BlueprintCallable)
+	 float GetDodgeDistance() { return DodgeDistance; }
+
+	 UFUNCTION(BlueprintCallable)
+	 void SetDodge(bool state);
 };
 #pragma endregion GetSet
 

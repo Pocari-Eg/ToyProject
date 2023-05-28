@@ -102,6 +102,20 @@ APlayerCharacter::APlayerCharacter()
 	MaxCombo = 3;
 	AttackEndComboState();
 
+	DodgeDistance = 1000.0f;
+	bIsDodGeCool = false;
+	DodgeCoolTime = 5.0f;
+	DodgeCoolTimer = 0.0f;
+
+	//curve
+	const ConstructorHelpers::FObjectFinder<UCurveFloat>DodgeCurveData(TEXT("/Game/StarterContent/Curve/DodgeCurve.DodgeCurve"));
+	if (DodgeCurveData.Succeeded())
+	{
+		DodgeCurve = DodgeCurveData.Object;
+
+	}
+
+	DodgeTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("DodgeTimeLine"));
 }
 
 // Called when the game starts or when spawned
@@ -110,14 +124,23 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	auto PlayerController = Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController());
 	PlayerController->PlayerInit(this);
+
+	DodgeCurveInit();
 }
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
+	if (bIsDodGeCool)
+	{
+		DodgeCoolTimer += DeltaTime;
+		if (DodgeCoolTimer >= DodgeCoolTime)
+		{
+			DodgeCoolTimer = 0.0f;
+			bIsDodGeCool = false;
+		}
+	}
 
 }
 
@@ -258,11 +281,34 @@ void APlayerCharacter::InitWeapon()
 	}
 }
 
+void APlayerCharacter::DodgeCurveInit()
+{
+
+
+	DodgeCallBack.BindUFunction(this, FName("MovingDodge"));
+	DodgeFinishCallback.BindUFunction(this, FName("FinishDodge"));
+
+	DodgeTimeLine->SetTimelineFinishedFunc(DodgeFinishCallback);
+	DodgeTimeLine->AddInterpFloat(DodgeCurve, DodgeCallBack);
+
+	float Min = 0.0f;
+	float Max = 0.0f;
+	DodgeCurve->GetTimeRange(Min, Max);
+	DodgeTimeLine->SetTimelineLength(Max);
+}
+
 void APlayerCharacter::ChangeState(IState* NewState)
 {
 	PlayerFSMInstance->ChangeState(NewState);
 }
 
+void APlayerCharacter::SetDodge(bool state)
+{
+	if(PlayerAnimInstance!=nullptr)
+	PlayerAnimInstance->SetDodge(state);
+
+	if (state) { ChangeState(UDodgeState::GetInstance()); }
+}
 void APlayerCharacter::AttackCheck()
 {
 
@@ -272,7 +318,31 @@ void APlayerCharacter::AttackCheck()
 
 void APlayerCharacter::SetAttackTransform()
 {
-	AddActorWorldRotation(FRotator(0.0f,AttackAngle,0.0f));
+	AddActorWorldRotation(FRotator(0.0f,  NewAngle ,0.0f));
 	AttackTransform = GetActorTransform();
 	AttackForwardVector = GetActorForwardVector();
+}
+
+void APlayerCharacter::Dodge()
+{
+	if (!bIsDodGeCool) {
+
+		TLOG_W(TEXT("Dodge"));
+		bIsDodGeCool = true;
+		AddActorWorldRotation(FRotator(0.0f, NewAngle, 0.0f));
+		SetDodge(true);
+		DodgeTimeLine->PlayFromStart();
+	}
+}
+
+void APlayerCharacter::MovingDodge(float Value)
+{
+	float TimeLineValue = Value;
+	float MoveDistance = DodgeDistance * TimeLineValue;
+	FVector MoveVector = MoveDistance * GetActorForwardVector();
+	GetCharacterMovement()->Velocity = MoveVector;
+}
+void APlayerCharacter::FinishDodge()
+{
+	PlayerAnimInstance->SetDodge(false);
 }

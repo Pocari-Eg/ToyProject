@@ -22,9 +22,10 @@ class PRACTIES_API UPlayerAnimInstance : public UAnimInstance
 public:
 	FOnNexAttackCheckDelegate OnNextAttackCheck;
 	FOnAttackCheckDelegate OnAttackCheck;;
+
+UPROPERTY(EditAnywhere,bluePrintreadwrite, category = Dodge)
+	bool bIsDodge;
 private:
-
-
 
 UPROPERTY()
 APlayerCharacter* Player;
@@ -33,6 +34,8 @@ private:
 //montage
 UPROPERTY(EditAnywhere, blueprintreadWrite,category=Attack,meta =(Allowprivateaccess=true))
 UAnimMontage* AttackMontage;
+
+
 
 
 
@@ -46,6 +49,13 @@ public:
 	void JumpToAttackMontageSecion(int32 NewSection);
 
 	FName GetAttackMontageSectionName(int32 Section);
+
+	UFUNCTION(BluePrintCallAble)
+	bool bIsPlayerWalk();
+
+	//GetSet
+	void SetDodge(bool State) { bIsDodge = State; }
+
 	//notify
 private:
 	UFUNCTION()

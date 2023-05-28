@@ -13,6 +13,7 @@ void UPlayerAnimInstance::PlayAttackMontage()
 	}
 }
 
+
 void UPlayerAnimInstance::JumpToAttackMontageSecion(int32 NewSection)
 {
 	if (Montage_IsPlaying(AttackMontage))
@@ -31,6 +32,15 @@ FName UPlayerAnimInstance::GetAttackMontageSectionName(int32 Section)
 		return FName(*FString::Printf(TEXT("Attack%d"), 0));
 	}
 	
+}
+
+bool UPlayerAnimInstance::bIsPlayerWalk()
+{
+	if (Player != nullptr) {
+		if (Player->GetPlayerState() == EPState::walk) return true;
+		else return false;
+	}
+return false;
 }
 
 UPlayerAnimInstance::UPlayerAnimInstance()
