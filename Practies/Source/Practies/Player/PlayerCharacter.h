@@ -67,6 +67,20 @@ private:
 	//attack
 	FTransform AttackTransform;
 	FVector AttackForwardVector;
+	//Attack Rotation
+	UPROPERTY()
+	UCurveFloat* RotationCurve;
+	UPROPERTY()
+	UTimelineComponent* RotationTimeLine;
+	UPROPERTY()
+	FOnTimelineFloat RotationCallBack;
+	UPROPERTY()
+	FOnTimelineEvent RotationFinishCallback;
+
+	bool bisEndRotation;
+	float PrevRotation;
+
+
 
 
 	//Dodge
@@ -122,6 +136,10 @@ public:
 	void AttackCheck();
 	UFUNCTION()
 	void SetAttackTransform();
+	UFUNCTION()
+	void Rotating(float Value);
+	UFUNCTION()
+	void FinishRotation();
 
 	//dodge
 	void Dodge();
@@ -160,6 +178,7 @@ private:
 	void InitWeapon();
 
 	void DodgeCurveInit();
+	void RotationCurveInit();
 
 #pragma region GetSet
 public:
