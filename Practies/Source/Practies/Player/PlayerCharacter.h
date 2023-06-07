@@ -4,6 +4,7 @@
 
 #include "../Practies.h"
 #include "CameraSetData.h"
+#include "StatData.h"
 #include "GameFramework/Character.h"
 #include "FSM/PlayerFSM.h"
 #include "WeaponComponent.h"
@@ -44,7 +45,7 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
-	float WalkSpeed;
+    FStatData PlayerStat;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
 	FWeaponData WeaponData;
 
@@ -128,6 +129,7 @@ public:
 
 	//After Component Init 
 	virtual void PostInitializeComponents() override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	//attack
 	UFUNCTION()
@@ -190,6 +192,8 @@ public:
 	FORCEINLINE  EPState GetPlayerState() const { return GetFSM()->GetCurState(); }
 	void ChangeState(IState* NewState);
 
+	FStatData* GetPlayerData() { return &PlayerStat; }
+
 	//Camera
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE bool GetCameraState() const { return bIsCameraMoving; }
@@ -207,9 +211,9 @@ public:
 	 //Dodge
 	 UFUNCTION(BlueprintCallable)
 	 float GetDodgeDistance() { return DodgeDistance; }
-
 	 UFUNCTION(BlueprintCallable)
 	 void SetDodge(bool state);
+
 };
 #pragma endregion GetSet
 

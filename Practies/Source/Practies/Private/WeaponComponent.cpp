@@ -6,6 +6,8 @@
 #include"DebugAPI.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Actor.h"
+#include "../Monster/Monster.h"
+#include "../Player/PlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values for this component's properties
@@ -122,9 +124,22 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 
 								if (TargetAngle <= (Data.AttackAngle * 0.5f))
 								{
-									TLOG_E(TEXT("Attack Hit"));
-									GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Attack Hit"));
+									
 
+									if (Cast<AMonster>(HitActor))
+									{
+										auto Player = Cast<APlayerCharacter>(Owner);
+										//TLOG_E(TEXT("Attack Hit"));
+										GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Attack Hit"));
+										FDamageEvent DamageEvent;
+										HitActor->TakeDamage(Data.Damage, DamageEvent, Player->GetController(), Owner);
+									}
+									if (Cast<APlayerCharacter>(HitActor))
+									{
+										auto Monster = Cast<AMonster>(Owner);
+										FDamageEvent DamageEvent;
+										HitActor->TakeDamage(Data.Damage, DamageEvent, Monster->GetController(), Owner);
+									}
 								}
 								break;
 							}

@@ -19,7 +19,7 @@ void UPlayerFSM::ChangeState(IState* NewState)
 			StateValue->Exit(this);
 			StateValue = NewState;
 			StateValue->Enter(this);
-			TLOG_E(TEXT("state change to %s"), *GetStateToString());
+		//	TLOG_E(TEXT("state change to %s"), *GetStateToString());
 		}
 	}
 }

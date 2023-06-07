@@ -96,7 +96,11 @@ APlayerCharacter::APlayerCharacter()
 	
 
 	// Activate ticking in order to update the cursor every frame.
-	WalkSpeed = 250.0f;
+	PlayerStat.MoveSpeed = 250;
+	PlayerStat.MaxHP = 10000;
+	PlayerStat.HP = PlayerStat.MaxHP;
+	PlayerStat.ATK = 100;
+
 	Debuging = false;
 
 	MaxCombo = 3;
@@ -185,6 +189,13 @@ void APlayerCharacter::PostInitializeComponents()
 
 }
 
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	TLOG_W(TEXT("Player : %s took Damage : %f"), *GetName(), FinalDamage);
+	return FinalDamage;
+}
+
 void APlayerCharacter::Attack()
 {
 
@@ -215,6 +226,7 @@ void APlayerCharacter::Attack()
 			}
 		}
 	}
+	
 }
 
 
@@ -287,7 +299,10 @@ void APlayerCharacter::AttackEndComboState()
 void APlayerCharacter::PlayerInit()
 {
 	TLOG_W(TEXT("Player Init"));
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	
+	
+
+	GetCharacterMovement()->MaxWalkSpeed = PlayerStat.MoveSpeed;
 }
 
 void APlayerCharacter::InitWeapon()
