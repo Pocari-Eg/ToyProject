@@ -13,6 +13,16 @@ void UPlayerAnimInstance::PlayAttackMontage()
 	}
 }
 
+void UPlayerAnimInstance::PlayDeathMontage()
+{
+	if (!Montage_IsPlaying(DeathMontage))
+	{
+		//Player->ChangeState(UAttackState::GetInstance());
+		
+		Montage_Play(DeathMontage, 1.0f);
+	}
+}
+
 
 void UPlayerAnimInstance::JumpToAttackMontageSecion(int32 NewSection)
 {
@@ -71,4 +81,8 @@ void UPlayerAnimInstance::AnimNotify_AttackCheck() const
 void UPlayerAnimInstance::AnimNotify_NextAttackCheck() const
 {
 	OnNextAttackCheck.Broadcast();
+}
+void UPlayerAnimInstance::AnimNotify_Death() const
+{
+	OnDeath.Broadcast();
 }

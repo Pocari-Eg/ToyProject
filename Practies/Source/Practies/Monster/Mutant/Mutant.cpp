@@ -3,11 +3,14 @@
 
 #include "Mutant.h"
 #include "MutantAnimInstance.h"
+#include "MutantAI.h"
 AMutant::AMutant()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
+	AIControllerClass = AMutantAI::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	// ÇÃ·¹ÀÌ¾î Ä¸½¶ Å©±â ¼³Á¤
 	GetCapsuleComponent()->InitCapsuleSize(90.0f, 40.0f);
 
@@ -60,6 +63,10 @@ AMutant::AMutant()
 	WeaponData.AttackHeight = 100.0f;
 	WeaponData.AttackRadius = 100.0f;
 	WeaponData.Damage = 100.0f;
+
+
+	DetectRange = 300.0f;
+	DetectHeight = 200.0f;
 
 }
 // Called when the game starts or when spawned

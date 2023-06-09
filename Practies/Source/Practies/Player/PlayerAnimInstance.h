@@ -10,6 +10,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnNexAttackCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnAttackCheckDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnDeathDelegate);
 /**
  * 
  */
@@ -21,7 +22,8 @@ class PRACTIES_API UPlayerAnimInstance : public UAnimInstance
 
 public:
 	FOnNexAttackCheckDelegate OnNextAttackCheck;
-	FOnAttackCheckDelegate OnAttackCheck;;
+	FOnAttackCheckDelegate OnAttackCheck;
+	FOnDeathDelegate OnDeath;
 
 UPROPERTY(EditAnywhere,bluePrintreadwrite, category = Dodge)
 	bool bIsDodge;
@@ -32,9 +34,10 @@ APlayerCharacter* Player;
 
 private:
 //montage
-UPROPERTY(EditAnywhere, blueprintreadWrite,category=Attack,meta =(Allowprivateaccess=true))
+UPROPERTY(EditAnywhere, blueprintreadWrite,category= Montage,meta =(Allowprivateaccess=true))
 UAnimMontage* AttackMontage;
-
+UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowprivateaccess = true))
+UAnimMontage* DeathMontage;
 
 
 
@@ -45,6 +48,7 @@ public:
 	UPlayerAnimInstance();
 	void Init(APlayerCharacter* Value);
 	void PlayAttackMontage();
+	void PlayDeathMontage();
 
 	void JumpToAttackMontageSecion(int32 NewSection);
 
@@ -64,6 +68,7 @@ private:
 	void AnimNotify_AttackCheck() const;
 	UFUNCTION()
 	void AnimNotify_NextAttackCheck() const;
-
+	UFUNCTION()
+	void AnimNotify_Death() const;
 
 };

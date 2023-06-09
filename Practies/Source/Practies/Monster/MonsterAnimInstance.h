@@ -9,14 +9,14 @@
 
 
 DECLARE_MULTICAST_DELEGATE(FOnAttackCheckDelegate);
-
+DECLARE_MULTICAST_DELEGATE(FOnDeathDelegate);
 UCLASS()
 class PRACTIES_API UMonsterAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 	public:
 	FOnAttackCheckDelegate OnAttackCheck;;
-
+	FOnDeathDelegate OnDeath;
 private:
 
 	UPROPERTY()
@@ -24,9 +24,16 @@ private:
 
 private:
 	//montage
-	UPROPERTY(EditAnywhere, blueprintreadWrite, category = Attack, meta = (Allowprivateaccess = true))
+	UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowprivateaccess = true))
 	UAnimMontage* AttackMontage;
-
+	UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowprivateaccess = true))
+	UAnimMontage* DeathMontage;
+	UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowprivateaccess = true))
+	UAnimMontage* HitMontage;
+	UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowprivateaccess = true))
+	UAnimMontage* IdleMontage;
+	UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowprivateaccess = true))
+	UAnimMontage* WalkMontage;
 
 	//function
 public:
@@ -34,12 +41,18 @@ public:
 	UMonsterAnimInstance();
 	void Init(AMonster* Value);
 	void PlayAttackMontage();
+	void PlayDeathMontage();
+	void PlayHitMontage();
 
-
+	void PlayIdleMontage();
+	void PlayWalkMontage();
 	//notify
 private:
 
 	UFUNCTION()
 	void AnimNotify_AttackCheck() const;
+	UFUNCTION()
+	void AnimNotify_Death() const;
+
 };
 

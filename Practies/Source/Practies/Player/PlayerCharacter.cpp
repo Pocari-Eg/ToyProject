@@ -101,7 +101,7 @@ APlayerCharacter::APlayerCharacter()
 	PlayerStat.HP = PlayerStat.MaxHP;
 	PlayerStat.ATK = 100;
 
-	Debuging = false;
+	bIsDebug = false;
 
 	MaxCombo = 3;
 	AttackEndComboState();
@@ -174,25 +174,24 @@ void APlayerCharacter::PostInitializeComponents()
 	InitWeapon();
 
 
+	InitAnimationDelegate();
 
-	PlayerAnimInstance->OnMontageEnded.AddDynamic(this, &APlayerCharacter::OnAttackMontageEnded);
-	PlayerAnimInstance->OnAttackCheck.AddUObject(this, &APlayerCharacter::AttackCheck);
-	PlayerAnimInstance->OnNextAttackCheck.AddLambda([this]()->void {
-
-		CanNextCombo = false;
-		if (IsComboInputOn)
-		{
-			AttackStartComboState();
-			PlayerAnimInstance->JumpToAttackMontageSecion(CurrentCombo);
-		}
-		});
 
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	TLOG_W(TEXT("Player : %s took Damage : %f"), *GetName(), FinalDamage);
+
+
+	PlayerStat.HP -= FinalDamage;
+
+	TLOG_W(TEXT("PlayerHP %d : %d"), PlayerStat.HP, PlayerStat.MaxHP);
+	if (PlayerStat.HP <= 0)
+	{
+		SetActorEnableCollision(false);
+		PlayerAnimInstance->PlayDeathMontage();
+	}
 	return FinalDamage;
 }
 
@@ -296,6 +295,28 @@ void APlayerCharacter::AttackEndComboState()
 	CurrentCombo = 0;
 }
 
+void APlayerCharacter::InitAnimationDelegate()
+{
+	PlayerAnimInstance->OnMontageEnded.AddDynamic(this, &APlayerCharacter::OnAttackMontageEnded);
+	PlayerAnimInstance->OnAttackCheck.AddUObject(this, &APlayerCharacter::AttackCheck);
+	PlayerAnimInstance->OnDeath.AddUObject(this, &APlayerCharacter::Death);
+
+	PlayerAnimInstance->OnNextAttackCheck.AddLambda([this]()->void {
+		CanNextCombo = false;
+		if (IsComboInputOn)
+		{
+			AttackStartComboState();
+			PlayerAnimInstance->JumpToAttackMontageSecion(CurrentCombo);
+		}
+		});
+}
+
+void APlayerCharacter::Death()
+{
+	this->SetActorHiddenInGame(true);
+	this->Destroy();
+}
+
 void APlayerCharacter::PlayerInit()
 {
 	TLOG_W(TEXT("Player Init"));
@@ -363,7 +384,7 @@ void APlayerCharacter::SetDodge(bool state)
 void APlayerCharacter::AttackCheck()
 {
 
-	PlayerWeapon->AttackCheck(Debuging, AttackTransform, AttackForwardVector);
+	PlayerWeapon->AttackCheck(bIsDebug, AttackTransform, AttackForwardVector,PlayerStat.ATK+WeaponData.Damage);
 
 }
 

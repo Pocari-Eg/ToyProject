@@ -21,7 +21,7 @@ UWeaponComponent::UWeaponComponent(const FObjectInitializer& ObjectInitializer):
 }
 
 
-void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVector OwnerFowardVector)
+void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVector OwnerFowardVector,int Damage)
 {
 	if (bisDebug)
 	{
@@ -129,16 +129,17 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 									if (Cast<AMonster>(HitActor))
 									{
 										auto Player = Cast<APlayerCharacter>(Owner);
+										Player->HitStopEvent();
 										//TLOG_E(TEXT("Attack Hit"));
 										GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Attack Hit"));
 										FDamageEvent DamageEvent;
-										HitActor->TakeDamage(Data.Damage, DamageEvent, Player->GetController(), Owner);
+										HitActor->TakeDamage(Damage, DamageEvent, Player->GetController(), Owner);
 									}
 									if (Cast<APlayerCharacter>(HitActor))
 									{
 										auto Monster = Cast<AMonster>(Owner);
 										FDamageEvent DamageEvent;
-										HitActor->TakeDamage(Data.Damage, DamageEvent, Monster->GetController(), Owner);
+										HitActor->TakeDamage(Damage, DamageEvent, Monster->GetController(), Owner);
 									}
 								}
 								break;

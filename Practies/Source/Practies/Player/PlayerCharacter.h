@@ -59,7 +59,7 @@ private:
 
 	//debug
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DEBUG, meta = (AllowPrivateAccess = "true"))
-	bool Debuging;
+	bool bIsDebug;
 
 
 	//common
@@ -173,6 +173,14 @@ public:
 	void AttackStartComboState();
 	void AttackEndComboState();
 
+	void InitAnimationDelegate();
+
+
+	void Death();
+
+	//event
+	UFUNCTION(BlueprintImplementableEvent)
+	void HitStopEvent();
 
 private:
 	//inti

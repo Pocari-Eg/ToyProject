@@ -34,13 +34,42 @@ void AMonster::InitWeapon()
 	}
 }
 
+void AMonster::InitAnimationDelegate()
+{
+	MonsterAnimInstance->OnAttackCheck.AddUObject(this, &AMonster::AttackCheck);
+	MonsterAnimInstance->OnDeath.AddUObject(this, &AMonster::Death);
+}
+
 // Called when the game starts or when spawned
 void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	InitAnimationDelegate();
 }
 
+void AMonster::AttackCheck()
+{
+}
+
+void AMonster::Death()
+{
+	TLOG_E(TEXT("Monster Dead"));
+	this->SetActorHiddenInGame(true);
+	this->Destroy();
+}
+void AMonster::PlayDeathAnimation()
+{
+	MonsterAnimInstance->PlayDeathMontage();
+}
+void AMonster::PlayIdleAnimation()
+{
+	MonsterAnimInstance->PlayIdleMontage();
+}
+void AMonster::PlayWalkAnimation()
+{
+
+	MonsterAnimInstance->PlayWalkMontage();
+}
 // Called every frame
 void AMonster::Tick(float DeltaTime)
 {
@@ -55,6 +84,8 @@ void AMonster::PostInitializeComponents()
 
 	MonsterInit();
 	InitWeapon();
+
+	MonsterAIController = Cast<AMonsterAIController>(GetController());
 }
 
 float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -62,14 +93,16 @@ float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
 
+	MonsterAnimInstance->PlayHitMontage();
 	MonsterStat.HP -= FinalDamage;
 
 	TLOG_W(TEXT("MonsterHP %d : %d"), MonsterStat.HP, MonsterStat.MaxHP);
 	if (MonsterStat.HP <=0)
 	{
-		TLOG_E(TEXT("Monster Dead"));
-		this->SetActorHiddenInGame(true);
-		this->Destroy();
+		SetActorEnableCollision(false);
+		GetAIController()->StopMovement();
+		GetAIController()->SetDeath(true);
+		PlayDeathAnimation();
 	}
 	return FinalDamage;
 }
