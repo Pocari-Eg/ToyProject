@@ -10,13 +10,17 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnAttackCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnDeathDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
 UCLASS()
 class PRACTIES_API UMonsterAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 	public:
-	FOnAttackCheckDelegate OnAttackCheck;;
+	FOnAttackCheckDelegate OnAttackCheck;
+	FOnAttackEndDelegate OnAttackEnd;
+
 	FOnDeathDelegate OnDeath;
+
 private:
 
 	UPROPERTY()
@@ -53,6 +57,7 @@ private:
 	void AnimNotify_AttackCheck() const;
 	UFUNCTION()
 	void AnimNotify_Death() const;
-
+	UFUNCTION()
+	void AnimNotify_AttackEnd() const;
 };
 

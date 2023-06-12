@@ -9,11 +9,10 @@ UMonsterAnimInstance::UMonsterAnimInstance()
 
 void UMonsterAnimInstance::PlayAttackMontage()
 {
-	//if (!Montage_IsPlaying(AttackMontage))
-	//{
-	//	TLOG_W(TEXT("Attack"));
-	//	Montage_Play(AttackMontage, 1.0f);
-	//}
+	if (!Montage_IsPlaying(AttackMontage))
+	{
+		Montage_Play(AttackMontage, 1.0f);
+	}
 }
 
 void UMonsterAnimInstance::PlayDeathMontage()
@@ -61,4 +60,8 @@ void UMonsterAnimInstance::AnimNotify_AttackCheck() const
 void UMonsterAnimInstance::AnimNotify_Death() const
 {
 	OnDeath.Broadcast();
+}
+void UMonsterAnimInstance::AnimNotify_AttackEnd() const
+{
+	OnAttackEnd.Broadcast();
 }

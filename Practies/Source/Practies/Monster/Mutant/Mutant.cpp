@@ -12,7 +12,7 @@ AMutant::AMutant()
 	AIControllerClass = AMutantAI::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	// ÇÃ·¹ÀÌ¾î Ä¸½¶ Å©±â ¼³Á¤
-	GetCapsuleComponent()->InitCapsuleSize(90.0f, 40.0f);
+	GetCapsuleComponent()->InitCapsuleSize(90.0f, 25.0);
 
 	//// ½ºÄÌ·¹Åæ ¸Þ½¬ ¼³Á¤
 	const ConstructorHelpers::FObjectFinder<USkeletalMesh>CharacterMesh(TEXT("SkeletalMesh'/Game/Characters/Monster/Mutant/Mesh/Mutant_Idle.Mutant_Idle'"));
@@ -35,45 +35,37 @@ AMutant::AMutant()
 
 
 	//WeaponSet
-	/*
-	PlayerWeapon = CreateDefaultSubobject<UWeaponComponent>(TEXT("PlayerWeapon"));
-	FName WeaponSocket(TEXT("RHandSocket"));
-	if (GetMesh()->DoesSocketExist(WeaponSocket)) {
-		const ConstructorHelpers::FObjectFinder<USkeletalMesh>WeaponMesh(TEXT("/Game/Characters/Weapon/Sword.Sword"));
-		if (WeaponMesh.Succeeded())
-		{
-			PlayerWeapon->MeshComponent->SetSkeletalMesh(WeaponMesh.Object);
+	
+	MonsterWeapon = CreateDefaultSubobject<UWeaponComponent>(TEXT("MonsterWeapon"));
 
-		}
+	MonsterWeapon->MeshComponent->SetupAttachment(GetMesh());
 
-		PlayerWeapon->MeshComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
-		PlayerWeapon->MeshComponent->SetupAttachment(GetMesh(), WeaponSocket);
-	}
-	*/
+	
 
 
 	// Activate ticking in order to update the cursor every frame.
-	MonsterStat.MoveSpeed = 250;
+	MonsterStat.MoveSpeed = 120;
 	MonsterStat.MaxHP = 1000;
 	MonsterStat.HP = MonsterStat.MaxHP;
 	MonsterStat.ATK = 100;
 
 
-	WeaponData.AttackAngle = 120.0f;
+	WeaponData.AttackAngle = 45.0;
 	WeaponData.AttackHeight = 100.0f;
-	WeaponData.AttackRadius = 100.0f;
+	WeaponData.AttackRange = 220;
 	WeaponData.Damage = 100.0f;
 
 
-	DetectRange = 300.0f;
-	DetectHeight = 200.0f;
+	ViewRange = 300.0f;
+	ViewHeight = 200.0f;
 
+	MaxSpawnDistance = 1200.0f;
 }
 // Called when the game starts or when spawned
 void AMutant::BeginPlay()
 {
 	Super::BeginPlay();
-
+	MonsterAnimInstance->OnAttackCheck.AddUObject(this, &AMutant::AttackCheck);
 }
 
 // Called every frame
@@ -81,4 +73,11 @@ void AMutant::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMutant::AttackCheck()
+{
+	TLOG_E(TEXT("MutantAttack"));
+	SetAttackTransform();
+	MonsterWeapon->AttackCheck(bIsDebug, AttackTransform, AttackForwardVector, MonsterStat.ATK + WeaponData.Damage);
 }

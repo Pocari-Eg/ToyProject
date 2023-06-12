@@ -21,6 +21,8 @@ public:
 static const FName IsPlayerFindKey;
 static const FName PlayerKey;
 static const FName IsDeathKey;
+static const FName IsInAttackRangeKey;
+static const FName SpawnLocationKey;
 protected:
 	UPROPERTY()
 	class UBehaviorTree* BTAsset;
@@ -36,8 +38,12 @@ protected:
 //Get Set
 public:
 	void SetPlayerFindKey(bool value);
+	bool GetPlayerFindKey();
 
 	void SetFind(class APlayerCharacter* Player);
 
-	void SetDeath(bool value);
+	void SetDeathKey(bool value);
+
+	void SetInAttackRangeKey(bool value);
+	void SetSpawnLocation(FVector value);
 };

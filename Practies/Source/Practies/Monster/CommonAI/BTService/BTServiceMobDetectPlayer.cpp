@@ -10,7 +10,7 @@
 
 UBTServiceMobDetectPlayer::UBTServiceMobDetectPlayer()
 {
-	NodeName = TEXT("DetectPlayer");
+	NodeName = TEXT("ViewPlayer");
 	Interval = 0.1f;
 }
 void UBTServiceMobDetectPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -21,12 +21,89 @@ void UBTServiceMobDetectPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 	if (nullptr == Monster)
 		return;
 
+	if (!Monster->GetIsAttacking()) {
+		if (!Monster->GetAIController()->GetPlayerFindKey()) ViewRangeCheck();
+		else AttackRangeCheck();
+	}
+
+
+
+}
+void UBTServiceMobDetectPlayer::ViewRangeCheck()
+{
 	UWorld* World = Monster->GetWorld();
 	FVector Center = Monster->GetActorLocation() + (-Monster->GetActorForwardVector() * Monster->GetCapsuleComponent()->GetScaledCapsuleRadius());
 
 
-	FVector Box = FVector(Monster->GetDetectRange(), Monster->GetDetectRange(), Monster->GetDetectHeight());
-	//모르빗 주변 범위 200 안에 있는 액터 탐지, EnemyDetect 트레이스 채널 사용
+	FVector Box = FVector(Monster->GetViewRange(), Monster->GetViewRange(), Monster->GetViewHeight());
+	//모르빗 주변 범위 200 안에 있는 액터 탐지, EnemyView 트레이스 채널 사용
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, Monster);
+	bool bResult = World->OverlapMultiByChannel( // 지정된 Collision FCollisionShape와 충돌한 액터 감지 
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel5,
+		FCollisionShape::MakeCapsule(Box),
+		CollisionQueryParam
+	);
+	if (bResult)
+	{
+		for (auto const& OverlapResult : OverlapResults)
+		{
+			//플레이어 클래스 정보를 가져오고 PlayerController를 소유하고 있는가 확인
+			APlayerCharacter* Player = Cast<APlayerCharacter>(OverlapResult.GetActor());
+		
+
+				if (nullptr != Player)
+				{
+					Monster->GetAIController()->SetFind(Player);
+					return;
+				}
+
+		}
+
+	}
+	if (Monster->GetTestMode())
+	{
+		FTransform BottomLine = Monster->GetTransform();
+		BottomLine.SetLocation(BottomLine.GetLocation() - FVector(0.0f, 0.0f, Monster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
+		FTransform TopLine = BottomLine;
+		TopLine.SetLocation(TopLine.GetLocation() + FVector(0.0f, 0.0f, Monster->GetViewHeight()));
+
+		FMatrix BottomDebugMatrix = BottomLine.ToMatrixNoScale();
+		FMatrix TopDebugMatrix = TopLine.ToMatrixNoScale();
+		DebugAPI::DrawRadial(World, BottomDebugMatrix, Monster->GetViewRange(), 360.0f, FColor::Blue, 10, 0.1f, false, 0, 2);
+		DebugAPI::DrawRadial(World, TopDebugMatrix, Monster->GetViewRange(), 360.0f, FColor::Blue, 10, 0.1f, false, 0, 2);
+	}
+
+}
+
+
+
+void UBTServiceMobDetectPlayer::AttackRangeCheck()
+{
+
+
+	UWorld* World = Monster->GetWorld();
+	FVector Center = Monster->GetActorLocation() + (-Monster->GetActorForwardVector() * Monster->GetCapsuleComponent()->GetScaledCapsuleRadius());
+
+	if (Monster->GetTestMode())
+	{
+		FTransform BottomLine = Monster->GetTransform();
+		BottomLine.SetLocation(Center);
+		FTransform TopLine = BottomLine;
+		TopLine.SetLocation(TopLine.GetLocation() + FVector(0.0f, 0.0f, Monster->GetAttackHeight()));
+
+		FMatrix BottomDebugMatrix = BottomLine.ToMatrixNoScale();
+		FMatrix TopDebugMatrix = TopLine.ToMatrixNoScale();
+		DebugAPI::DrawRadial(World, BottomDebugMatrix, Monster->GetAttackRange(), 360.0f, FColor::Red, 10, 0.1f, false, 0, 2);
+		DebugAPI::DrawRadial(World, TopDebugMatrix, Monster->GetAttackRange(), 360.0f, FColor::Red, 10, 0.1f, false, 0, 2);
+	}
+
+	//Center += Monster->GetActorForwardVector() * Monster->GetAttackRange();
+	FVector Box = FVector(Monster->GetAttackRange(), Monster->GetAttackRange(), Monster->GetAttackHeight());
+	//모르빗 주변 범위 200 안에 있는 액터 탐지, EnemyAttack 트레이스 채널 사용
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, Monster);
 	bool bResult = World->OverlapMultiByChannel( // 지정된 Collision FCollisionShape와 충돌한 액터 감지 
@@ -44,88 +121,22 @@ void UBTServiceMobDetectPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 			//플레이어 클래스 정보를 가져오고 PlayerController를 소유하고 있는가 확인
 			APlayerCharacter* Player = Cast<APlayerCharacter>(OverlapResult.GetActor());
 			if (Player && Player->GetController()->IsPlayerController())
-			{
-				//1차 탐지
-		/*		if(Monster->GetTestMode())
-					STARRYLOG(Warning, TEXT("Detect Player in DetectSphere"));*/
+			{	
 
-				TArray<FHitResult> Hits;
-				TArray<AActor*> ActorsToIgnore; // 무시할 액터 유형?
-				bool bTraceResult;
-
-				// https://blog.daum.net/peace-day/22
-				// TraceTypeQuery는 콜리전 프리셋의 트레이스 유형에서 1부터 순차적으로 부여됨
-				if (Monster->GetTestMode())
+				if (nullptr != Player)
 				{
-					bTraceResult = UKismetSystemLibrary::SphereTraceMulti(
-						World,
-						Monster->GetActorLocation(), // SphereTrace 시작 위치
-						Player->GetActorLocation(), // SphereTrace 종료 위치
-						5.0f,
-						ETraceTypeQuery::TraceTypeQuery4,
-						false,
-						ActorsToIgnore,
-						EDrawDebugTrace::ForDuration, // 마지막 인자값으로 시간 조절 가능
-						Hits,
-						true,
-						FLinearColor::Red,
-						FLinearColor::Green,
-						1.0f
-					);
-				}
-				else
-				{
-					bTraceResult = UKismetSystemLibrary::SphereTraceMulti(
-						World,
-						Monster->GetActorLocation(),
-						Player->GetActorLocation(),
-						5.0f,
-						ETraceTypeQuery::TraceTypeQuery4,
-						false,
-						ActorsToIgnore,
-						EDrawDebugTrace::None,
-						Hits,
-						true
-					);
-				}	
-				
-				for (int i = 0; i < Hits.Num(); i++)
-				{
-					Player = Cast<APlayerCharacter>(Hits[i].GetActor());
-					if (Player != nullptr)
-					{
-						break;
-					}
+					Monster->GetAIController()->SetInAttackRangeKey(true);
+					return;
 				}
 
-				if (bTraceResult && !(nullptr == Player))
-				{
-						Monster->GetAIController()->SetFind(Player);
-						return;
-					}
-					
-				}
-
-				
 			}
 
 		}
 
-	
+	}
 
-	if (Monster->GetTestMode())
-	{
-		FTransform BottomLine = Monster->GetTransform();
-		BottomLine.SetLocation(BottomLine.GetLocation() - FVector(0.0f, 0.0f, Monster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
-		FTransform TopLine = BottomLine;
-		TopLine.SetLocation(TopLine.GetLocation() + FVector(0.0f, 0.0f, Monster->GetDetectHeight()));
-
-		FMatrix BottomDebugMatrix = BottomLine.ToMatrixNoScale();
-		FMatrix TopDebugMatrix = TopLine.ToMatrixNoScale();
-		DebugAPI::DrawRadial(World, BottomDebugMatrix, Monster->GetDetectRange(), 360.0f, FColor::Blue, 10, 0.1f, false, 0, 2);
-		DebugAPI::DrawRadial(World, TopDebugMatrix, Monster->GetDetectRange(), 360.0f, FColor::Blue, 10, 0.1f, false, 0, 2);
-	};
-
-};
+	Monster->GetAIController()->SetInAttackRangeKey(false);
+	return;
 
 
+}

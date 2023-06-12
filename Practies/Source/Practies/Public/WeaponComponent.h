@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
 	float AttackAngle;
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
-	float AttackRadius;
+	float AttackRange;
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
 	float AttackHeight;
 
@@ -43,7 +43,7 @@ public:
 FWeaponData Data;
 
 UPROPERTY()
- class AActor* Owner;
+ class ACharacter* Owner;
 
 	#pragma endregion Data
 		
@@ -51,7 +51,6 @@ UPROPERTY()
 public:
 UFUNCTION(BlueprintCallable)
 void AttackCheck(bool bisDebug,FTransform OwnerTransform, FVector OwnerFowardVector, int Damage);
-		
 UFUNCTION(BlueprintCallable)
 void SetVisible(bool Set);
 		
@@ -59,12 +58,12 @@ void SetVisible(bool Set);
 	void SetWeaponData(FWeaponData newdata) {
 	 Data.Damage = newdata.Damage;
 		Data.AttackAngle = newdata.AttackAngle;
-		Data.AttackRadius = newdata.AttackRadius;
+		Data.AttackRange = newdata.AttackRange;
 		Data.AttackHeight = newdata.AttackHeight;
 	}
 	FORCEINLINE FWeaponData GetWeaponData() { return Data; }
 		
-	void SetOwner(AActor* Value);
+	void SetOwner(ACharacter* Value);
 		
 #pragma endregion GetSet
 

@@ -15,6 +15,9 @@ AMonster::AMonster()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+
+
+
 }
 
 void AMonster::MonsterInit()
@@ -36,8 +39,10 @@ void AMonster::InitWeapon()
 
 void AMonster::InitAnimationDelegate()
 {
-	MonsterAnimInstance->OnAttackCheck.AddUObject(this, &AMonster::AttackCheck);
+
 	MonsterAnimInstance->OnDeath.AddUObject(this, &AMonster::Death);
+	MonsterAnimInstance->OnAttackEnd.AddUObject(this, &AMonster::AttackEnd);
+
 }
 
 // Called when the game starts or when spawned
@@ -45,10 +50,8 @@ void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
 	InitAnimationDelegate();
-}
 
-void AMonster::AttackCheck()
-{
+	MonsterAIController->SetSpawnLocation(GetActorLocation());
 }
 
 void AMonster::Death()
@@ -69,6 +72,11 @@ void AMonster::PlayWalkAnimation()
 {
 
 	MonsterAnimInstance->PlayWalkMontage();
+}
+void AMonster::PlayAttackAnimation()
+{
+
+	MonsterAnimInstance->PlayAttackMontage();
 }
 // Called every frame
 void AMonster::Tick(float DeltaTime)
@@ -92,8 +100,8 @@ float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 {
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
+	if(!bIsAttacking)	MonsterAnimInstance->PlayHitMontage();
 
-	MonsterAnimInstance->PlayHitMontage();
 	MonsterStat.HP -= FinalDamage;
 
 	TLOG_W(TEXT("MonsterHP %d : %d"), MonsterStat.HP, MonsterStat.MaxHP);
@@ -101,9 +109,26 @@ float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	{
 		SetActorEnableCollision(false);
 		GetAIController()->StopMovement();
-		GetAIController()->SetDeath(true);
+		GetAIController()->SetDeathKey(true);
 		PlayDeathAnimation();
 	}
 	return FinalDamage;
 }
 
+void AMonster::Attack()
+{
+	PlayAttackAnimation();
+	SetAttackTransform();
+	GetAIController()->SetInAttackRangeKey(true);
+	bIsAttacking = true;
+}
+void AMonster::AttackEnd()
+{
+	bIsAttacking = false;
+	AttackEndDelegate.Broadcast();
+}
+void AMonster::SetAttackTransform()
+{
+	AttackTransform = GetActorTransform();
+	AttackForwardVector = GetActorForwardVector();
+}

@@ -88,9 +88,9 @@ APlayerCharacter::APlayerCharacter()
     }
 
 
-	WeaponData.AttackAngle = 120.0f;
+	WeaponData.AttackAngle = 100.0f;
 	WeaponData.AttackHeight = 100.0f;
-	WeaponData.AttackRadius = 100.0f;
+	WeaponData.AttackRange = 150.0f;
 	WeaponData.Damage = 100.0f;
 
 	

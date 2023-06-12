@@ -7,6 +7,11 @@
 const FName AMonsterAIController::IsPlayerFindKey = (TEXT("bisFindPlayer"));
 const FName AMonsterAIController::PlayerKey = (TEXT("PlayerKey"));
 const FName AMonsterAIController::IsDeathKey = (TEXT("bIsDeath"));
+const FName AMonsterAIController::IsInAttackRangeKey = (TEXT("bIsInAttackRange"));
+const FName AMonsterAIController::SpawnLocationKey = (TEXT("SpawnLocation"));
+
+
+
 AMonsterAIController::AMonsterAIController()
 {
 
@@ -21,6 +26,11 @@ void AMonsterAIController::SetPlayerFindKey(bool value)
 	Blackboard->SetValueAsBool(IsPlayerFindKey, value);
 }
 
+bool AMonsterAIController::GetPlayerFindKey()
+{
+	return Blackboard->GetValueAsBool(IsPlayerFindKey);
+}
+
 void AMonsterAIController::SetFind(APlayerCharacter* Player)
 {
 	auto Monster = Cast<AMonster>(GetPawn());
@@ -33,7 +43,16 @@ void AMonsterAIController::SetFind(APlayerCharacter* Player)
 
 	Blackboard->SetValueAsObject(PlayerKey, Player);
 }
-void AMonsterAIController::SetDeath(bool value)
+void AMonsterAIController::SetDeathKey(bool value)
 {
-	Blackboard->SetValueAsBool(IsDeathKey, true);
+	Blackboard->SetValueAsBool(IsDeathKey, value);
+}
+
+void AMonsterAIController::SetInAttackRangeKey(bool value)
+{
+	Blackboard->SetValueAsBool(IsInAttackRangeKey, value);
+}
+void AMonsterAIController::SetSpawnLocation(FVector value)
+{
+	Blackboard->SetValueAsVector(SpawnLocationKey, value);
 }

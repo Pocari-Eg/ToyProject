@@ -12,22 +12,22 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MonsterAIController.h"
 #include "Monster.generated.h"
-
+DECLARE_MULTICAST_DELEGATE(FAttackEndDelegate);
 UCLASS()
 class PRACTIES_API AMonster : public ACharacter
 {
 	GENERATED_BODY()
 //variation
 #pragma region Variable
-private:
-	//Player
-	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UWeaponComponent> MonsterWeapon;
 
 private:
-
+	bool bIsAttacking;
+	
 
 protected:
+	//Component
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UWeaponComponent> MonsterWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MonsterStat, meta = (AllowPrivateAccess = "true"))
 	FStatData MonsterStat;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MonsterStat, meta = (AllowPrivateAccess = "true"))
@@ -38,15 +38,21 @@ protected:
 	class UMonsterAnimInstance* MonsterAnimInstance;
 	UPROPERTY()
 	AMonsterAIController* MonsterAIController;
-
-
 	//
-	float DetectRange;
-	float DetectHeight;
+	float ViewRange;
+	float ViewHeight;
+
+	FTransform AttackTransform;
+	FVector	AttackForwardVector;
+
+	float MaxSpawnDistance;
 //debug
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DEBUG, meta = (AllowPrivateAccess = "true"))
 bool bIsDebug;
 
+//delegate
+public:
+	FAttackEndDelegate AttackEndDelegate;
 
 //function	
 private:
@@ -54,12 +60,13 @@ private:
 	void MonsterInit();
 	void InitWeapon();
 	void InitAnimationDelegate();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
-	void AttackCheck();
+	UFUNCTION()
+	virtual void AttackCheck() PURE_VIRTUAL(AMaster_InteractableObject::Interact, );
 	void Death();
 public:	
 	// Sets default values for this actor's properties
@@ -70,11 +77,13 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-
+	void Attack();
+	void AttackEnd();
 
 	void PlayDeathAnimation();
 	void PlayWalkAnimation();
 	void PlayIdleAnimation();
+	void PlayAttackAnimation();
 #pragma region Get,Set
 public:
 	FStatData* GetMonsterStat() { return &MonsterStat; }
@@ -82,13 +91,23 @@ public:
 	UMonsterAnimInstance* GetAnimInstance() { return MonsterAnimInstance; }
 	AMonsterAIController* GetAIController() { return MonsterAIController; }
 
-	void SetDetectRange(float value) {  DetectRange= value; }
-	void SetDetectHeight(float value) {  DetectHeight= value; }
+	void SetViewRange(float value) {  ViewRange= value; }
+	void SetViewHeight(float value) {  ViewHeight= value; }
 
-	float GetDetectRange() { return DetectRange;}
-	float GetDetectHeight() { return DetectHeight; }
+	float GetViewRange() { return ViewRange;}
+	float GetViewHeight() { return ViewHeight; }
+
+	float GetAttackRange() { return WeaponData.AttackRange; }
+	float GetAttackHeight() { return WeaponData.AttackHeight; }
+
+	float GetMaxSpawnDistance() { return MaxSpawnDistance; }
 
 	bool GetTestMode() { return bIsDebug; }
+	bool GetIsAttacking() { return bIsAttacking; }
+
+	UFUNCTION()
+	void SetAttackTransform();
+
 #pragma endregion Get,Set
 
 };

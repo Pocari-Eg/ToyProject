@@ -16,4 +16,5 @@ class PRACTIES_API UBT_Walk : public UBTTaskNode
 	public:
 		UBT_Walk();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

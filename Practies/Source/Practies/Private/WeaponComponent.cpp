@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "../Monster/Monster.h"
 #include "../Player/PlayerCharacter.h"
+#include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values for this component's properties
@@ -26,7 +27,7 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 	if (bisDebug)
 	{
 		FTransform BottomLine = OwnerTransform;
-		BottomLine.SetLocation(BottomLine.GetLocation()+FVector(0.0f, 0.0f, -50.0f));
+		BottomLine.SetLocation(BottomLine.GetLocation()+FVector(0.0f, 0.0f, -Owner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
 
 
 		FRotator Rotation = FRotator::ZeroRotator;
@@ -43,8 +44,8 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 		FMatrix BottomDebugMatrix = BottomLine.ToMatrixNoScale();
 		FMatrix TopDebugMatrix = TopLine.ToMatrixNoScale();
 
-	  DebugAPI::DrawRadial(GetWorld(), BottomDebugMatrix, Data.AttackRadius, Data.AttackAngle, FColor::Red, 10, 0.5f, false, 0, 2);
-	  DebugAPI::DrawRadial(GetWorld(), TopDebugMatrix, Data.AttackRadius, Data.AttackAngle, FColor::Red, 10, 0.5f, false, 0, 2);
+	  DebugAPI::DrawRadial(GetWorld(), BottomDebugMatrix, Data.AttackRange, Data.AttackAngle, FColor::Red, 10, 0.5f, false, 0, 2);
+	  DebugAPI::DrawRadial(GetWorld(), TopDebugMatrix, Data.AttackRange, Data.AttackAngle, FColor::Red, 10, 0.5f, false, 0, 2);
 	
 	}
 
@@ -54,11 +55,11 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 	AttackDirection.Normalize();
 
 
-	float HalfRadius = Data.AttackRadius * 0.5;
+	float HalfRadius = Data.AttackRange * 0.5;
 	FVector Center = OwnerTransform.GetLocation();
 
 
-	FVector Box = FVector(Data.AttackRadius, Data.AttackRadius, Data.AttackHeight);
+	FVector Box = FVector(Data.AttackRange, Data.AttackRange, Data.AttackHeight);
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, Owner);
 	bool bResult = GetWorld()->OverlapMultiByChannel( // 지정된 Collision FCollisionShape와 충돌한 액터 감지 
@@ -84,7 +85,7 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 					GetWorld(),
 						OwnerTransform.GetLocation(), // SphereTrace 시작 위치
 						OwnerTransform.GetLocation(), // SphereTrace 종료 위치
-					Data.AttackRadius,
+					Data.AttackRange,
 					ETraceTypeQuery::TraceTypeQuery4,
 					false,
 					ActorsToIgnore,
@@ -151,13 +152,12 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 	}
 
 }
-
 void UWeaponComponent::SetVisible(bool Set)
 {
 	MeshComponent->SetVisibility(Set);
 }
 
-void UWeaponComponent::SetOwner(AActor* Value)
+void UWeaponComponent::SetOwner(ACharacter* Value)
 {
 	Owner = Value;
 }
