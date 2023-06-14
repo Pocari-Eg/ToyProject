@@ -6,8 +6,8 @@
 #include"DebugAPI.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Actor.h"
-#include "../Monster/Monster.h"
-#include "../Player/PlayerCharacter.h"
+#include "Monster/Monster.h"
+#include "Player/PlayerCharacter.h"
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
 
@@ -72,8 +72,7 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 	);
 	if (bResult)
 	{
-		for (auto const& OverlapResult : OverlapResults)
-		{
+
 			//플레이어 클래스 정보를 가져오고 OwnerController를 소유하고 있는가 확인
 			//STARRYLOG(Warning, TEXT("%s"), *OverlapResult.GetActor()->GetName());
 		
@@ -102,19 +101,9 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 						AActor* HitActor = Cast<AActor>(Hits[i].GetActor());
 							if (HitActor != Owner) {
 								
-
-							
                					FVector TargetDir = HitActor->GetActorLocation() - OwnerTransform.GetLocation();
 								TargetDir = TargetDir.GetSafeNormal();
-								/*
-								TLOG_W(TEXT("HitActor  : %s"), *HitActor->GetActorLabel())
-								TLOG_W(TEXT("HitActor Location : %f, %f,%f "), HitActor->GetActorLocation().X, HitActor->GetActorLocation().Y, HitActor->GetActorLocation().Z);
-								UKismetSystemLibrary::DrawDebugArrow(this, Owner->GetActorLocation(), Owner->GetActorLocation() + (AttackDirection * 100), 300.0f, FLinearColor::Red, 1.0f, 3.0f);
-								UKismetSystemLibrary::DrawDebugArrow(this, Owner->GetActorLocation(), Owner->GetActorLocation() + (TargetDir * 100), 300.0f, FLinearColor::Blue, 1.0f, 3.0f);
-								TLOG_W(TEXT("AttackDirection : %f "), AttackDirection.X, AttackDirection.Y, AttackDirection.Z);
-								TLOG_W(TEXT("TargetDirection : %f , %f , %f "), TargetDir.X, TargetDir.Y, TargetDir.Z);
-								*/
-
+								
 								float Radian = FVector::DotProduct(AttackDirection, TargetDir);
 								//내적 결과값은 Cos{^-1}(A dot B / |A||B|)이기 때문에 아크코사인 함수를 사용해주고 Degree로 변환해준다.
 								float TargetAngle = FMath::RadiansToDegrees(FMath::Acos(Radian));
@@ -129,25 +118,31 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 
 									if (Cast<AMonster>(HitActor))
 									{
-										auto Player = Cast<APlayerCharacter>(Owner);
-										Player->HitStopEvent();
-										//TLOG_E(TEXT("Attack Hit"));
-										GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Attack Hit"));
-										FDamageEvent DamageEvent;
-										HitActor->TakeDamage(Damage, DamageEvent, Player->GetController(), Owner);
+										if (Cast<APlayerCharacter>(Owner)) {
+											auto Player = Cast<APlayerCharacter>(Owner);
+											Player->HitStopEvent();
+											//TLOG_E(TEXT("Attack Hit"));
+											GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Attack Hit"));
+											FDamageEvent DamageEvent;
+											HitActor->TakeDamage(Damage, DamageEvent, Player->GetController(), Owner);
+											continue;
+										}
 									}
 									if (Cast<APlayerCharacter>(HitActor))
 									{
-										auto Monster = Cast<AMonster>(Owner);
-										FDamageEvent DamageEvent;
-										HitActor->TakeDamage(Damage, DamageEvent, Monster->GetController(), Owner);
+										
+										if (Cast<AMonster>(Owner)) {
+											auto Monster = Cast<AMonster>(Owner);
+											FDamageEvent DamageEvent;
+											HitActor->TakeDamage(Damage, DamageEvent, Monster->GetController(), Owner);
+											continue;
+										}
 									}
 								}
-								break;
 							}
 					}
 
-				}
+	
 		}
 	}
 
