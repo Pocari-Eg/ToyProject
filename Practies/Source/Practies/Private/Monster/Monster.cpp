@@ -75,13 +75,13 @@ void AMonster::BeginPlay()
 	InitAnimationDelegate();
 
 	MonsterAIController->SetSpawnLocation(GetActorLocation());
-
+	MonsterStat.HP = MonsterStat.MaxHP;
 	auto Widget = Cast<UMonsterWidget>(MonsterWidget->GetWidget());
 	if (Widget != nullptr)
 	{
 		Widget->BindMonster(this);
 	}
-	
+
 }
 
 void AMonster::Death()
@@ -173,6 +173,8 @@ void AMonster::SetAttackTransform()
 	AttackTransform = GetActorTransform();
 	AttackForwardVector = GetActorForwardVector();
 }
+
+
 
 float AMonster::GetHpRatio()
 {

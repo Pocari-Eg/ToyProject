@@ -20,7 +20,7 @@
 #pragma endregion variable
 */
 
-
+DECLARE_MULTICAST_DELEGATE(FOnHpChangedDelegate);
 UCLASS()
 class PRACTIES_API APlayerCharacter : public ACharacter
 {
@@ -51,6 +51,9 @@ public:
 	//widget
 	UPROPERTY(BlueprintReadWrite)
 	class UUserWidget* PlayerHud;
+
+	//delegate
+	FOnHpChangedDelegate OnHpChanged;
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
     FStatData PlayerStat;
@@ -90,8 +93,6 @@ private:
 	float PrevRotation;
 
 
-
-
 	//Dodge
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dodge, meta = (AllowPrivateAccess = "true"))
 	float DodgeDistance;
@@ -118,6 +119,8 @@ private:
 	int32 CurrentCombo;
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
 	int32 MaxCombo;
+
+
 
 #pragma endregion Variable
 
@@ -182,7 +185,7 @@ public:
 	void AttackEndComboState();
 
 	void InitAnimationDelegate();
-
+	void InitPlayerWidget();
 
 	void Death();
 
@@ -214,7 +217,7 @@ public:
 	FORCEINLINE  EPState GetPlayerState() const { return GetFSM()->GetCurState(); }
 	void ChangeState(IState* NewState);
 
-	FStatData* GetPlayerData() { return &PlayerStat; }
+	FStatData* GetPlayerStat() { return &PlayerStat; }
 
 	//Camera
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -236,6 +239,8 @@ public:
 	 UFUNCTION(BlueprintCallable)
 	 void SetDodge(bool state);
 
+	 //widget
+	 float GetHpRatio();
 };
 #pragma endregion GetSet
 

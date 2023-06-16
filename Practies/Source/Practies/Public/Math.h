@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../Practies.h"
+#include "Practies.h"
 
 /**
  * 

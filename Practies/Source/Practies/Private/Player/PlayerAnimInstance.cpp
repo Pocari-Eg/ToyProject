@@ -17,7 +17,6 @@ void UPlayerAnimInstance::PlayDeathMontage()
 {
 	if (!Montage_IsPlaying(DeathMontage))
 	{
-		//Player->ChangeState(UAttackState::GetInstance());
 		
 		Montage_Play(DeathMontage, 1.0f);
 	}

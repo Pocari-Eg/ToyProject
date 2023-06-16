@@ -107,7 +107,6 @@ APlayerCharacter::APlayerCharacter()
 	PlayerStat.MoveSpeed = 250;
 	PlayerStat.Level = 1;
 	PlayerStat.MaxHP = 10000;
-	PlayerStat.HP = PlayerStat.MaxHP;
 	PlayerStat.ATK = 100;
 
 	bIsDebug = false;
@@ -148,12 +147,6 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 
-	if (PlayerWidgetBP != nullptr)
-	{
-		PlayerHud = CreateWidget<UUserWidget>(GetWorld(), PlayerWidgetBP);
-		PlayerHud->AddToViewport();
-	}
-
 	auto PlayerController = Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController());
 	PlayerController->PlayerInit(this);
 
@@ -162,6 +155,10 @@ void APlayerCharacter::BeginPlay()
 
 	auto Instance = Cast<UPRGameInstance>(GetGameInstance());
 	Instance->BindPlayer(this);
+	PlayerStat.HP = PlayerStat.MaxHP;
+	InitPlayerWidget();
+
+
 }
 
 // Called every frame
@@ -205,10 +202,13 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	PlayerStat.HP -= FinalDamage;
 
+	OnHpChanged.Broadcast();
+
 	TLOG_W(TEXT("PlayerHP %d : %d"), PlayerStat.HP, PlayerStat.MaxHP);
 	if (PlayerStat.HP <= 0)
 	{
-		SetActorEnableCollision(false);
+		//SetActorEnableCollision(false);
+		GetCapsuleComponent()->SetCollisionProfileName("NoCollision");
 		PlayerAnimInstance->PlayDeathMontage();
 	}
 	return FinalDamage;
@@ -330,10 +330,24 @@ void APlayerCharacter::InitAnimationDelegate()
 		});
 }
 
+void APlayerCharacter::InitPlayerWidget()
+{
+	if (PlayerWidgetBP != nullptr)
+	{
+		PlayerHud = CreateWidget<UUserWidget>(GetWorld(), PlayerWidgetBP);
+		PlayerHud->AddToViewport();
+	}
+	auto Widget = Cast<UPlayerWidget>(PlayerHud);
+	if (Widget != nullptr)
+	{
+		Widget->BindPlayer(this);
+	}
+}
+
 void APlayerCharacter::Death()
 {
-	this->SetActorHiddenInGame(true);
-	this->Destroy();
+	//this->SetActorHiddenInGame(true);
+	//this->Destroy();
 }
 
 void APlayerCharacter::BindMonster(AMonster* NewMonster)
@@ -467,4 +481,8 @@ void APlayerCharacter::MovingDodge(float Value)
 void APlayerCharacter::FinishDodge()
 {
 	PlayerAnimInstance->SetDodge(false);
+}
+float APlayerCharacter::GetHpRatio()
+{
+	return (float)PlayerStat.HP < KINDA_SMALL_NUMBER ? 0.0f : (float)PlayerStat.HP / (float)PlayerStat.MaxHP;
 }

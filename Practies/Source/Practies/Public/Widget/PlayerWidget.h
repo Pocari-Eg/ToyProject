@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../../Practies.h"
+#include "Practies.h"
 #include "Monster/Monster.h"
 #include "Player/PlayerCharacter.h"
 #include "Blueprint/UserWidget.h"
@@ -14,10 +14,9 @@
 #include "PlayerWidget.generated.h"
 
 USTRUCT()
-struct FMonsterData
+struct FMonsterWidgetData
 {
 	GENERATED_BODY()
-	//加己 包访 单捞磐
 	UPROPERTY()
 	class UCanvasPanel* Base;
 	UPROPERTY()
@@ -26,6 +25,20 @@ struct FMonsterData
 	class UProgressBar* HPBar;
 	UPROPERTY()
 	class UTextBlock* Level;
+	UPROPERTY()
+	class UTextBlock* MaxHp;
+	UPROPERTY()
+	class UTextBlock* CurHp;
+
+};
+
+USTRUCT()
+struct FHPWidgetData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	class UProgressBar* HPBar;
 	UPROPERTY()
 	class UTextBlock* MaxHp;
 	UPROPERTY()
@@ -46,6 +59,8 @@ public:
 	void UpdateMHpWidget();
 	void UpdateInfo();
 
+
+	void UpdateHpWidget();
 	void SetVisibleMonsterWidget(bool Set);
 	
 protected:
@@ -61,8 +76,9 @@ private:
 
 
 	UPROPERTY()
-	FMonsterData MonsterInfo;
-	
+	FMonsterWidgetData MonsterInfo;
+
+	FHPWidgetData PlayerHp;
 
 	
 };

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "StateInterface.h"
-#include "../Practies.h"
+#include "Practies.h"
 
 #include "PlayerFSM.generated.h"
 /**

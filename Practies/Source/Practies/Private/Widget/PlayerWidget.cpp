@@ -12,9 +12,10 @@ void UPlayerWidget::BindPlayer(class APlayerCharacter* NewPlayer) {
 
 	//델리게이트를 통해 UpdateWidget함수가 호출될수 있도록 
 
-	//NewIrene->IreneUIManager->OnHpChanged.AddUObject(this, &UPlayerHudWidget::UpdateHp);
+	Player->OnHpChanged.AddUObject(this, &UPlayerWidget::UpdateHpWidget);
 	//NewIrene->IreneUIManager->OnSoulUpdate.AddUObject(this, &UPlayerHudWidget::UpdateSoulGauge);
 
+	UpdateHpWidget();
 }
 void UPlayerWidget::BindMonster(class AMonster* NewMonster) {
 
@@ -63,6 +64,28 @@ void UPlayerWidget::UpdateInfo()
 	}
 }
 
+void UPlayerWidget::UpdateHpWidget()
+{
+	if (Player != nullptr) {
+
+		if (nullptr != PlayerHp.HPBar)
+		{
+			PlayerHp.HPBar->SetPercent(Player->GetHpRatio());
+		}
+		if (nullptr != PlayerHp.MaxHp)
+		{
+
+			FText NewText = FText::FromString(FString::FromInt(Player->GetPlayerStat()->MaxHP));
+			PlayerHp.MaxHp->SetText(NewText);
+		}
+		if (nullptr != PlayerHp.CurHp)
+		{
+			FText NewText = FText::FromString(FString::FromInt(Player->GetPlayerStat()->HP));
+			PlayerHp.CurHp->SetText(NewText);
+		}
+	}
+}
+
 void UPlayerWidget::SetVisibleMonsterWidget(bool Set)
 {
 	if(Set)	MonsterInfo.Base->SetVisibility(ESlateVisibility::Visible);
@@ -88,4 +111,9 @@ void UPlayerWidget::NativeConstruct()
 
 
 	MonsterInfo.Base->SetVisibility(ESlateVisibility::Hidden);
+
+
+	PlayerHp.HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HP")));
+	PlayerHp.MaxHp = Cast<UTextBlock>(GetWidgetFromName(TEXT("MaxHp")));
+	PlayerHp.CurHp = Cast<UTextBlock>(GetWidgetFromName(TEXT("CurHp")));
 }

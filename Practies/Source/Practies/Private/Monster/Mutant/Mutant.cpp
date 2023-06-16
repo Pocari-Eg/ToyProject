@@ -48,7 +48,7 @@ AMutant::AMutant()
 	MonsterStat.Level = 1;
 	MonsterStat.MoveSpeed = 120;
 	MonsterStat.MaxHP = 1000;
-	MonsterStat.HP = MonsterStat.MaxHP;
+
 	MonsterStat.ATK = 100;
 
 
@@ -80,6 +80,6 @@ void AMutant::Tick(float DeltaTime)
 void AMutant::AttackCheck()
 {
 	TLOG_E(TEXT("MutantAttack"));
-	SetAttackTransform();
+//	SetAttackTransform();
 	MonsterWeapon->AttackCheck(bIsDebug, AttackTransform, AttackForwardVector, MonsterStat.ATK + WeaponData.Damage);
 }
