@@ -7,6 +7,7 @@ void UPlayerAnimInstance::PlayAttackMontage()
 {
 	if (!Montage_IsPlaying(AttackMontage))
 	{
+	
 		Player->ChangeState(UAttackState::GetInstance());
 		Montage_Play(AttackMontage, 1.0f);
 	}
@@ -50,6 +51,8 @@ bool UPlayerAnimInstance::bIsPlayerWalk()
 	}
 return false;
 }
+
+
 
 UPlayerAnimInstance::UPlayerAnimInstance()
 {

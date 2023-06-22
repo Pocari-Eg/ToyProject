@@ -50,6 +50,8 @@ public:
 
 	void PlayIdleMontage();
 	void PlayWalkMontage();
+
+
 	//notify
 private:
 

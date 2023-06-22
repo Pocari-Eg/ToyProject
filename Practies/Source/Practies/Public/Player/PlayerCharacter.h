@@ -91,6 +91,7 @@ private:
 
 	bool bisEndRotation;
 	float PrevRotation;
+	bool bIsTimeLinePlaying;
 
 
 	//Dodge
@@ -187,6 +188,7 @@ public:
 	void InitAnimationDelegate();
 	void InitPlayerWidget();
 
+
 	void Death();
 
 	//event
@@ -241,6 +243,7 @@ public:
 
 	 //widget
 	 float GetHpRatio();
+
 };
 #pragma endregion GetSet
 

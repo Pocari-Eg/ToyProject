@@ -13,6 +13,7 @@
 AMainPlayerController::AMainPlayerController()
 {
 	bShowMouseCursor = true;
+	bIsFirstAttack = true;
 	DefaultMouseCursor = EMouseCursor::Default;
 }
 
@@ -190,7 +191,6 @@ void AMainPlayerController::AttackClickCheck(float DeltaTime)
 				if (Player->GetPlayerState() != EPState::attack) {
 					StopMovement();
 				}
-
 				RotateAttack();
 
 			}
@@ -218,7 +218,11 @@ void AMainPlayerController::Dodge()
 
 void AMainPlayerController::RotateAttack()
 {
-	SetMouseCursorAngle();
+	if (bIsFirstAttack)
+	{
+		SetMouseCursorAngle();
+		bIsFirstAttack = false;
+	}
 	Player->Attack();
 }
 

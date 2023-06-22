@@ -69,6 +69,9 @@ private:
 	void SetMouseCursorAngle();
 
 	APlayerCharacter* Player;
+
+public:
+	bool bIsFirstAttack;
 };
 
 

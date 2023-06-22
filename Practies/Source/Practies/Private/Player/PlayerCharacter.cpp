@@ -217,12 +217,10 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 void APlayerCharacter::Attack()
 {
 
-
 	if (GetFSM()->GetCurState() == EPState::attack)
 	{
 		if (FMath::IsWithinInclusive<int32>(CurrentCombo, 1, MaxCombo))
 		{
-	
 			if (CanNextCombo)IsComboInputOn = true;
 		}
 	}
@@ -232,15 +230,21 @@ void APlayerCharacter::Attack()
 		{
 			if (!bisEndRotation)
 			{
+				if (!bIsTimeLinePlaying) {
+					bIsTimeLinePlaying = true;
+					RotationTimeLine->PlayFromStart();
+				}
 
-				RotationTimeLine->PlayFromStart();
 			}
 			else {
+
 				SetAttackTransform();
 				AttackStartComboState();
 				PlayerAnimInstance->PlayAttackMontage();
 				PlayerAnimInstance->JumpToAttackMontageSecion(CurrentCombo);
+				bIsTimeLinePlaying = false;
 				bisEndRotation = false;
+
 			}
 		}
 	}
@@ -297,6 +301,8 @@ void APlayerCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrp
 {
 	PlayerFSMInstance->ChangeState(UIdleState::GetInstance());
 	AttackEndComboState();
+	auto PlayerController = Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController());
+	PlayerController->bIsFirstAttack = true;
 }
 
 void APlayerCharacter::AttackStartComboState()
@@ -312,6 +318,7 @@ void APlayerCharacter::AttackEndComboState()
 	IsComboInputOn = false;
 	CanNextCombo = false;
 	CurrentCombo = 0;
+
 }
 
 void APlayerCharacter::InitAnimationDelegate()
@@ -411,6 +418,7 @@ void APlayerCharacter::RotationCurveInit()
 	RotationTimeLine->SetTimelineFinishedFunc(RotationFinishCallback);
 	RotationTimeLine->AddInterpFloat(RotationCurve, RotationCallBack);
 
+	bIsTimeLinePlaying = false;
 	float Min = 0.0f;
 	float Max = 0.0f;
 	RotationCurve->GetTimeRange(Min, Max);
@@ -444,6 +452,7 @@ void APlayerCharacter::SetAttackTransform()
 
 void APlayerCharacter::Rotating(float Value)
 {
+	
 	float TimeLineValue = Value;
 	float NewRotationValue = (NewAngle* TimeLineValue) - PrevRotation;
 	PrevRotation += NewRotationValue;
@@ -476,6 +485,7 @@ void APlayerCharacter::MovingDodge(float Value)
 	float TimeLineValue = Value;
 	float MoveDistance = DodgeDistance * TimeLineValue;
 	FVector MoveVector = MoveDistance * GetActorForwardVector();
+	
 	GetCharacterMovement()->Velocity = MoveVector;
 }
 void APlayerCharacter::FinishDodge()
@@ -486,3 +496,4 @@ float APlayerCharacter::GetHpRatio()
 {
 	return (float)PlayerStat.HP < KINDA_SMALL_NUMBER ? 0.0f : (float)PlayerStat.HP / (float)PlayerStat.MaxHP;
 }
+
