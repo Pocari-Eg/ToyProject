@@ -36,13 +36,9 @@ void UMonsterWidget::UpdateHpWidget()
 	{
 		if (nullptr != HPProgressBar)
 		{
-			TLOG_E(TEXT("Ratio %f"), CurMonster->GetHpRatio());
-			HPProgressBar->SetPercent(CurMonster->GetHpRatio());
+				HPProgressBar->SetPercent(CurMonster->GetHpRatio());
 		}
-		else {
 
-			TLOG_E(TEXT("NULL"));
-		}
 	}
 
 }

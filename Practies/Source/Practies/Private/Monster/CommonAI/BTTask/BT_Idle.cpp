@@ -2,6 +2,7 @@
 
 
 #include "Monster/CommonAI/BTTask/BT_Idle.h"
+#include "Monster/MonsterAIController.h"
 #include "Monster/Monster.h"
 
 UBT_Idle::UBT_Idle()
@@ -15,6 +16,8 @@ EBTNodeResult::Type UBT_Idle::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uin
 	auto Monster = Cast<AMonster>(OwnerComp.GetAIOwner()->GetPawn());
 	if (nullptr == Monster)
 		return EBTNodeResult::Failed;
+	Monster->GetAIController()->SetReturnHome(false);
+
 	Monster->PlayIdleAnimation();
 	return EBTNodeResult::InProgress;
 }

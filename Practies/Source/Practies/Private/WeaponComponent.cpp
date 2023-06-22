@@ -120,7 +120,8 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 									{
 										if (Cast<APlayerCharacter>(Owner)) {
 											auto Player = Cast<APlayerCharacter>(Owner);
-											Player->HitStopEvent();
+											if(i==0)	Player->HitStopEvent();
+										
 											//TLOG_E(TEXT("Attack Hit"));
 											GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Attack Hit"));
 											FDamageEvent DamageEvent;

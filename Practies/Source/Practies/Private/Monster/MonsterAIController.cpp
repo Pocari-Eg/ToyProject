@@ -9,6 +9,7 @@ const FName AMonsterAIController::PlayerKey = (TEXT("PlayerKey"));
 const FName AMonsterAIController::IsDeathKey = (TEXT("bIsDeath"));
 const FName AMonsterAIController::IsInAttackRangeKey = (TEXT("bIsInAttackRange"));
 const FName AMonsterAIController::SpawnLocationKey = (TEXT("SpawnLocation"));
+const FName AMonsterAIController::IsHitKey = (TEXT("bIsHit"));
 
 
 
@@ -47,7 +48,10 @@ void AMonsterAIController::SetDeathKey(bool value)
 {
 	Blackboard->SetValueAsBool(IsDeathKey, value);
 }
-
+void AMonsterAIController::SetHitKey(bool value)
+{
+	Blackboard->SetValueAsBool(IsHitKey, value);
+}
 void AMonsterAIController::SetInAttackRangeKey(bool value)
 {
 	Blackboard->SetValueAsBool(IsInAttackRangeKey, value);

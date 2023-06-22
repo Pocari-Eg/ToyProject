@@ -6,6 +6,7 @@
 #include "Player/PlayerCharacter.h"
 #include "DebugAPI.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Monster/MonsterAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTServiceMobDetectPlayer::UBTServiceMobDetectPlayer()
@@ -21,7 +22,7 @@ void UBTServiceMobDetectPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 	if (nullptr == Monster)
 		return;
 
-	if (!Monster->GetIsAttacking()) {
+	if (!Monster->GetIsAttacking()&&!Monster->GetAIController()->GetReturnHome()) {
 		if (!Monster->GetAIController()->GetPlayerFindKey()) ViewRangeCheck();
 		else AttackRangeCheck();
 	}
@@ -97,8 +98,8 @@ void UBTServiceMobDetectPlayer::AttackRangeCheck()
 
 		FMatrix BottomDebugMatrix = BottomLine.ToMatrixNoScale();
 		FMatrix TopDebugMatrix = TopLine.ToMatrixNoScale();
-		DebugAPI::DrawRadial(World, BottomDebugMatrix, Monster->GetAttackRange(), 360.0f, FColor::Red, 10, 0.1f, false, 0, 2);
-		DebugAPI::DrawRadial(World, TopDebugMatrix, Monster->GetAttackRange(), 360.0f, FColor::Red, 10, 0.1f, false, 0, 2);
+		DebugAPI::DrawRadial(World, BottomDebugMatrix, Monster->GetAttackRange(), Monster->GetAttackAngle(), FColor::Red, 10, 0.1f, false, 0, 2);
+		DebugAPI::DrawRadial(World, TopDebugMatrix, Monster->GetAttackRange(), Monster->GetAttackAngle(), FColor::Red, 10, 0.1f, false, 0, 2);
 	}
 
 	//Center += Monster->GetActorForwardVector() * Monster->GetAttackRange();
@@ -125,8 +126,30 @@ void UBTServiceMobDetectPlayer::AttackRangeCheck()
 
 				if (nullptr != Player)
 				{
-					Monster->GetAIController()->SetInAttackRangeKey(true);
-					return;
+					/*Monster->GetAIController()->SetInAttackRangeKey(true);
+					return;*/
+
+
+						FVector TargetDir = Player->GetActorLocation() - Monster->GetActorLocation();
+						TargetDir = TargetDir.GetSafeNormal();
+
+						float Radian = FVector::DotProduct(Monster->GetActorForwardVector(), TargetDir);
+						//내적 결과값은 Cos{^-1}(A dot B / |A||B|)이기 때문에 아크코사인 함수를 사용해주고 Degree로 변환해준다.
+						float TargetAngle = FMath::RadiansToDegrees(FMath::Acos(Radian));
+
+
+
+						//TLOG_W(TEXT("TargetAngle : %f "), TargetAngle);
+
+						if (TargetAngle <= (Monster->GetAttackAngle() * 0.5f))
+						{
+
+							Monster->GetAIController()->SetInAttackRangeKey(true);
+							return;
+
+						}
+
+
 				}
 
 			}

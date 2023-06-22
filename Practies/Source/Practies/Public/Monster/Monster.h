@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MonsterAIController.h"
+#include "Widget/DamageWidgetActor.h"
 #include "Monster.generated.h"
 DECLARE_MULTICAST_DELEGATE(FAttackEndDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnHpChangedDelegate);
@@ -61,6 +62,11 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = UI)
 	class UWidgetComponent* MonsterWidget;
 
+	UPROPERTY(VisibleAnywhere, Category = UI)
+	class TSubclassOf<ADamageWidgetActor> DamageWidgetClass;
+
+	TQueue<ADamageWidgetActor*> DWidget;
+	int widgetsize = 0;
 
 //function	
 private:
@@ -92,7 +98,9 @@ public:
 	void PlayWalkAnimation();
 	void PlayIdleAnimation();
 	void PlayAttackAnimation();
+	void PlayHitAnimation();
 
+	void OnDamageWidget(int Damage);
 	UFUNCTION()
 	void MouseBegin(UPrimitiveComponent* Component);
 	UFUNCTION()
@@ -112,10 +120,13 @@ public:
 
 	float GetAttackRange() { return WeaponData.AttackRange; }
 	float GetAttackHeight() { return WeaponData.AttackHeight; }
+	float GetAttackAngle() { return WeaponData.AttackAngle; }
 
 	float GetMaxSpawnDistance() { return MaxSpawnDistance; }
 
 	bool GetTestMode() { return bIsDebug; }
+
+	void SetIsAttacKing(bool value) { bIsAttacking = value; }
 	bool GetIsAttacking() { return bIsAttacking; }
 
 	UFUNCTION()
@@ -129,4 +140,9 @@ public:
 
 #pragma endregion Get,Set
 
+	//etc
+private:
+
+	void DeleteDamageWidget();
+	void UpDamageWidget();
 };

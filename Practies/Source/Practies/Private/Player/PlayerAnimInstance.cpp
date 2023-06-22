@@ -8,7 +8,6 @@ void UPlayerAnimInstance::PlayAttackMontage()
 	if (!Montage_IsPlaying(AttackMontage))
 	{
 		Player->ChangeState(UAttackState::GetInstance());
-		TLOG_W(TEXT("Attack"));
 		Montage_Play(AttackMontage, 1.0f);
 	}
 }

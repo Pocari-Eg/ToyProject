@@ -4,6 +4,7 @@
 #include "Monster/Monster.h"
 #include "Monster/MonsterAnimInstance.h"
 #include "Widget/MonsterWidget.h"
+
 #include "Components/WidgetComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -26,6 +27,7 @@ AMonster::AMonster()
 	MonsterWidget->SetRelativeRotation(FRotator(0.0f, 270.0f, 0.0f));
 	MonsterWidget->SetWidgetSpace(EWidgetSpace::Screen);
 
+
 	GetMesh()->SetCollisionProfileName("NoCollision");
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> UI_MONSTERWIDGET(TEXT("WidgetBlueprint'/Game/Blueprint/Monster/BP_MonsterWidget.BP_MonsterWidget_C'"));
@@ -37,6 +39,12 @@ AMonster::AMonster()
 		MonsterWidget->bAutoActivate = true;
 	}
 
+	static ConstructorHelpers::FClassFinder<AActor> DamageActor(TEXT("Blueprint'/Game/Blueprint/Widget/BP_DamageWidgetActor.BP_DamageWidgetActor_C'"));
+
+	if (DamageActor.Succeeded()) {
+
+		DamageWidgetClass = DamageActor.Class;
+	}
 	GetCapsuleComponent()->OnBeginCursorOver.AddDynamic(this, &AMonster::MouseBegin);
 	GetCapsuleComponent()->OnEndCursorOver.AddDynamic(this, &AMonster::MouseEnd);
 
@@ -108,15 +116,43 @@ void AMonster::PlayAttackAnimation()
 
 	MonsterAnimInstance->PlayAttackMontage();
 }
+void AMonster::PlayHitAnimation()
+{
+    
+	MonsterAnimInstance->PlayHitMontage();
+}
+
+void AMonster::OnDamageWidget(int Damage)
+{
+	//z
+	//y
+	
+	FVector3d NewLocation = GetActorTransform().GetLocation();
+
+	FTransform NewTransform = GetActorTransform();
+
+	float NewY = FMath::FRandRange(10.0f, 20.0f);
+	int Ysign = UKismetMathLibrary::RandomInteger(2);
+
+	if (Ysign == 1)NewY *= -1.0f;
+
+	NewLocation.Y += NewY;
+	NewTransform.SetLocation(NewLocation);
+	auto widget = GetWorld()->SpawnActor<ADamageWidgetActor>(DamageWidgetClass, NewTransform);
+	widget->BindMonster(this,NewY);
+	widget->OnDamageWidget(Damage);
+
+	widget->Delete.AddUObject(this, &AMonster::DeleteDamageWidget);
+	DWidget.Enqueue(widget);
+	widgetsize++;
+}
+
+
 // Called every frame
 void AMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//FRotator CameraRot = UKismetMathLibrary::FindLookAtRotation(MonsterWidget->GetComponentTransform().GetLocation(),
-	//	UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation());
 
-	//// Yaw 값만 변환하여 위젯이 카메라를 따라옴
-	//MonsterWidget->SetWorldRotation(FRotator(CameraRot.Pitch, 0.0f, 0.0f));
 }
 
 void AMonster::PostInitializeComponents()
@@ -133,18 +169,19 @@ void AMonster::PostInitializeComponents()
 float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	
-	if(!bIsAttacking)	MonsterAnimInstance->PlayHitMontage();
+
 
 	auto Widget = Cast<UMonsterWidget>(MonsterWidget->GetWidget());
 	if (Widget != nullptr)
 	{
 		Widget->SetWidgetVisible(true);
 	}
+	UpDamageWidget();
+	OnDamageWidget(FinalDamage);
 	MonsterStat.HP -= FinalDamage;
 	OnHpChanged.Broadcast();
 
-	TLOG_W(TEXT("MonsterHP %d : %d"), MonsterStat.HP, MonsterStat.MaxHP);
+	MonsterAIController->SetHitKey(true);
 	if (MonsterStat.HP <=0)
 	{
 		MonsterWidget->SetVisibility(false);
@@ -179,6 +216,30 @@ void AMonster::SetAttackTransform()
 float AMonster::GetHpRatio()
 {
 	return (float)MonsterStat.HP < KINDA_SMALL_NUMBER ? 0.0f : (float)MonsterStat.HP / (float)MonsterStat.MaxHP;
+}
+
+void AMonster::DeleteDamageWidget()
+{
+	DWidget.Pop();
+	widgetsize--;
+}
+
+void AMonster::UpDamageWidget()
+{
+
+	if (!DWidget.IsEmpty())
+	{
+		for (int i = 0; i < widgetsize; i++)
+		{
+			auto curwidget = *DWidget.Peek();
+			DWidget.Pop();
+			FVector Newlocation = curwidget->GetActorLocation();
+			Newlocation.Z += 10.0f;
+			curwidget->SetActorLocation(Newlocation);
+			DWidget.Enqueue(curwidget);
+			
+		}
+	}
 }
 
 void AMonster::MouseBegin(UPrimitiveComponent* Component)

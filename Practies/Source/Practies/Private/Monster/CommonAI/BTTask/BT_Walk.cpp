@@ -42,6 +42,7 @@ void UBT_Walk::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, fl
 		{
 			Monster->GetAIController()->StopMovement();
 			Monster->GetAIController()->SetPlayerFindKey(false);
+			Monster->GetAIController()->SetReturnHome(true);
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
 	}
