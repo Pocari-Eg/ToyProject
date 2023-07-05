@@ -55,6 +55,9 @@ protected:
 	void Dodge();
 
 	void RotateAttack();
+
+
+	void InputSkill_Q();
 private:
 	bool bMoveInputPressed; // Input is bring pressed
 	bool bIsTouch; // Is it a touch device

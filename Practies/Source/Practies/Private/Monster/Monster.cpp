@@ -139,7 +139,7 @@ void AMonster::OnDamageWidget(int Damage)
 	NewLocation.Y += NewY;
 	NewTransform.SetLocation(NewLocation);
 	auto widget = GetWorld()->SpawnActor<ADamageWidgetActor>(DamageWidgetClass, NewTransform);
-	widget->BindMonster(this,NewY);
+	widget->Bind(this,NewY);
 	widget->OnDamageWidget(Damage);
 
 	widget->Delete.AddUObject(this, &AMonster::DeleteDamageWidget);

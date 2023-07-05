@@ -3,7 +3,6 @@
 
 #include "Widget/DamageWidgetActor.h"
 #include "Widget/DamageWidget.h"
-#include "Monster/Monster.h"
 #include "Components/WidgetComponent.h"
 // Sets default values
 ADamageWidgetActor::ADamageWidgetActor()
@@ -48,7 +47,7 @@ void ADamageWidgetActor::Tick(float DeltaTime)
 			Widget->SetRenderScale(FVector2d(NewScale, NewScale));
 		}
 	
-		FVector NewLocation = Monster->GetActorLocation();
+		FVector NewLocation = Owner->GetActorLocation();
 		NewLocation.Z = GetActorLocation().Z;
 		NewLocation.Y+= MoveY;
 		SetActorLocation(NewLocation);

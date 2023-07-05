@@ -10,6 +10,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnNexAttackCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnAttackCheckDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnSkillCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnDeathDelegate);
 /**
  * 
@@ -24,6 +25,7 @@ public:
 	FOnNexAttackCheckDelegate OnNextAttackCheck;
 	FOnAttackCheckDelegate OnAttackCheck;
 	FOnDeathDelegate OnDeath;
+	FOnSkillCheckDelegate OnSkillCheck;
 
 UPROPERTY(EditAnywhere,bluePrintreadwrite, category = Dodge)
 	bool bIsDodge;
@@ -39,6 +41,8 @@ UAnimMontage* AttackMontage;
 UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowprivateaccess = true))
 UAnimMontage* DeathMontage;
 
+UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowprivateaccess = true))
+UAnimMontage* Skill1Montage;
 
 
 
@@ -49,6 +53,8 @@ public:
 	void Init(APlayerCharacter* Value);
 	void PlayAttackMontage();
 	void PlayDeathMontage();
+
+	void PlaySkillMontage(int i);
 
 	void JumpToAttackMontageSecion(int32 NewSection);
 
@@ -66,6 +72,8 @@ private:
 	void AnimNotify_Setidle() const;
 	UFUNCTION()
 	void AnimNotify_AttackCheck() const;
+	UFUNCTION()
+	void AnimNotify_SkillCheck() const;
 	UFUNCTION()
 	void AnimNotify_NextAttackCheck() const;
 	UFUNCTION()

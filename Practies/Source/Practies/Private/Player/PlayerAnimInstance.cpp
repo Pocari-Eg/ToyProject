@@ -22,6 +22,18 @@ void UPlayerAnimInstance::PlayDeathMontage()
 	}
 }
 
+void UPlayerAnimInstance::PlaySkillMontage(int i)
+{
+	Player->ChangeState(UAttackState::GetInstance());
+	switch (i) {
+	case 1:
+		Montage_Play(Skill1Montage, 1.0f);
+		break;
+	default:
+		break;
+	}
+}
+
 
 void UPlayerAnimInstance::JumpToAttackMontageSecion(int32 NewSection)
 {
@@ -56,7 +68,7 @@ return false;
 
 UPlayerAnimInstance::UPlayerAnimInstance()
 {
-
+	
 }
 
 void UPlayerAnimInstance::Init(APlayerCharacter* Value)
@@ -86,4 +98,8 @@ void UPlayerAnimInstance::AnimNotify_NextAttackCheck() const
 void UPlayerAnimInstance::AnimNotify_Death() const
 {
 	OnDeath.Broadcast();
+}
+void UPlayerAnimInstance::AnimNotify_SkillCheck() const
+{
+	OnSkillCheck.Broadcast();
 }

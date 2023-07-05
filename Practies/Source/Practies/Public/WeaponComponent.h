@@ -26,7 +26,22 @@ public:
 	float AttackHeight;
 
 };
+USTRUCT(Atomic, BlueprintType)
+struct FSkillData
+{
 
+	GENERATED_BODY()
+	public:
+	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
+	int Damage;
+	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
+	float Angle;
+	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
+	float Range;
+	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
+	float Height;
+
+};
 UCLASS( ClassGroup=(Weapon), meta=(BlueprintSpawnableComponent) )
 class PRACTIES_API UWeaponComponent : public USceneComponent
 {
@@ -51,6 +66,8 @@ UPROPERTY()
 public:
 UFUNCTION(BlueprintCallable)
 void AttackCheck(bool bisDebug,FTransform OwnerTransform, FVector OwnerFowardVector, int Damage);
+UFUNCTION(BlueprintCallable)
+void SkillCheck(bool bisDebug, FTransform OwnerTransform, FVector OwnerFowardVector, FSkillData SkillData);
 UFUNCTION(BlueprintCallable)
 void SetVisible(bool Set);
 		

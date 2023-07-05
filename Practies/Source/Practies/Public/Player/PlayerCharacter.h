@@ -12,7 +12,7 @@
 
 #include "Curves/CurveFloat.h"
 #include "Components/TimeLineComponent.h"
-
+#include "Widget/DamageWidgetActor.h"
 #include "PlayerCharacter.generated.h"
 
 /* Region
@@ -52,6 +52,11 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	class UUserWidget* PlayerHud;
 
+	UPROPERTY(VisibleAnywhere, Category = UI)
+	class TSubclassOf<ADamageWidgetActor> DamageWidgetClass;
+
+	TQueue<ADamageWidgetActor*> DWidget;
+	int widgetsize = 0;
 	//delegate
 	FOnHpChangedDelegate OnHpChanged;
 private:
@@ -59,6 +64,8 @@ private:
     FStatData PlayerStat;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
 	FWeaponData WeaponData;
+	
+	FSkillData SkillData;
 
 
 	//Ä«¸Þ¶ó
@@ -110,7 +117,8 @@ private:
 	float DodgeCoolTime;
 	float DodgeCoolTimer;
 	bool bIsDodGeCool;
-
+	bool bIsHitWall;
+	bool bIsInvincible;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
 	bool CanNextCombo;
@@ -134,7 +142,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	protected:
+		virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, 
+			bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -154,6 +164,11 @@ public:
 	void Rotating(float Value);
 	UFUNCTION()
 	void FinishRotation();
+
+	UFUNCTION()
+	void SkillAttack(int i);
+	UFUNCTION()
+	void SkillCheck();
 
 	//dodge
 	void Dodge();
@@ -200,6 +215,11 @@ public:
 	UFUNCTION()
 	void BindMonster(AMonster* NewMonster);
 	void UnBindMonster();
+
+	void OnDamageWidget(int Damage);
+	void DeleteDamageWidget();
+	void UpDamageWidget();
+
 	
 private:
 	//inti

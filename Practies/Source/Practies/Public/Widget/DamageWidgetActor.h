@@ -23,7 +23,7 @@ private:
 	float MoveY;
 	float ScaleUnit;
 
-	class AMonster* Monster;
+	AActor* Owner;
 public:
 	FOnDeleteDelegate Delete;
 public:
@@ -40,8 +40,8 @@ public:
 
 
 	void OnDamageWidget(int Damage);
-	void BindMonster(class AMonster* value,float MoveYvalue) { 
-		Monster = value;
+	void Bind(AActor* value,float MoveYvalue) { 
+		Owner = value;
 		MoveY = MoveYvalue;
 	}
 };

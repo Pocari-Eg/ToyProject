@@ -12,6 +12,8 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
 #include"Widget/PlayerWidget.h"
 #include"PRGameInstance.h"
 
@@ -96,6 +98,13 @@ APlayerCharacter::APlayerCharacter()
 		PlayerWidgetBP = WidgetBP.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<AActor> DamageActor(TEXT("Blueprint'/Game/Blueprint/Widget/BP_DamageWidgetActor.BP_DamageWidgetActor_C'"));
+
+	if (DamageActor.Succeeded()) {
+
+		DamageWidgetClass = DamageActor.Class;
+	}
+
 	WeaponData.AttackAngle = 100.0f;
 	WeaponData.AttackHeight = 100.0f;
 	WeaponData.AttackRange = 150.0f;
@@ -120,6 +129,8 @@ APlayerCharacter::APlayerCharacter()
 	DodgeCoolTimer = 0.0f;
 	bisEndRotation = false;
 	PrevRotation = 0.0f;
+
+	bIsInvincible = false;
 
 	//curve
 	const ConstructorHelpers::FObjectFinder<UCurveFloat>DodgeCurveData(TEXT("/Game/StarterContent/Curve/DodgeCurve.DodgeCurve"));
@@ -199,21 +210,32 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	if (!bIsInvincible) {
 
-	PlayerStat.HP -= FinalDamage;
+		PlayerStat.HP -= FinalDamage;
+		UpDamageWidget();
+		OnDamageWidget(FinalDamage);
+		OnHpChanged.Broadcast();
 
-	OnHpChanged.Broadcast();
-
-	TLOG_W(TEXT("PlayerHP %d : %d"), PlayerStat.HP, PlayerStat.MaxHP);
-	if (PlayerStat.HP <= 0)
-	{
-		//SetActorEnableCollision(false);
-		GetCapsuleComponent()->SetCollisionProfileName("NoCollision");
-		PlayerAnimInstance->PlayDeathMontage();
+		TLOG_W(TEXT("PlayerHP %d : %d"), PlayerStat.HP, PlayerStat.MaxHP);
+		if (PlayerStat.HP <= 0)
+		{
+			//SetActorEnableCollision(false);
+			GetCapsuleComponent()->SetCollisionProfileName("NoCollision");
+			PlayerAnimInstance->PlayDeathMontage();
+		}
+		return FinalDamage;
 	}
-	return FinalDamage;
-}
+	return 0.0f;
 
+}
+void APlayerCharacter::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+
+	if (OtherComp->GetCollisionProfileName() == "Wall") {
+		bIsHitWall = true;
+	}
+}
 void APlayerCharacter::Attack()
 {
 
@@ -325,6 +347,7 @@ void APlayerCharacter::InitAnimationDelegate()
 {
 	PlayerAnimInstance->OnMontageEnded.AddDynamic(this, &APlayerCharacter::OnAttackMontageEnded);
 	PlayerAnimInstance->OnAttackCheck.AddUObject(this, &APlayerCharacter::AttackCheck);
+	PlayerAnimInstance->OnSkillCheck.AddUObject(this, &APlayerCharacter::SkillCheck);
 	PlayerAnimInstance->OnDeath.AddUObject(this, &APlayerCharacter::Death);
 
 	PlayerAnimInstance->OnNextAttackCheck.AddLambda([this]()->void {
@@ -370,6 +393,51 @@ void APlayerCharacter::UnBindMonster()
 {
 	auto Widget = Cast<UPlayerWidget>(PlayerHud);
 	Widget->SetVisibleMonsterWidget(false);
+}
+
+void APlayerCharacter::OnDamageWidget(int Damage)
+{
+	FVector3d NewLocation = GetActorTransform().GetLocation();
+
+	FTransform NewTransform = GetActorTransform();
+
+	float NewY = FMath::FRandRange(10.0f, 20.0f);
+	int Ysign = UKismetMathLibrary::RandomInteger(2);
+
+	if (Ysign == 1)NewY *= -1.0f;
+
+	NewLocation.Y += NewY;
+	NewTransform.SetLocation(NewLocation);
+	auto widget = GetWorld()->SpawnActor<ADamageWidgetActor>(DamageWidgetClass, NewTransform);
+	widget->Bind(this, NewY);
+	widget->OnDamageWidget(Damage);
+
+	widget->Delete.AddUObject(this, &APlayerCharacter::DeleteDamageWidget);
+	DWidget.Enqueue(widget);
+	widgetsize++;
+}
+
+void APlayerCharacter::DeleteDamageWidget()
+{
+	DWidget.Pop();
+	widgetsize--;
+}
+
+void APlayerCharacter::UpDamageWidget()
+{
+	if (!DWidget.IsEmpty())
+	{
+		for (int i = 0; i < widgetsize; i++)
+		{
+			auto curwidget = *DWidget.Peek();
+			DWidget.Pop();
+			FVector Newlocation = curwidget->GetActorLocation();
+			Newlocation.Z += 10.0f;
+			curwidget->SetActorLocation(Newlocation);
+			DWidget.Enqueue(curwidget);
+
+		}
+	}
 }
 
 void APlayerCharacter::PlayerInit()
@@ -466,6 +534,28 @@ void APlayerCharacter::FinishRotation()
 	Attack();
 }
 
+void APlayerCharacter::SkillAttack(int i)
+{
+	//나중에 i값으로 데이터테이블에서 값을 찾아 적용할 수 있도록 수정 할것
+	switch (i)
+	{
+	case 1:
+		SkillData.Damage = 500;
+		SkillData.Angle = 90.0f;
+		SkillData.Height = 100.0f;
+		SkillData.Range = 320.0f;
+		PlayerAnimInstance->PlaySkillMontage(1);
+		break;
+	default:
+		break;
+	}
+	
+}
+void APlayerCharacter::SkillCheck()
+{
+	SetAttackTransform();
+	PlayerWeapon->SkillCheck(bIsDebug, AttackTransform, AttackForwardVector, SkillData);
+}
 void APlayerCharacter::Dodge()
 {
 	if (!bIsDodGeCool) {
@@ -474,9 +564,11 @@ void APlayerCharacter::Dodge()
 		bIsDodGeCool = true;
 
 		AddActorWorldRotation(FRotator(0.0f, NewAngle, 0.0f));
-
+		bIsHitWall = false;
+		bIsInvincible = true;
 		SetDodge(true);
 		DodgeTimeLine->PlayFromStart();
+		
 	}
 }
 
@@ -486,11 +578,13 @@ void APlayerCharacter::MovingDodge(float Value)
 	float MoveDistance = DodgeDistance * TimeLineValue;
 	FVector MoveVector = MoveDistance * GetActorForwardVector();
 	
+	if (bIsHitWall)MoveVector = FVector::ZeroVector;
 	GetCharacterMovement()->Velocity = MoveVector;
 }
 void APlayerCharacter::FinishDodge()
 {
 	PlayerAnimInstance->SetDodge(false);
+	bIsInvincible = false;
 }
 float APlayerCharacter::GetHpRatio()
 {

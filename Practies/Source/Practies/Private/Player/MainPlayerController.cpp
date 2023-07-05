@@ -40,6 +40,8 @@ void AMainPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Attack", IE_Pressed, this, &AMainPlayerController::OnSetAttackPressed);
 	InputComponent->BindAction("Attack", IE_Released, this, &AMainPlayerController::OnSetAttackReleased);
 
+	InputComponent->BindAction("SkillQ", IE_Released, this, &AMainPlayerController::InputSkill_Q);
+
 	InputComponent->BindAction("Dodge", IE_Released, this, &AMainPlayerController::Dodge);
 
 	// support touch devices 
@@ -224,6 +226,14 @@ void AMainPlayerController::RotateAttack()
 		bIsFirstAttack = false;
 	}
 	Player->Attack();
+}
+
+void AMainPlayerController::InputSkill_Q()
+{
+	if (Player != nullptr)
+	{
+		Player->SkillAttack(1);
+	}
 }
 
 void AMainPlayerController::SetMouseCursorAngle()
