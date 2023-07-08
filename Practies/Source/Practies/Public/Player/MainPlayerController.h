@@ -28,6 +28,7 @@ public:
 	UNiagaraSystem* FXCursor;
 public:
 	void PlayerInit(APlayerCharacter* Value) { Player = Value; }
+	void SetOnMouseWidget(bool Value);
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -58,6 +59,15 @@ protected:
 
 
 	void InputSkill_Q();
+	void InputSkill_W();
+	void InputSkill_E();
+	void InputSkill_R();
+	void InputSkill_A();
+	void InputSkill_S();
+	void InputSkill_D();
+	void InputSkill_F();
+
+	void InputSkillBook();
 private:
 	bool bMoveInputPressed; // Input is bring pressed
 	bool bIsTouch; // Is it a touch device
@@ -73,6 +83,8 @@ private:
 
 	APlayerCharacter* Player;
 
+
+	bool bIsMouseOnWidget;
 public:
 	bool bIsFirstAttack;
 };

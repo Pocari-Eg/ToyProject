@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Player/Skill.h"
 #include "PRGameInstance.generated.h"
 
 /**
@@ -28,5 +29,10 @@ public:
 	void BindPlayer(APlayerCharacter* NewPlayer);
 	APlayerCharacter* GetPlayer();
 
-
+	UFUNCTION(Blueprintcallable)
+	void SetMouseOnWidget(bool Value);
+	UFUNCTION(Blueprintcallable)
+	void SetPlayerUseSkill(int idx, FSkill Data);
+	UFUNCTION(Blueprintcallable)
+	void ErasePlayerSkill(int idx);
 };

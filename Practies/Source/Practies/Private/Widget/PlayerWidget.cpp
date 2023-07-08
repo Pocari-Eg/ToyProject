@@ -96,6 +96,12 @@ void UPlayerWidget::SetVisibleMonsterWidget(bool Set)
 	}
 }
 
+void UPlayerWidget::ToggleSkillBook()
+{
+	if(SkillBook->GetVisibility()== ESlateVisibility::Hidden) SkillBook->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	else SkillBook->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void UPlayerWidget::NativeConstruct()
 {
 
@@ -112,6 +118,9 @@ void UPlayerWidget::NativeConstruct()
 
 	MonsterInfo.Base->SetVisibility(ESlateVisibility::Hidden);
 
+	SkillBook = Cast<UUserWidget>(GetWidgetFromName(TEXT("BP_SkillBook")));
+	SkillBook->SetVisibility(ESlateVisibility::Hidden);
+	
 
 	PlayerHp.HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HP")));
 	PlayerHp.MaxHp = Cast<UTextBlock>(GetWidgetFromName(TEXT("MaxHp")));

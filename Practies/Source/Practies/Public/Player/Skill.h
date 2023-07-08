@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StatData.generated.h"
+#include "Engine/Texture2D.h"
+#include "Animation/AnimMontage.h"
+#include "Skill.generated.h"
 
 USTRUCT(Atomic, BluePrintType)
-struct FStatData
+struct FSkill
 {
 	GENERATED_BODY()
 
@@ -14,15 +16,14 @@ struct FStatData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Level;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 HP;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 MaxHP;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ATK;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 MoveSpeed;
+	int32 Damage;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Range;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Angle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* Texture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* Montage;
 };

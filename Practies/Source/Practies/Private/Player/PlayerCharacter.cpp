@@ -150,6 +150,10 @@ APlayerCharacter::APlayerCharacter()
 	}
 
 	RotationTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("RotationTimeLine"));
+
+	FSkill Null;
+	Null.Damage = -1;
+	UseSkills.Init(Null, 8);
 }
 
 // Called when the game starts or when spawned
@@ -493,6 +497,12 @@ void APlayerCharacter::RotationCurveInit()
 	RotationTimeLine->SetTimelineLength(Max);
 }
 
+void APlayerCharacter::ToggleSkillBook()
+{
+	auto Widget = Cast<UPlayerWidget>(PlayerHud);
+	Widget->ToggleSkillBook();
+}
+
 void APlayerCharacter::ChangeState(IState* NewState)
 {
 	PlayerFSMInstance->ChangeState(NewState);
@@ -537,17 +547,20 @@ void APlayerCharacter::FinishRotation()
 void APlayerCharacter::SkillAttack(int i)
 {
 	//나중에 i값으로 데이터테이블에서 값을 찾아 적용할 수 있도록 수정 할것
-	switch (i)
-	{
-	case 1:
-		SkillData.Damage = 500;
-		SkillData.Angle = 90.0f;
-		SkillData.Height = 100.0f;
-		SkillData.Range = 320.0f;
-		PlayerAnimInstance->PlaySkillMontage(1);
-		break;
-	default:
-		break;
+
+	if (UseSkills[i].Damage == -1) {
+		TLOG_E(TEXT("EmptySkill"))
+	}
+	else {
+		SkillData.Damage = UseSkills[i].Damage;
+		SkillData.Angle = UseSkills[i].Angle;
+		SkillData.Range = UseSkills[i].Range;
+
+		PlayerAnimInstance->SetSkillMontage(UseSkills[i].Montage);
+		PlayerAnimInstance->PlaySkillMontage();
+
+		TLOG_E(TEXT("PlaySKill"))
+
 	}
 	
 }
@@ -589,5 +602,23 @@ void APlayerCharacter::FinishDodge()
 float APlayerCharacter::GetHpRatio()
 {
 	return (float)PlayerStat.HP < KINDA_SMALL_NUMBER ? 0.0f : (float)PlayerStat.HP / (float)PlayerStat.MaxHP;
+}
+
+void APlayerCharacter::SetOnMouseWidget(bool Value)
+{
+	auto PlayerController = Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController());
+	PlayerController->SetOnMouseWidget(Value);
+}
+
+void APlayerCharacter::SetUseSkill(int idx, FSkill Data)
+{
+	UseSkills[idx] = Data;
+}
+
+void APlayerCharacter::EraseUseSkill(int idx)
+{
+	FSkill Null;
+	Null.Damage = -1;
+	UseSkills[idx] = Null;
 }
 

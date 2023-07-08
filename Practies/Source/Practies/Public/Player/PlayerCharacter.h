@@ -5,6 +5,7 @@
 #include "../Practies.h"
 #include "CameraSetData.h"
 #include "StatData.h"
+#include "Skill.h"
 #include "GameFramework/Character.h"
 #include "FSM/PlayerFSM.h"
 #include "WeaponComponent.h"
@@ -67,7 +68,8 @@ private:
 	
 	FSkillData SkillData;
 
-
+	TArray<FSkill> UseSkills;
+	
 	//Ä«¸Þ¶ó
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	FCameraSetData CameraData;
@@ -228,7 +230,11 @@ private:
 
 	void DodgeCurveInit();
 	void RotationCurveInit();
+#pragma region WidgetControl
+public:
+	void ToggleSkillBook();
 
+#pragma endregion
 #pragma region GetSet
 public:
 	//Component
@@ -263,6 +269,12 @@ public:
 
 	 //widget
 	 float GetHpRatio();
+
+	 void SetOnMouseWidget(bool Value);
+
+
+	 void SetUseSkill(int idx, FSkill Data);
+	 void EraseUseSkill(int idx);
 
 };
 #pragma endregion GetSet

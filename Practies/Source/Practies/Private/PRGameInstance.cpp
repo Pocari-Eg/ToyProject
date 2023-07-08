@@ -11,7 +11,7 @@ void UPRGameInstance::BindMonster2PlayerWidget(AMonster* NewMonster)
    if (Player != nullptr){
 
 	Player->BindMonster(NewMonster);
-     }
+   }
 
 }
 
@@ -29,4 +29,19 @@ void UPRGameInstance::BindPlayer(APlayerCharacter* NewPlayer)
 APlayerCharacter* UPRGameInstance::GetPlayer()
 {
 	return Player;
+}
+
+void UPRGameInstance::SetMouseOnWidget(bool Value)
+{
+	Player->SetOnMouseWidget(Value);
+}
+
+void UPRGameInstance::SetPlayerUseSkill(int idx, FSkill Data)
+{
+	Player->SetUseSkill(idx, Data);
+}
+
+void UPRGameInstance::ErasePlayerSkill(int idx)
+{
+	Player->EraseUseSkill(idx);
 }

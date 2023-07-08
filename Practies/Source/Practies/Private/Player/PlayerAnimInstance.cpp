@@ -22,16 +22,11 @@ void UPlayerAnimInstance::PlayDeathMontage()
 	}
 }
 
-void UPlayerAnimInstance::PlaySkillMontage(int i)
+void UPlayerAnimInstance::PlaySkillMontage()
 {
 	Player->ChangeState(UAttackState::GetInstance());
-	switch (i) {
-	case 1:
-		Montage_Play(Skill1Montage, 1.0f);
-		break;
-	default:
-		break;
-	}
+	Montage_Play(SkillMontage, 1.0f);
+
 }
 
 

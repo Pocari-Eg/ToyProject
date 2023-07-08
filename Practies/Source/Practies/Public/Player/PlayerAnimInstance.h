@@ -42,7 +42,7 @@ UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowpri
 UAnimMontage* DeathMontage;
 
 UPROPERTY(EditAnywhere, blueprintreadWrite, category = Montage, meta = (Allowprivateaccess = true))
-UAnimMontage* Skill1Montage;
+UAnimMontage* SkillMontage;
 
 
 
@@ -54,7 +54,7 @@ public:
 	void PlayAttackMontage();
 	void PlayDeathMontage();
 
-	void PlaySkillMontage(int i);
+	void PlaySkillMontage();
 
 	void JumpToAttackMontageSecion(int32 NewSection);
 
@@ -66,6 +66,7 @@ public:
 	//GetSet
 	void SetDodge(bool State) { bIsDodge = State; }
 
+	void SetSkillMontage(UAnimMontage* Value) { SkillMontage = Value; }
 	//notify
 private:
 	UFUNCTION()

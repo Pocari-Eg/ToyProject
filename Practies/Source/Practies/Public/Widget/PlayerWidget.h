@@ -63,6 +63,8 @@ public:
 	void UpdateHpWidget();
 	void SetVisibleMonsterWidget(bool Set);
 	
+
+	void ToggleSkillBook();
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;
@@ -79,6 +81,8 @@ private:
 	FMonsterWidgetData MonsterInfo;
 
 	FHPWidgetData PlayerHp;
+
+	UUserWidget* SkillBook;
 
 	
 };

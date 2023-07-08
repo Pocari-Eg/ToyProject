@@ -14,6 +14,7 @@ AMainPlayerController::AMainPlayerController()
 {
 	bShowMouseCursor = true;
 	bIsFirstAttack = true;
+	bIsMouseOnWidget = false;
 	DefaultMouseCursor = EMouseCursor::Default;
 }
 
@@ -41,6 +42,16 @@ void AMainPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Attack", IE_Released, this, &AMainPlayerController::OnSetAttackReleased);
 
 	InputComponent->BindAction("SkillQ", IE_Released, this, &AMainPlayerController::InputSkill_Q);
+	InputComponent->BindAction("SkillW", IE_Released, this, &AMainPlayerController::InputSkill_W);
+	InputComponent->BindAction("SkillE", IE_Released, this, &AMainPlayerController::InputSkill_E);
+	InputComponent->BindAction("SkillR", IE_Released, this, &AMainPlayerController::InputSkill_R);
+	InputComponent->BindAction("SkillA", IE_Released, this, &AMainPlayerController::InputSkill_A);
+	InputComponent->BindAction("SkillS", IE_Released, this, &AMainPlayerController::InputSkill_S);
+	InputComponent->BindAction("SkillD", IE_Released, this, &AMainPlayerController::InputSkill_D);
+	InputComponent->BindAction("SkillF", IE_Released, this, &AMainPlayerController::InputSkill_F);
+
+
+	InputComponent->BindAction("SkillBook", IE_Pressed, this, &AMainPlayerController::InputSkillBook);
 
 	InputComponent->BindAction("Dodge", IE_Released, this, &AMainPlayerController::Dodge);
 
@@ -52,32 +63,35 @@ void AMainPlayerController::SetupInputComponent()
 
 void AMainPlayerController::OnSetDestinationPressed()
 {
-			// We flag that the input is being pressed
-	bMoveInputPressed = true;
-			// Just in case the character was moving because of a previous short press we stop it
-	
+	if (!bIsMouseOnWidget) {
+		// We flag that the input is being pressed
+		bMoveInputPressed = true;
+		// Just in case the character was moving because of a previous short press we stop it
+	}
 }
 
 void AMainPlayerController::OnSetDestinationReleased()
 {
-	// Player is no longer pressing the input
-	bMoveInputPressed = false;
-	
-	// If it was a short press
-	if(MoveFollowTime <= ShortPressThreshold)
-	{
-		if (Player->GetPlayerState() == EPState::idle || Player->GetPlayerState() == EPState::walk) {
-			// We look for the location in the world where the player has pressed the input
-			FVector HitLocation = FVector::ZeroVector;
-			FHitResult Hit;
-			GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-			HitLocation = Hit.Location;
+	if (!bIsMouseOnWidget) {
+		// Player is no longer pressing the input
+		bMoveInputPressed = false;
 
-			// We move there and spawn some particles
-			Player->ChangeState(UWalkState::GetInstance());
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
-			bIsShortClickWalk = true;
+		// If it was a short press
+		if (MoveFollowTime <= ShortPressThreshold)
+		{
+			if (Player->GetPlayerState() == EPState::idle || Player->GetPlayerState() == EPState::walk) {
+				// We look for the location in the world where the player has pressed the input
+				FVector HitLocation = FVector::ZeroVector;
+				FHitResult Hit;
+				GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+				HitLocation = Hit.Location;
+
+				// We move there and spawn some particles
+				Player->ChangeState(UWalkState::GetInstance());
+				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+				bIsShortClickWalk = true;
+			}
 		}
 	}
 }
@@ -120,19 +134,23 @@ void AMainPlayerController::ZoomOut()
 
 void AMainPlayerController::OnSetAttackPressed()
 {
-	bAttackInputPressed = true;
+	if (!bIsMouseOnWidget) {
+		bAttackInputPressed = true;
+	}
 }
 
 void AMainPlayerController::OnSetAttackReleased()
 {
-	bAttackInputPressed = false;
-	if (Player != nullptr) {
-		// If it was a short press
-		if (AttackFollowTime < ShortPressThreshold)
-		{
-			StopMovement();
+	if (!bIsMouseOnWidget) {
+		bAttackInputPressed = false;
+		if (Player != nullptr) {
+			// If it was a short press
+			if (AttackFollowTime < ShortPressThreshold)
+			{
+				StopMovement();
 
-			RotateAttack();
+				RotateAttack();
+			}
 		}
 	}
 }
@@ -230,10 +248,54 @@ void AMainPlayerController::RotateAttack()
 
 void AMainPlayerController::InputSkill_Q()
 {
-	if (Player != nullptr)
-	{
-		Player->SkillAttack(1);
-	}
+	if (Player != nullptr)Player->SkillAttack(0);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Q"));
+}
+void AMainPlayerController::InputSkill_W()
+{
+	if (Player != nullptr)Player->SkillAttack(1);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("W"));
+}
+void AMainPlayerController::InputSkill_E()
+{
+	if (Player != nullptr)Player->SkillAttack(2);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("E"));
+}
+void AMainPlayerController::InputSkill_R()
+{
+	if (Player != nullptr)Player->SkillAttack(3);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("R"));
+}
+void AMainPlayerController::InputSkill_A()
+{
+	if (Player != nullptr)Player->SkillAttack(4);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("A"));
+}
+void AMainPlayerController::InputSkill_S()
+{
+	if (Player != nullptr)Player->SkillAttack(5);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("S"));
+}
+void AMainPlayerController::InputSkill_D()
+{
+	if (Player != nullptr)Player->SkillAttack(6);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("D"));
+}
+void AMainPlayerController::InputSkill_F()
+{
+	if (Player != nullptr)Player->SkillAttack(7);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("F"));
+}
+void AMainPlayerController::InputSkillBook()
+{
+	if (Player != nullptr)Player->ToggleSkillBook();
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("K"));
+}
+
+void AMainPlayerController::SetOnMouseWidget(bool Value)
+{
+	bIsMouseOnWidget = Value;
 }
 
 void AMainPlayerController::SetMouseCursorAngle()
