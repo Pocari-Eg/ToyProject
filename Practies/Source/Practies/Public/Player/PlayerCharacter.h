@@ -69,7 +69,8 @@ private:
 	FSkillData SkillData;
 
 	TArray<FSkill> UseSkills;
-	
+
+
 	//Ä«¸Þ¶ó
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	FCameraSetData CameraData;
@@ -275,6 +276,8 @@ public:
 
 	 void SetUseSkill(int idx, FSkill Data);
 	 void EraseUseSkill(int idx);
+
+
 
 };
 #pragma endregion GetSet

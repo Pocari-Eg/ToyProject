@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Player/Skill.h"
+#include "DataTable/SkillDetailTable.h"
+#include "DataTable/SkilltypeTable.h"
 #include "PRGameInstance.generated.h"
 
 /**
@@ -18,9 +20,11 @@ class PRACTIES_API UPRGameInstance : public UGameInstance
 	
 private:
 	 APlayerCharacter* Player;
+	 UDataTable* SkillTypeData;
 
-
+	 UDataTable* SkillDetailData;
 public:
+	UPRGameInstance();
 	void BindMonster2PlayerWidget(class AMonster* NewMonster);
 	void UnBindMonster2PlayerWidget();
 
@@ -35,4 +39,9 @@ public:
 	void SetPlayerUseSkill(int idx, FSkill Data);
 	UFUNCTION(Blueprintcallable)
 	void ErasePlayerSkill(int idx);
+
+	//skilldata
+	FSkillTypeTable* GetSKillTypeData(int SkillCode);
+
+	FSkillDetail GetSkillDetailData(FName SkillName, int SkillLevel);
 };

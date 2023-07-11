@@ -13,7 +13,7 @@
 #include "GameFramework/SpringArmComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
-
+#include "Engine/DataTable.h"
 #include"Widget/PlayerWidget.h"
 #include"PRGameInstance.h"
 
@@ -118,6 +118,7 @@ APlayerCharacter::APlayerCharacter()
 	PlayerStat.MaxHP = 10000;
 	PlayerStat.ATK = 100;
 
+
 	bIsDebug = false;
 
 	MaxCombo = 3;
@@ -152,7 +153,7 @@ APlayerCharacter::APlayerCharacter()
 	RotationTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("RotationTimeLine"));
 
 	FSkill Null;
-	Null.Damage = -1;
+	Null.SkillLevel = -1;
 	UseSkills.Init(Null, 8);
 }
 
@@ -548,19 +549,25 @@ void APlayerCharacter::SkillAttack(int i)
 {
 	//나중에 i값으로 데이터테이블에서 값을 찾아 적용할 수 있도록 수정 할것
 
-	if (UseSkills[i].Damage == -1) {
-		TLOG_E(TEXT("EmptySkill"))
-	}
-	else {
-		SkillData.Damage = UseSkills[i].Damage;
-		SkillData.Angle = UseSkills[i].Angle;
-		SkillData.Range = UseSkills[i].Range;
+	if (GetPlayerState() != EPState::attack) {
 
-		PlayerAnimInstance->SetSkillMontage(UseSkills[i].Montage);
-		PlayerAnimInstance->PlaySkillMontage();
+		if (UseSkills[i].SkillLevel == -1) {
+			TLOG_E(TEXT("EmptySkill"))
+		}
+		else {
 
-		TLOG_E(TEXT("PlaySKill"))
+			auto Instance = Cast<UPRGameInstance>(GetGameInstance());
+			FSkillDetail Detail = Instance->GetSkillDetailData(UseSkills[i].SkillType.Name, UseSkills[i].SkillLevel);
+			SkillData.Damage = Detail.Damage;
+			SkillData.Angle = Detail.Angle;
+			SkillData.Range = Detail.Range;
 
+			PlayerAnimInstance->SetSkillMontage(UseSkills[i].SkillType.Montage);
+			PlayerAnimInstance->PlaySkillMontage();
+
+			TLOG_E(TEXT("PlaySKill"))
+
+		}
 	}
 	
 }
@@ -618,7 +625,7 @@ void APlayerCharacter::SetUseSkill(int idx, FSkill Data)
 void APlayerCharacter::EraseUseSkill(int idx)
 {
 	FSkill Null;
-	Null.Damage = -1;
+	Null.SkillLevel = -1;
 	UseSkills[idx] = Null;
 }
 
