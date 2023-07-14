@@ -44,4 +44,8 @@ public:
 	FSkillTypeTable* GetSKillTypeData(int SkillCode);
 
 	FSkillDetail GetSkillDetailData(FName SkillName, int SkillLevel);
+
+	UFUNCTION(Blueprintcallable)
+	UTexture2D* GetSkillImage(FSkillType SkillType) {return SkillType.Texture; }
+
 };

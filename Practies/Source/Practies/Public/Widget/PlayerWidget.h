@@ -7,6 +7,8 @@
 #include "Player/PlayerCharacter.h"
 #include "Blueprint/UserWidget.h"
 
+#include "Widget/UseSkillWidget.h"
+
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Components/CanvasPanel.h"
@@ -65,6 +67,9 @@ public:
 	
 
 	void ToggleSkillBook();
+
+	void UseSkillCoolStart(int idx);
+	void UseSkillCoolEnd(int idx);
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;
@@ -84,5 +89,5 @@ private:
 
 	UUserWidget* SkillBook;
 
-	
+	UUseSkillWidget* UseSkillWidget;
 };

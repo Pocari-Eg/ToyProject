@@ -24,7 +24,6 @@ void UPlayerAnimInstance::PlayDeathMontage()
 
 void UPlayerAnimInstance::PlaySkillMontage()
 {
-	Player->ChangeState(UAttackState::GetInstance());
 	Montage_Play(SkillMontage, 1.0f);
 
 }

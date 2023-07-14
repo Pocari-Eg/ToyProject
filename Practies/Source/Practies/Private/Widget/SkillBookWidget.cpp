@@ -14,8 +14,12 @@ FSkillType USkillBookWidget::GetSkillType(int SkillCode)
 	FString TextruePath = SkillData->TexturePath;
 	NewSkill.Texture= LoadObject<UTexture2D>(NULL, *TextruePath, NULL, LOAD_None, NULL);
 
+	SkillTexture = NewSkill.Texture;
+
 	FString MongtagePath = SkillData->MontagePath;
 	NewSkill.Montage = LoadObject<UAnimMontage>(NULL, *MongtagePath, NULL, LOAD_None, NULL);
+
+
 
 	return NewSkill;
 }

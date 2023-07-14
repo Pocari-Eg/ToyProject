@@ -20,14 +20,18 @@ struct FSkillType
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* Montage;
 };
+USTRUCT(Atomic, BluePrintType)
 struct FSkillDetail
 {
+	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 Damage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Range;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Angle;
+	  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	   float CoolTime;
 };
 USTRUCT(Atomic, BluePrintType)
 struct FSkill
@@ -39,5 +43,19 @@ struct FSkill
 	FSkillType SkillType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int SkillLevel;
+
+};
+USTRUCT(Atomic, BluePrintType)
+struct FSkillState
+{
+	GENERATED_BODY()
+
+	public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SkillMaxCool;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SkillCurCool;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsSkillEnabled;
 
 };

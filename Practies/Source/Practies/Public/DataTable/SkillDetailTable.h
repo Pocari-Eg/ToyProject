@@ -19,4 +19,6 @@ struct FSkillDetailTable : public FTableRowBase
 	int Range;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Angle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CoolTime;
 };

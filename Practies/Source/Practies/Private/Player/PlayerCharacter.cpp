@@ -154,7 +154,16 @@ APlayerCharacter::APlayerCharacter()
 
 	FSkill Null;
 	Null.SkillLevel = -1;
+
+	FSkillData NullDetail;
+	FSkillState NullState;
+
+
+	OnSkillCoolChanged.SetNum(8);
+
 	UseSkills.Init(Null, 8);
+	SkillDetails.Init(NullDetail, 8);
+	SkillState.Init(NullState, 8);
 }
 
 // Called when the game starts or when spawned
@@ -190,6 +199,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 			bIsDodGeCool = false;
 		}
 	}
+
+	if (SkillState[0].bIsSkillEnabled == false&&UseSkills[0].SkillLevel!=-1)CalcSkillCool(0, DeltaTime);
+	if (SkillState[1].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(1, DeltaTime);
+	if (SkillState[2].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(2, DeltaTime);
+	if (SkillState[3].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(3, DeltaTime);
+	if (SkillState[4].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(4, DeltaTime);
+	if (SkillState[5].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(5, DeltaTime);
+	if (SkillState[6].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(6, DeltaTime);
+	if (SkillState[7].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(7, DeltaTime);
 
 }
 
@@ -352,7 +370,7 @@ void APlayerCharacter::InitAnimationDelegate()
 {
 	PlayerAnimInstance->OnMontageEnded.AddDynamic(this, &APlayerCharacter::OnAttackMontageEnded);
 	PlayerAnimInstance->OnAttackCheck.AddUObject(this, &APlayerCharacter::AttackCheck);
-	PlayerAnimInstance->OnSkillCheck.AddUObject(this, &APlayerCharacter::SkillCheck);
+	PlayerAnimInstance->OnSkillCheck.AddUObject(this, &APlayerCharacter::SkillAttackCheck);
 	PlayerAnimInstance->OnDeath.AddUObject(this, &APlayerCharacter::Death);
 
 	PlayerAnimInstance->OnNextAttackCheck.AddLambda([this]()->void {
@@ -369,13 +387,13 @@ void APlayerCharacter::InitPlayerWidget()
 {
 	if (PlayerWidgetBP != nullptr)
 	{
-		PlayerHud = CreateWidget<UUserWidget>(GetWorld(), PlayerWidgetBP);
+		PlayerHud =Cast<UPlayerWidget>(CreateWidget<UUserWidget>(GetWorld(), PlayerWidgetBP));
 		PlayerHud->AddToViewport();
 	}
-	auto Widget = Cast<UPlayerWidget>(PlayerHud);
-	if (Widget != nullptr)
+
+	if (PlayerHud != nullptr)
 	{
-		Widget->BindPlayer(this);
+	 PlayerHud->BindPlayer(this);
 	}
 }
 
@@ -387,17 +405,18 @@ void APlayerCharacter::Death()
 
 void APlayerCharacter::BindMonster(AMonster* NewMonster)
 {
-	auto Widget = Cast<UPlayerWidget>(PlayerHud);
-	Widget->SetVisibleMonsterWidget(true);
-	Widget->BindMonster(NewMonster);
+	
+	PlayerHud->SetVisibleMonsterWidget(true);
+	PlayerHud->BindMonster(NewMonster);
+
 	NewMonster->OnHpChanged.Broadcast();
 	NewMonster->OnInfoChanged.Broadcast();
 }
 
 void APlayerCharacter::UnBindMonster()
 {
-	auto Widget = Cast<UPlayerWidget>(PlayerHud);
-	Widget->SetVisibleMonsterWidget(false);
+
+	PlayerHud->SetVisibleMonsterWidget(false);
 }
 
 void APlayerCharacter::OnDamageWidget(int Damage)
@@ -443,6 +462,11 @@ void APlayerCharacter::UpDamageWidget()
 
 		}
 	}
+}
+
+float APlayerCharacter::GetCurSkillCool(int idx)
+{
+	return SkillState[idx].SkillCurCool;
 }
 
 void APlayerCharacter::PlayerInit()
@@ -500,8 +524,7 @@ void APlayerCharacter::RotationCurveInit()
 
 void APlayerCharacter::ToggleSkillBook()
 {
-	auto Widget = Cast<UPlayerWidget>(PlayerHud);
-	Widget->ToggleSkillBook();
+	PlayerHud->ToggleSkillBook();
 }
 
 void APlayerCharacter::ChangeState(IState* NewState)
@@ -551,31 +574,54 @@ void APlayerCharacter::SkillAttack(int i)
 
 	if (GetPlayerState() != EPState::attack) {
 
-		if (UseSkills[i].SkillLevel == -1) {
-			TLOG_E(TEXT("EmptySkill"))
-		}
-		else {
-
-			auto Instance = Cast<UPRGameInstance>(GetGameInstance());
-			FSkillDetail Detail = Instance->GetSkillDetailData(UseSkills[i].SkillType.Name, UseSkills[i].SkillLevel);
-			SkillData.Damage = Detail.Damage;
-			SkillData.Angle = Detail.Angle;
-			SkillData.Range = Detail.Range;
-
+		if (SkillCheck(i))
+		{
+			ChangeState(UAttackState::GetInstance());
+			SkillData = SkillDetails[i];
 			PlayerAnimInstance->SetSkillMontage(UseSkills[i].SkillType.Montage);
 			PlayerAnimInstance->PlaySkillMontage();
 
+			SkillState[i].bIsSkillEnabled = false;
+			PlayerHud->UseSkillCoolStart(i);
+			OnSkillCoolChanged[i].Execute(i);
 			TLOG_E(TEXT("PlaySKill"))
-
 		}
+		else {
+			TLOG_E(TEXT("EmptySkill"))
+		}
+
 	}
 	
 }
-void APlayerCharacter::SkillCheck()
+void APlayerCharacter::SkillAttackCheck()
 {
 	SetAttackTransform();
 	PlayerWeapon->SkillCheck(bIsDebug, AttackTransform, AttackForwardVector, SkillData);
 }
+bool APlayerCharacter::SkillCheck(int idx)
+{
+	if (UseSkills[idx].SkillLevel == -1)return false;
+
+	if (SkillState[idx].bIsSkillEnabled == false)return false;
+
+
+	return true;
+
+}
+void APlayerCharacter::CalcSkillCool(int idx, float DeltaTime)
+{
+
+	SkillState[idx].SkillCurCool -= DeltaTime;
+
+	OnSkillCoolChanged[idx].Execute(idx);
+	if (SkillState[idx].SkillCurCool <=0.0f)
+	{
+		SkillState[idx].bIsSkillEnabled = true;
+		SkillState[idx].SkillCurCool = SkillState[idx].SkillMaxCool;
+		PlayerHud->UseSkillCoolEnd(idx);
+	}
+}
+
 void APlayerCharacter::Dodge()
 {
 	if (!bIsDodGeCool) {
@@ -619,7 +665,21 @@ void APlayerCharacter::SetOnMouseWidget(bool Value)
 
 void APlayerCharacter::SetUseSkill(int idx, FSkill Data)
 {
+	SkillState[idx].SkillCurCool = 0.0f;
+	SkillState[idx].bIsSkillEnabled = true;
+
 	UseSkills[idx] = Data;
+
+	auto Instance = Cast<UPRGameInstance>(GetGameInstance());
+	FSkillDetail Detail = Instance->GetSkillDetailData(Data.SkillType.Name, Data.SkillLevel);
+	SkillDetails[idx].Damage = Detail.Damage;
+	SkillDetails[idx].Angle = Detail.Angle;
+	SkillDetails[idx].Range = Detail.Range;
+
+	SkillState[idx].SkillMaxCool = Detail.CoolTime;
+	SkillState[idx].SkillCurCool = SkillState[idx].SkillMaxCool;
+
+
 }
 
 void APlayerCharacter::EraseUseSkill(int idx)
@@ -628,4 +688,6 @@ void APlayerCharacter::EraseUseSkill(int idx)
 	Null.SkillLevel = -1;
 	UseSkills[idx] = Null;
 }
+
+
 

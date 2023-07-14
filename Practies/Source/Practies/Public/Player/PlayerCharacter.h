@@ -22,11 +22,11 @@
 */
 
 DECLARE_MULTICAST_DELEGATE(FOnHpChangedDelegate);
+DECLARE_DELEGATE_OneParam(FOnSkillCoolChangedDelegate,int32);
 UCLASS()
 class PRACTIES_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
 #pragma region Variable
 private:
 	//Component
@@ -51,7 +51,7 @@ public:
 	class UPlayerFSM* PlayerFSMInstance;
 	//widget
 	UPROPERTY(BlueprintReadWrite)
-	class UUserWidget* PlayerHud;
+	class UPlayerWidget* PlayerHud;
 
 	UPROPERTY(VisibleAnywhere, Category = UI)
 	class TSubclassOf<ADamageWidgetActor> DamageWidgetClass;
@@ -60,6 +60,8 @@ public:
 	int widgetsize = 0;
 	//delegate
 	FOnHpChangedDelegate OnHpChanged;
+	TArray<FOnSkillCoolChangedDelegate> OnSkillCoolChanged;
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
     FStatData PlayerStat;
@@ -69,7 +71,10 @@ private:
 	FSkillData SkillData;
 
 	TArray<FSkill> UseSkills;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SKILL, meta = (AllowPrivateAccess = "true"))
+	TArray<FSkillData> SkillDetails;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SKILL, meta = (AllowPrivateAccess = "true"))
+	TArray<FSkillState> SkillState;
 
 	//Ä«¸Þ¶ó
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -171,8 +176,11 @@ public:
 	UFUNCTION()
 	void SkillAttack(int i);
 	UFUNCTION()
-	void SkillCheck();
+	void SkillAttackCheck();
+	UFUNCTION()
+	bool SkillCheck(int idx);
 
+	void CalcSkillCool(int idx,float DeltaTime);
 	//dodge
 	void Dodge();
 	UFUNCTION()
@@ -222,6 +230,8 @@ public:
 	void OnDamageWidget(int Damage);
 	void DeleteDamageWidget();
 	void UpDamageWidget();
+
+	float GetCurSkillCool(int idx);
 
 	
 private:
@@ -276,7 +286,6 @@ public:
 
 	 void SetUseSkill(int idx, FSkill Data);
 	 void EraseUseSkill(int idx);
-
 
 
 };

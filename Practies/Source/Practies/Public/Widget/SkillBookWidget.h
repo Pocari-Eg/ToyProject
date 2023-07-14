@@ -18,6 +18,10 @@ class PRACTIES_API USkillBookWidget : public UUserWidget
 	GENERATED_BODY()
 	
 	
+	UTexture2D* SkillTexture;
+	
 	UFUNCTION(BluePrintCallable)
 	FSkillType GetSkillType(int SkillCode);
+	UFUNCTION(BluePrintCallable)
+	UTexture2D* GetTexture(){return SkillTexture;}
 };
