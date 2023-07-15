@@ -7,14 +7,13 @@
 #include "SkilltypeTable.generated.h"
 
 USTRUCT(BlueprintType)
-struct FSkillTypeTable : public FTableRowBase
+struct FSkillTable : public FTableRowBase
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName SkillName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString TexturePath;
+	FString Texture;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString MontagePath;
-
+	FString Montage;
 };

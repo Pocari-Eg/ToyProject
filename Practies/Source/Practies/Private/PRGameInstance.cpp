@@ -12,6 +12,8 @@ UPRGameInstance::UPRGameInstance()
 	{
 		SkillTypeData = DT_SKILLDATA.Object;
 	}
+
+	SkillLevels.Init(-1, 100);
 }
 void UPRGameInstance::BindMonster2PlayerWidget(AMonster* NewMonster)
 {
@@ -43,21 +45,50 @@ void UPRGameInstance::SetMouseOnWidget(bool Value)
 	Player->SetOnMouseWidget(Value);
 }
 
-void UPRGameInstance::SetPlayerUseSkill(int idx, FSkill Data)
+void UPRGameInstance::SetPlayerUseSkill(int idx, int SkillCode)
 {
-	Player->SetUseSkill(idx, Data);
+	Player->SetUseSkill(idx, SkillCode);
 }
 
 void UPRGameInstance::ErasePlayerSkill(int idx)
 {
 	Player->EraseUseSkill(idx);
 }
-FSkillTypeTable* UPRGameInstance::GetSKillTypeData(int SkillCode)
+FSkillTable* UPRGameInstance::GetSKillTypeData(int SkillCode)
 {
-	return SkillTypeData->FindRow<FSkillTypeTable>(*FString::FromInt(SkillCode), TEXT(""));
+	return SkillTypeData->FindRow<FSkillTable>(*FString::FromInt(SkillCode), TEXT(""));
 }
 
-FSkillDetail UPRGameInstance::GetSkillDetailData(FName SkillName, int SkillLevel)
+FSkill UPRGameInstance::GetSkill(int SkillCode)
+{
+
+	auto SkillData = GetSKillTypeData(SkillCode);
+
+	FSkill NewSkill;
+	NewSkill.Name = SkillData->SkillName;
+
+	FString TEXTURENANME = SkillData->Texture;
+	FString TextruePath = "/Game/Characters/Skills/" + TEXTURENANME+"."+ TEXTURENANME;
+	NewSkill.Texture = LoadObject<UTexture2D>(NULL, *TextruePath, NULL, LOAD_None, NULL);
+
+	FString MONTAGENAME = SkillData->Montage;
+	FString MongtagePath = "/Game/Characters/player/anim/Montage/" + MONTAGENAME +"." + MONTAGENAME;
+	NewSkill.Montage = LoadObject<UAnimMontage>(NULL, *MongtagePath, NULL, LOAD_None, NULL);
+
+	return NewSkill;
+}
+
+int UPRGameInstance::GetSkillLevel(int SkillCode)
+{
+	return SkillLevels[SkillCode];
+}
+
+void UPRGameInstance::SetSkillLevel(int SkillCode, int Value)
+{
+	SkillLevels[SkillCode] = Value;
+}
+
+FSkillDetail UPRGameInstance::GetSkillDetailData(FName SkillName, int SkillCode)
 {
 
 	FString SKILLNAME = SkillName.ToString();
@@ -66,6 +97,7 @@ FSkillDetail UPRGameInstance::GetSkillDetailData(FName SkillName, int SkillLevel
 
 	FSkillDetail NewDetail;
 	
+	int SkillLevel = SkillLevels[SkillCode];
 
 	NewDetail.Damage = SkillDetailData->FindRow<FSkillDetailTable>(*FString::FromInt(SkillLevel), TEXT(""))->Damage;
 	NewDetail.Range= SkillDetailData->FindRow<FSkillDetailTable>(*FString::FromInt(SkillLevel), TEXT(""))->Range;

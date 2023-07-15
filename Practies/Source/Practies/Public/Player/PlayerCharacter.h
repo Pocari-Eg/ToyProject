@@ -70,9 +70,7 @@ private:
 	
 	FSkillData SkillData;
 
-	TArray<FSkill> UseSkills;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SKILL, meta = (AllowPrivateAccess = "true"))
-	TArray<FSkillData> SkillDetails;
+	TArray<int> UseSkills;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SKILL, meta = (AllowPrivateAccess = "true"))
 	TArray<FSkillState> SkillState;
 
@@ -283,8 +281,8 @@ public:
 
 	 void SetOnMouseWidget(bool Value);
 
-
-	 void SetUseSkill(int idx, FSkill Data);
+	 FSkill GetSkillData(int idx,int SkillCode);
+	 void SetUseSkill(int idx, int SkillCode);
 	 void EraseUseSkill(int idx);
 
 

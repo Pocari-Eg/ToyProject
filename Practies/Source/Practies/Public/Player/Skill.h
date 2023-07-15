@@ -8,7 +8,7 @@
 #include "Skill.generated.h"
 
 USTRUCT(Atomic, BluePrintType)
-struct FSkillType
+struct FSkill
 {
 	GENERATED_BODY()
 
@@ -19,6 +19,9 @@ struct FSkillType
 	UTexture2D* Texture;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* Montage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int CurSkillLevel;
+
 };
 USTRUCT(Atomic, BluePrintType)
 struct FSkillDetail
@@ -32,18 +35,6 @@ struct FSkillDetail
 		float Angle;
 	  UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	   float CoolTime;
-};
-USTRUCT(Atomic, BluePrintType)
-struct FSkill
-{
-	GENERATED_BODY()
-
-	public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FSkillType SkillType;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int SkillLevel;
-
 };
 USTRUCT(Atomic, BluePrintType)
 struct FSkillState

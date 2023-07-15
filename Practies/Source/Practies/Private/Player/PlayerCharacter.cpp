@@ -152,17 +152,12 @@ APlayerCharacter::APlayerCharacter()
 
 	RotationTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("RotationTimeLine"));
 
-	FSkill Null;
-	Null.SkillLevel = -1;
-
-	FSkillData NullDetail;
 	FSkillState NullState;
 
 
 	OnSkillCoolChanged.SetNum(8);
 
-	UseSkills.Init(Null, 8);
-	SkillDetails.Init(NullDetail, 8);
+	UseSkills.Init(-1, 8);
 	SkillState.Init(NullState, 8);
 }
 
@@ -200,14 +195,14 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	if (SkillState[0].bIsSkillEnabled == false&&UseSkills[0].SkillLevel!=-1)CalcSkillCool(0, DeltaTime);
-	if (SkillState[1].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(1, DeltaTime);
-	if (SkillState[2].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(2, DeltaTime);
-	if (SkillState[3].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(3, DeltaTime);
-	if (SkillState[4].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(4, DeltaTime);
-	if (SkillState[5].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(5, DeltaTime);
-	if (SkillState[6].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(6, DeltaTime);
-	if (SkillState[7].bIsSkillEnabled == false && UseSkills[0].SkillLevel != -1)CalcSkillCool(7, DeltaTime);
+	if (SkillState[0].bIsSkillEnabled == false&&UseSkills[0]!=-1)CalcSkillCool(0, DeltaTime);
+	if (SkillState[1].bIsSkillEnabled == false && UseSkills[1] != -1)CalcSkillCool(1, DeltaTime);
+	if (SkillState[2].bIsSkillEnabled == false && UseSkills[2] != -1)CalcSkillCool(2, DeltaTime);
+	if (SkillState[3].bIsSkillEnabled == false && UseSkills[3] != -1)CalcSkillCool(3, DeltaTime);
+	if (SkillState[4].bIsSkillEnabled == false && UseSkills[4] != -1)CalcSkillCool(4, DeltaTime);
+	if (SkillState[5].bIsSkillEnabled == false && UseSkills[5] != -1)CalcSkillCool(5, DeltaTime);
+	if (SkillState[6].bIsSkillEnabled == false && UseSkills[6] != -1)CalcSkillCool(6, DeltaTime);
+	if (SkillState[7].bIsSkillEnabled == false && UseSkills[7] != -1)CalcSkillCool(7, DeltaTime);
 
 }
 
@@ -577,10 +572,9 @@ void APlayerCharacter::SkillAttack(int i)
 		if (SkillCheck(i))
 		{
 			ChangeState(UAttackState::GetInstance());
-			SkillData = SkillDetails[i];
-			PlayerAnimInstance->SetSkillMontage(UseSkills[i].SkillType.Montage);
+			FSkill Data = GetSkillData(i,UseSkills[i]);
+			PlayerAnimInstance->SetSkillMontage(Data.Montage);
 			PlayerAnimInstance->PlaySkillMontage();
-
 			SkillState[i].bIsSkillEnabled = false;
 			PlayerHud->UseSkillCoolStart(i);
 			OnSkillCoolChanged[i].Execute(i);
@@ -600,7 +594,7 @@ void APlayerCharacter::SkillAttackCheck()
 }
 bool APlayerCharacter::SkillCheck(int idx)
 {
-	if (UseSkills[idx].SkillLevel == -1)return false;
+	if (UseSkills[idx] == -1)return false;
 
 	if (SkillState[idx].bIsSkillEnabled == false)return false;
 
@@ -663,30 +657,36 @@ void APlayerCharacter::SetOnMouseWidget(bool Value)
 	PlayerController->SetOnMouseWidget(Value);
 }
 
-void APlayerCharacter::SetUseSkill(int idx, FSkill Data)
+FSkill APlayerCharacter::GetSkillData(int idx, int SkillCode)
 {
-	SkillState[idx].SkillCurCool = 0.0f;
-	SkillState[idx].bIsSkillEnabled = true;
-
-	UseSkills[idx] = Data;
 
 	auto Instance = Cast<UPRGameInstance>(GetGameInstance());
-	FSkillDetail Detail = Instance->GetSkillDetailData(Data.SkillType.Name, Data.SkillLevel);
-	SkillDetails[idx].Damage = Detail.Damage;
-	SkillDetails[idx].Angle = Detail.Angle;
-	SkillDetails[idx].Range = Detail.Range;
+	FSkill Data = Instance->GetSkill(SkillCode);
+	FSkillDetail Detail = Instance->GetSkillDetailData(Data.Name, SkillCode);
+
+	SkillData.Damage = Detail.Damage;
+	SkillData.Angle = Detail.Angle;
+	SkillData.Range = Detail.Range;
 
 	SkillState[idx].SkillMaxCool = Detail.CoolTime;
 	SkillState[idx].SkillCurCool = SkillState[idx].SkillMaxCool;
 
+	return Data;
+}
 
+void APlayerCharacter::SetUseSkill(int idx, int SkillCode)
+{
+
+	SkillState[idx].SkillCurCool = 0.0f;
+	SkillState[idx].bIsSkillEnabled = true;
+
+	UseSkills[idx] = SkillCode;
 }
 
 void APlayerCharacter::EraseUseSkill(int idx)
 {
-	FSkill Null;
-	Null.SkillLevel = -1;
-	UseSkills[idx] = Null;
+
+	UseSkills[idx] = -1;
 }
 
 

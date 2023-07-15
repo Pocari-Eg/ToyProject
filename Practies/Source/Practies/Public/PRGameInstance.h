@@ -23,6 +23,8 @@ private:
 	 UDataTable* SkillTypeData;
 
 	 UDataTable* SkillDetailData;
+
+	 TArray<int> SkillLevels;
 public:
 	UPRGameInstance();
 	void BindMonster2PlayerWidget(class AMonster* NewMonster);
@@ -36,16 +38,27 @@ public:
 	UFUNCTION(Blueprintcallable)
 	void SetMouseOnWidget(bool Value);
 	UFUNCTION(Blueprintcallable)
-	void SetPlayerUseSkill(int idx, FSkill Data);
+	void SetPlayerUseSkill(int idx, int SkillCode);
 	UFUNCTION(Blueprintcallable)
 	void ErasePlayerSkill(int idx);
 
 	//skilldata
-	FSkillTypeTable* GetSKillTypeData(int SkillCode);
+	FSkillTable* GetSKillTypeData(int SkillCode);
 
-	FSkillDetail GetSkillDetailData(FName SkillName, int SkillLevel);
+	FSkillDetail GetSkillDetailData(FName SkillName, int SkillCode);
 
+
+
+
+	UFUNCTION(BluePrintCallable)
+	FSkill GetSkill(int SkillCode);
 	UFUNCTION(Blueprintcallable)
-	UTexture2D* GetSkillImage(FSkillType SkillType) {return SkillType.Texture; }
+	int GetSkillLevel(int SkillCode);
+	UFUNCTION(Blueprintcallable)
+	void SetSkillLevel(int SkillCode,int Value);
+	UFUNCTION(Blueprintcallable)
+	UTexture2D* GetSkillImage(FSkill Skill) {return Skill.Texture; }
+
+	
 
 };
