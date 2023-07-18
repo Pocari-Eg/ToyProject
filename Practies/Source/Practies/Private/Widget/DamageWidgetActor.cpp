@@ -16,7 +16,7 @@ ADamageWidgetActor::ADamageWidgetActor()
 	DamageWidget->SetWidgetSpace(EWidgetSpace::Screen);
 
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> UI_WIDGET(TEXT("WidgetBlueprint'/Game/Blueprint/Widget/BP_DamageWidget.BP_DamageWidget_C'"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_WIDGET(TEXT("WidgetBlueprint'/Game/Blueprint/Widget/DamageWidget/BP_DamageWidget.BP_DamageWidget_C'"));
 
 	if (UI_WIDGET.Succeeded()) {
 

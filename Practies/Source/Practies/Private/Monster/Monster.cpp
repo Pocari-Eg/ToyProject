@@ -39,7 +39,7 @@ AMonster::AMonster()
 		MonsterWidget->bAutoActivate = true;
 	}
 
-	static ConstructorHelpers::FClassFinder<AActor> DamageActor(TEXT("Blueprint'/Game/Blueprint/Widget/BP_DamageWidgetActor.BP_DamageWidgetActor_C'"));
+	static ConstructorHelpers::FClassFinder<AActor> DamageActor(TEXT("Blueprint'/Game/Blueprint/Widget/DamageWidget/BP_DamageWidgetActor.BP_DamageWidgetActor_C'"));
 
 	if (DamageActor.Succeeded()) {
 

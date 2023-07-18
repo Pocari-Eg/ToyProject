@@ -7,6 +7,9 @@
 #include "Player/Skill.h"
 #include "DataTable/SkillDetailTable.h"
 #include "DataTable/SkilltypeTable.h"
+#include "Common/Item.h"
+
+#include "DataTable/ConsumablesItemTable.h"
 #include "PRGameInstance.generated.h"
 
 /**
@@ -21,8 +24,10 @@ class PRACTIES_API UPRGameInstance : public UGameInstance
 private:
 	 APlayerCharacter* Player;
 	 UDataTable* SkillTypeData;
-
 	 UDataTable* SkillDetailData;
+
+	 UDataTable* FConsumData;
+	 //UDataTable* FConsumDetailData;
 
 	 TArray<int> SkillLevels;
 public:
@@ -44,12 +49,11 @@ public:
 
 	//skilldata
 	FSkillTable* GetSKillTypeData(int SkillCode);
-
 	FSkillDetail GetSkillDetailData(FName SkillName, int SkillCode);
 
 
 
-
+	//skill 
 	UFUNCTION(BluePrintCallable)
 	FSkill GetSkill(int SkillCode);
 	UFUNCTION(Blueprintcallable)
@@ -59,6 +63,15 @@ public:
 	UFUNCTION(Blueprintcallable)
 	UTexture2D* GetSkillImage(FSkill Skill) {return Skill.Texture; }
 
-	
 
+
+	//Itemldata
+	FConsumablesDataTable* GetConsumItemData(int ItemCode);
+	//FSkillDetail GetSkillDetailData(FName ItemName, int ItemCode);
+	
+	//item
+	UFUNCTION(BluePrintCallable)
+	FConsumablesItem GetConsumItem(int ItemCode);
+	UFUNCTION(Blueprintcallable)
+	UTexture2D* GetItemImage(FConsumablesItem Item) { return Item.Texture; }
 };

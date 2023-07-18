@@ -25,3 +25,10 @@ enum class EPState : uint8
     skill UMETA(DisplayName = "SKILL"),
     dodge UMETA(DisplayName = "DODGE"),
 };
+UENUM(BlueprintType)
+enum class EConsumType : uint8
+{
+    
+    POTION UMETA(DisplayName = "POTION"),
+    THROW UMETA(DisplayName = "WALK"),
+};

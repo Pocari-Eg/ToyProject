@@ -98,7 +98,7 @@ APlayerCharacter::APlayerCharacter()
 		PlayerWidgetBP = WidgetBP.Class;
 	}
 
-	static ConstructorHelpers::FClassFinder<AActor> DamageActor(TEXT("Blueprint'/Game/Blueprint/Widget/BP_DamageWidgetActor.BP_DamageWidgetActor_C'"));
+	static ConstructorHelpers::FClassFinder<AActor> DamageActor(TEXT("Blueprint'/Game/Blueprint/Widget/DamageWidget/BP_DamageWidgetActor.BP_DamageWidgetActor_C'"));
 
 	if (DamageActor.Succeeded()) {
 
@@ -573,10 +573,13 @@ void APlayerCharacter::SkillAttack(int i)
 		{
 			ChangeState(UAttackState::GetInstance());
 			FSkill Data = GetSkillData(i,UseSkills[i]);
+
 			PlayerAnimInstance->SetSkillMontage(Data.Montage);
 			PlayerAnimInstance->PlaySkillMontage();
+
 			SkillState[i].bIsSkillEnabled = false;
 			PlayerHud->UseSkillCoolStart(i);
+
 			OnSkillCoolChanged[i].Execute(i);
 			TLOG_E(TEXT("PlaySKill"))
 		}

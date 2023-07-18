@@ -13,6 +13,12 @@ UPRGameInstance::UPRGameInstance()
 		SkillTypeData = DT_SKILLDATA.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UDataTable> DT_CONSUMDATA(TEXT("DataTable'/Game/DataTable/Item/ConsumDataTable.ConsumDataTable'"));
+	if (DT_SKILLDATA.Succeeded())
+	{
+		FConsumData = DT_CONSUMDATA.Object;
+	}
+
 	SkillLevels.Init(-1, 100);
 }
 void UPRGameInstance::BindMonster2PlayerWidget(AMonster* NewMonster)
@@ -67,8 +73,9 @@ FSkill UPRGameInstance::GetSkill(int SkillCode)
 	FSkill NewSkill;
 	NewSkill.Name = SkillData->SkillName;
 
+
 	FString TEXTURENANME = SkillData->Texture;
-	FString TextruePath = "/Game/Characters/Skills/" + TEXTURENANME+"."+ TEXTURENANME;
+	FString TextruePath = "/Game/Resource/Skills/" + TEXTURENANME+"."+ TEXTURENANME;
 	NewSkill.Texture = LoadObject<UTexture2D>(NULL, *TextruePath, NULL, LOAD_None, NULL);
 
 	FString MONTAGENAME = SkillData->Montage;
@@ -86,6 +93,29 @@ int UPRGameInstance::GetSkillLevel(int SkillCode)
 void UPRGameInstance::SetSkillLevel(int SkillCode, int Value)
 {
 	SkillLevels[SkillCode] = Value;
+}
+
+FConsumablesDataTable* UPRGameInstance::GetConsumItemData(int ItemCode)
+{
+
+	return FConsumData->FindRow<FConsumablesDataTable>(*FString::FromInt(ItemCode), TEXT(""));
+}
+
+FConsumablesItem UPRGameInstance::GetConsumItem(int ItemCode)
+{
+	auto ItemData = GetConsumItemData(ItemCode);
+
+	FConsumablesItem NewItem;
+	NewItem.Name = ItemData->Name;
+
+
+	FString TEXTURENANME = ItemData->Texture;
+	FString TextruePath = "/Game/Resource/Item/Textures/" + TEXTURENANME + "." + TEXTURENANME;
+	NewItem.Texture = LoadObject<UTexture2D>(NULL, *TextruePath, NULL, LOAD_None, NULL);
+
+	NewItem.Type = ItemData->Type;
+
+	return NewItem;
 }
 
 FSkillDetail UPRGameInstance::GetSkillDetailData(FName SkillName, int SkillCode)
