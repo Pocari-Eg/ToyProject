@@ -152,13 +152,16 @@ APlayerCharacter::APlayerCharacter()
 
 	RotationTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("RotationTimeLine"));
 
-	FSkillState NullState;
 
 
 	OnSkillCoolChanged.SetNum(8);
-
+	SkillState.SetNum(8);
 	UseSkills.Init(-1, 8);
-	SkillState.Init(NullState, 8);
+
+
+	OnItemCoolChanged.SetNum(4);
+	ItemState.SetNum(4);
+	UseItems.Init(-1, 4);
 }
 
 // Called when the game starts or when spawned
@@ -195,14 +198,20 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	if (SkillState[0].bIsSkillEnabled == false&&UseSkills[0]!=-1)CalcSkillCool(0, DeltaTime);
-	if (SkillState[1].bIsSkillEnabled == false && UseSkills[1] != -1)CalcSkillCool(1, DeltaTime);
-	if (SkillState[2].bIsSkillEnabled == false && UseSkills[2] != -1)CalcSkillCool(2, DeltaTime);
-	if (SkillState[3].bIsSkillEnabled == false && UseSkills[3] != -1)CalcSkillCool(3, DeltaTime);
-	if (SkillState[4].bIsSkillEnabled == false && UseSkills[4] != -1)CalcSkillCool(4, DeltaTime);
-	if (SkillState[5].bIsSkillEnabled == false && UseSkills[5] != -1)CalcSkillCool(5, DeltaTime);
-	if (SkillState[6].bIsSkillEnabled == false && UseSkills[6] != -1)CalcSkillCool(6, DeltaTime);
-	if (SkillState[7].bIsSkillEnabled == false && UseSkills[7] != -1)CalcSkillCool(7, DeltaTime);
+	if (SkillState[0].bIsEnabled == false&&UseSkills[0]!=-1)CalcSkillCool(0, DeltaTime);
+	if (SkillState[1].bIsEnabled == false && UseSkills[1] != -1)CalcSkillCool(1, DeltaTime);
+	if (SkillState[2].bIsEnabled == false && UseSkills[2] != -1)CalcSkillCool(2, DeltaTime);
+	if (SkillState[3].bIsEnabled == false && UseSkills[3] != -1)CalcSkillCool(3, DeltaTime);
+	if (SkillState[4].bIsEnabled == false && UseSkills[4] != -1)CalcSkillCool(4, DeltaTime);
+	if (SkillState[5].bIsEnabled == false && UseSkills[5] != -1)CalcSkillCool(5, DeltaTime);
+	if (SkillState[6].bIsEnabled == false && UseSkills[6] != -1)CalcSkillCool(6, DeltaTime);
+	if (SkillState[7].bIsEnabled == false && UseSkills[7] != -1)CalcSkillCool(7, DeltaTime);
+
+
+	if (ItemState[0].bIsEnabled == false && UseItems[0] != -1)CalcItemCool(0, DeltaTime);
+	if (ItemState[1].bIsEnabled == false && UseItems[1] != -1)CalcItemCool(1, DeltaTime);
+	if (ItemState[2].bIsEnabled == false && UseItems[2] != -1)CalcItemCool(2, DeltaTime);
+	if (ItemState[3].bIsEnabled == false && UseItems[3] != -1)CalcItemCool(3, DeltaTime);
 
 }
 
@@ -388,7 +397,7 @@ void APlayerCharacter::InitPlayerWidget()
 
 	if (PlayerHud != nullptr)
 	{
-	 PlayerHud->BindPlayer(this);
+	  PlayerHud->BindPlayer(this);
 	}
 }
 
@@ -461,9 +470,12 @@ void APlayerCharacter::UpDamageWidget()
 
 float APlayerCharacter::GetCurSkillCool(int idx)
 {
-	return SkillState[idx].SkillCurCool;
+	return SkillState[idx].CurCool;
 }
-
+float APlayerCharacter::GetCurItemCool(int idx)
+{
+	return ItemState[idx].CurCool;
+}
 void APlayerCharacter::PlayerInit()
 {
 	TLOG_W(TEXT("Player Init"));
@@ -521,6 +533,10 @@ void APlayerCharacter::ToggleSkillBook()
 {
 	PlayerHud->ToggleSkillBook();
 }
+void APlayerCharacter::ToggleInventory()
+{
+	PlayerHud->ToggleInventory();
+}
 
 void APlayerCharacter::ChangeState(IState* NewState)
 {
@@ -577,7 +593,7 @@ void APlayerCharacter::SkillAttack(int i)
 			PlayerAnimInstance->SetSkillMontage(Data.Montage);
 			PlayerAnimInstance->PlaySkillMontage();
 
-			SkillState[i].bIsSkillEnabled = false;
+			SkillState[i].bIsEnabled = false;
 			PlayerHud->UseSkillCoolStart(i);
 
 			OnSkillCoolChanged[i].Execute(i);
@@ -599,7 +615,7 @@ bool APlayerCharacter::SkillCheck(int idx)
 {
 	if (UseSkills[idx] == -1)return false;
 
-	if (SkillState[idx].bIsSkillEnabled == false)return false;
+	if (SkillState[idx].bIsEnabled == false)return false;
 
 
 	return true;
@@ -608,13 +624,13 @@ bool APlayerCharacter::SkillCheck(int idx)
 void APlayerCharacter::CalcSkillCool(int idx, float DeltaTime)
 {
 
-	SkillState[idx].SkillCurCool -= DeltaTime;
+	SkillState[idx].CurCool -= DeltaTime;
 
 	OnSkillCoolChanged[idx].Execute(idx);
-	if (SkillState[idx].SkillCurCool <=0.0f)
+	if (SkillState[idx].CurCool <=0.0f)
 	{
-		SkillState[idx].bIsSkillEnabled = true;
-		SkillState[idx].SkillCurCool = SkillState[idx].SkillMaxCool;
+		SkillState[idx].bIsEnabled = true;
+		SkillState[idx].CurCool = SkillState[idx].MaxCool;
 		PlayerHud->UseSkillCoolEnd(idx);
 	}
 }
@@ -649,6 +665,51 @@ void APlayerCharacter::FinishDodge()
 	PlayerAnimInstance->SetDodge(false);
 	bIsInvincible = false;
 }
+void APlayerCharacter::UseBattleItem(int i)
+{
+
+	//나중에 i값으로 데이터테이블에서 값을 찾아 적용할 수 있도록 수정 할것
+
+	if (GetPlayerState() != EPState::attack) {
+
+		if (ItemCheck(i))
+		{
+			
+			UsingBattleItem(i, 1);
+
+			ItemState[i].bIsEnabled = false;
+			PlayerHud->UseItemCoolStart(i);
+			OnItemCoolChanged[i].Execute(i);
+			TLOG_E(TEXT("UseItem"))
+		}
+		else {
+			TLOG_E(TEXT("EmptyItem"))
+		}
+
+	}
+}
+bool APlayerCharacter::ItemCheck(int idx)
+{
+	if (UseItems[idx] == -1)return false;
+
+	if (ItemState[idx].bIsEnabled == false)return false;
+
+
+	return true;
+}
+void APlayerCharacter::CalcItemCool(int idx, float DeltaTime)
+{
+	ItemState[idx].CurCool -= DeltaTime;
+
+	OnItemCoolChanged[idx].Execute(idx);
+	if (ItemState[idx].CurCool <= 0.0f)
+	{
+		ItemState[idx].bIsEnabled = true;
+		ItemState[idx].CurCool = ItemState[idx].MaxCool;
+
+		PlayerHud->UseItemCoolEnd(idx);
+	}
+}
 float APlayerCharacter::GetHpRatio()
 {
 	return (float)PlayerStat.HP < KINDA_SMALL_NUMBER ? 0.0f : (float)PlayerStat.HP / (float)PlayerStat.MaxHP;
@@ -671,18 +732,16 @@ FSkill APlayerCharacter::GetSkillData(int idx, int SkillCode)
 	SkillData.Angle = Detail.Angle;
 	SkillData.Range = Detail.Range;
 
-	SkillState[idx].SkillMaxCool = Detail.CoolTime;
-	SkillState[idx].SkillCurCool = SkillState[idx].SkillMaxCool;
+	SkillState[idx].MaxCool = Detail.CoolTime;
+	SkillState[idx].CurCool = SkillState[idx].MaxCool;
 
 	return Data;
 }
 
 void APlayerCharacter::SetUseSkill(int idx, int SkillCode)
 {
-
-	SkillState[idx].SkillCurCool = 0.0f;
-	SkillState[idx].bIsSkillEnabled = true;
-
+	SkillState[idx].CurCool = 0.0f;
+	SkillState[idx].bIsEnabled = true;
 	UseSkills[idx] = SkillCode;
 }
 
@@ -690,6 +749,36 @@ void APlayerCharacter::EraseUseSkill(int idx)
 {
 
 	UseSkills[idx] = -1;
+}
+
+void APlayerCharacter::UsingBattleItem(int idx, int ItemCode)
+{
+
+	//auto Instance = Cast<UPRGameInstance>(GetGameInstance());
+//	FBattleItem Data = Instance->GetBattleItem(ItemCode);
+
+	//switch (Data.Type)
+	//{
+
+	//}
+
+	ItemState[idx].MaxCool =10.0f;
+	ItemState[idx].CurCool = ItemState[idx].MaxCool;
+
+
+}
+
+void APlayerCharacter::SetBattleItem(int idx, int ItemCode)
+{
+	ItemState[idx].CurCool = 0.0f;
+	ItemState[idx].bIsEnabled = true;
+
+	UseItems[idx] = ItemCode;
+}
+
+void APlayerCharacter::EraseBattleItme(int idx)
+{
+	UseItems[idx] = -1;
 }
 
 

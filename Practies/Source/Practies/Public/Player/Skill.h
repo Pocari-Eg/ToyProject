@@ -37,16 +37,16 @@ struct FSkillDetail
 	   float CoolTime;
 };
 USTRUCT(Atomic, BluePrintType)
-struct FSkillState
+struct FUseState
 {
 	GENERATED_BODY()
 
 	public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SkillMaxCool;
+	float MaxCool;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SkillCurCool;
+	float CurCool;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bIsSkillEnabled;
+	bool bIsEnabled;
 
 };

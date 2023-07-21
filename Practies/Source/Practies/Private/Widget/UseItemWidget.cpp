@@ -1,37 +1,40 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widget/UseSkillWidget.h"
+#include "Widget/UseItemWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Player/PlayerCharacter.h"
 
-void UUseSkillWidget::BindPlayer(APlayerCharacter* Value)
+void UUseItemWidget::BindPlayer(APlayerCharacter* Value)
 {
 	Player = Value;
-	for (int i = 0; i < 8; i++)Player->OnSkillCoolChanged[i].BindUFunction(this,FName("SkillTimeUpdate"));
+	for (int i = 0; i < 4; i++)Player->OnItemCoolChanged[i].BindUFunction(this,FName("ItemTimeUpdate"));
 }
 
-void UUseSkillWidget::OnWidget(int idx)
+void UUseItemWidget::OnWidget(int idx)
 {
 	StateWidget[idx].Texture->SetVisibility(ESlateVisibility::Visible);
 	StateWidget[idx].Time->SetVisibility(ESlateVisibility::Visible);
+
+
 }
 
-void UUseSkillWidget::OffWidget(int idx)
+void UUseItemWidget::OffWidget(int idx)
 {
 
 	StateWidget[idx].Texture->SetVisibility(ESlateVisibility::Hidden);
 	StateWidget[idx].Time->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void UUseSkillWidget::NativeConstruct()
+void UUseItemWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	UE_LOG(LogTemp, Warning, TEXT("PlayerHudInit"));
 
-	StateWidget.SetNum(8);
-	for (int i = 0; i < 8; i++)
+
+	StateWidget.SetNum(4);
+	for (int i = 0; i < 4; i++)
 	{
 		FString TimeName ="Time"+ FString::FromInt(i + 1);
 		FString TextureName = "Texture" + FString::FromInt(i + 1);
@@ -45,11 +48,11 @@ void UUseSkillWidget::NativeConstruct()
 
 }
 
-void UUseSkillWidget::SkillTimeUpdate(int32 idx)
+void UUseItemWidget::ItemTimeUpdate(int32 idx)
 {
 	if (StateWidget[idx].Time != nullptr)
 	{
-		int curTime = Player->GetCurSkillCool(idx);
+		int curTime = Player->GetCurItemCool(idx);
 
 
 		FText TimeText = FText::FromString(FString::FromInt(curTime));

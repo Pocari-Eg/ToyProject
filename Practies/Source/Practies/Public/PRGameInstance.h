@@ -9,7 +9,7 @@
 #include "DataTable/SkilltypeTable.h"
 #include "Common/Item.h"
 
-#include "DataTable/ConsumablesItemTable.h"
+#include "DataTable/BattleItemTable.h"
 #include "PRGameInstance.generated.h"
 
 /**
@@ -26,8 +26,8 @@ private:
 	 UDataTable* SkillTypeData;
 	 UDataTable* SkillDetailData;
 
-	 UDataTable* FConsumData;
-	 //UDataTable* FConsumDetailData;
+	 UDataTable* FBattleData;
+	 //UDataTable* FBattleDetailData;
 
 	 TArray<int> SkillLevels;
 public:
@@ -64,14 +64,21 @@ public:
 	UTexture2D* GetSkillImage(FSkill Skill) {return Skill.Texture; }
 
 
+	//item
+
+	UFUNCTION(Blueprintcallable)
+	void SetBattleItem(int idx, int ItemCode);
+	UFUNCTION(Blueprintcallable)
+	void EraseBattleItem(int idx);
 
 	//Itemldata
-	FConsumablesDataTable* GetConsumItemData(int ItemCode);
-	//FSkillDetail GetSkillDetailData(FName ItemName, int ItemCode);
+	FBattleItemDataTable* GetBattleItemData(int ItemCode);
+
+
 	
-	//item
+
 	UFUNCTION(BluePrintCallable)
-	FConsumablesItem GetConsumItem(int ItemCode);
+	FBattleItem GetBattleItem(int ItemCode);
 	UFUNCTION(Blueprintcallable)
-	UTexture2D* GetItemImage(FConsumablesItem Item) { return Item.Texture; }
+	UTexture2D* GetItemImage(FBattleItem Item) { return Item.Texture; }
 };

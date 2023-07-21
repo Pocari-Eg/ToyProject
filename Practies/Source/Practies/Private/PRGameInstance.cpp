@@ -13,10 +13,10 @@ UPRGameInstance::UPRGameInstance()
 		SkillTypeData = DT_SKILLDATA.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UDataTable> DT_CONSUMDATA(TEXT("DataTable'/Game/DataTable/Item/ConsumDataTable.ConsumDataTable'"));
+	static ConstructorHelpers::FObjectFinder<UDataTable> DT_CONSUMDATA(TEXT("DataTable'/Game/DataTable/Item/BattleItemDataTable.BattleItemDataTable'"));
 	if (DT_SKILLDATA.Succeeded())
 	{
-		FConsumData = DT_CONSUMDATA.Object;
+		FBattleData = DT_CONSUMDATA.Object;
 	}
 
 	SkillLevels.Init(-1, 100);
@@ -95,17 +95,17 @@ void UPRGameInstance::SetSkillLevel(int SkillCode, int Value)
 	SkillLevels[SkillCode] = Value;
 }
 
-FConsumablesDataTable* UPRGameInstance::GetConsumItemData(int ItemCode)
+FBattleItemDataTable* UPRGameInstance::GetBattleItemData(int ItemCode)
 {
 
-	return FConsumData->FindRow<FConsumablesDataTable>(*FString::FromInt(ItemCode), TEXT(""));
+	return FBattleData->FindRow<FBattleItemDataTable>(*FString::FromInt(ItemCode), TEXT(""));
 }
 
-FConsumablesItem UPRGameInstance::GetConsumItem(int ItemCode)
+FBattleItem UPRGameInstance::GetBattleItem(int ItemCode)
 {
-	auto ItemData = GetConsumItemData(ItemCode);
+	auto ItemData = GetBattleItemData(ItemCode);
 
-	FConsumablesItem NewItem;
+	FBattleItem NewItem;
 	NewItem.Name = ItemData->Name;
 
 
@@ -134,4 +134,13 @@ FSkillDetail UPRGameInstance::GetSkillDetailData(FName SkillName, int SkillCode)
 	NewDetail.Angle= SkillDetailData->FindRow<FSkillDetailTable>(*FString::FromInt(SkillLevel), TEXT(""))->Angle;
 	NewDetail.CoolTime = SkillDetailData->FindRow<FSkillDetailTable>(*FString::FromInt(SkillLevel), TEXT(""))->CoolTime;
 	 return NewDetail;
+}
+void UPRGameInstance::SetBattleItem(int idx, int ItemCode)
+{
+	Player->SetBattleItem(idx, ItemCode);
+}
+
+void UPRGameInstance::EraseBattleItem(int idx)
+{
+	Player->EraseBattleItme(idx);
 }

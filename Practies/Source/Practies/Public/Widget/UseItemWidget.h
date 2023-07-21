@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "UseSkillWidget.generated.h"
+#include "UseItemWidget.generated.h"
 
 USTRUCT()
-struct FUseStateWidget
+struct FItemStateWidget
 {
 	GENERATED_BODY()
 public:
@@ -18,7 +18,7 @@ public:
 
 };
 UCLASS()
-class PRACTIES_API UUseSkillWidget : public UUserWidget
+class PRACTIES_API UUseItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -26,10 +26,10 @@ private:
 	class APlayerCharacter* Player;
 
 	UPROPERTY()
-	TArray<FUseStateWidget> StateWidget;
+	TArray<FItemStateWidget> StateWidget;
 
 	UFUNCTION()
-	void SkillTimeUpdate(int32 idx);
+	void ItemTimeUpdate(int32 idx);
 
 public:
 	void BindPlayer(class APlayerCharacter* Value);

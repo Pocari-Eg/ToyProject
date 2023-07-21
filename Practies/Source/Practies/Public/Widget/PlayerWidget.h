@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 
 #include "Widget/UseSkillWidget.h"
+#include "Widget/UseItemWidget.h"
 
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -67,9 +68,14 @@ public:
 	
 
 	void ToggleSkillBook();
+	void ToggleInventory();
 
 	void UseSkillCoolStart(int idx);
 	void UseSkillCoolEnd(int idx);
+
+
+	void UseItemCoolStart(int idx);
+	void UseItemCoolEnd(int idx);
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;
@@ -88,6 +94,8 @@ private:
 	FHPWidgetData PlayerHp;
 
 	UUserWidget* SkillBook;
+	UUserWidget* Inventory;
 
 	UUseSkillWidget* UseSkillWidget;
+	UUseItemWidget* UseItemWidget;
 };

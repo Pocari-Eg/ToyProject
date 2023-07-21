@@ -10,6 +10,7 @@
 #include "FSM/PlayerFSM.h"
 #include "WeaponComponent.h"
 
+#include "Common/Item.h"
 
 #include "Curves/CurveFloat.h"
 #include "Components/TimeLineComponent.h"
@@ -22,7 +23,7 @@
 */
 
 DECLARE_MULTICAST_DELEGATE(FOnHpChangedDelegate);
-DECLARE_DELEGATE_OneParam(FOnSkillCoolChangedDelegate,int32);
+DECLARE_DELEGATE_OneParam(FOnCoolChangedDelegate,int32);
 UCLASS()
 class PRACTIES_API APlayerCharacter : public ACharacter
 {
@@ -60,7 +61,9 @@ public:
 	int widgetsize = 0;
 	//delegate
 	FOnHpChangedDelegate OnHpChanged;
-	TArray<FOnSkillCoolChangedDelegate> OnSkillCoolChanged;
+	TArray<FOnCoolChangedDelegate> OnSkillCoolChanged;
+	TArray<FOnCoolChangedDelegate> OnItemCoolChanged;
+	
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
@@ -71,8 +74,7 @@ private:
 	FSkillData SkillData;
 
 	TArray<int> UseSkills;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SKILL, meta = (AllowPrivateAccess = "true"))
-	TArray<FSkillState> SkillState;
+	TArray<FUseState> SkillState;
 
 	//Ä«¸Þ¶ó
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -85,6 +87,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DEBUG, meta = (AllowPrivateAccess = "true"))
 	bool bIsDebug;
 
+
+	//item
+	TArray<int> UseItems;
+	TArray<FUseState> ItemState;
 
 	//common
 	float NewAngle;
@@ -186,6 +192,13 @@ public:
 	UFUNCTION()
 	void FinishDodge();
 
+	//item
+	void UseBattleItem(int i);
+	UFUNCTION()
+	bool ItemCheck(int idx);
+	void CalcItemCool(int idx, float DeltaTime);
+
+
 	//camera
 	FORCEINLINE void CameraInit();
 	UFUNCTION(blueprintcallable)
@@ -231,7 +244,8 @@ public:
 
 	float GetCurSkillCool(int idx);
 
-	
+	float GetCurItemCool(int idx);
+
 private:
 	//inti
 	void PlayerInit();
@@ -242,6 +256,7 @@ private:
 #pragma region WidgetControl
 public:
 	void ToggleSkillBook();
+	void ToggleInventory();
 
 #pragma endregion
 #pragma region GetSet
@@ -285,6 +300,10 @@ public:
 	 void SetUseSkill(int idx, int SkillCode);
 	 void EraseUseSkill(int idx);
 
+
+	 void UsingBattleItem(int idx, int ItemCode);
+	 void SetBattleItem(int idx, int ItemCode);
+	 void EraseBattleItme(int idx);
 
 };
 #pragma endregion GetSet

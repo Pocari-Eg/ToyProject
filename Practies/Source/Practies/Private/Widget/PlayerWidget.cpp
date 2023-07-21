@@ -9,12 +9,15 @@ void UPlayerWidget::BindPlayer(class APlayerCharacter* NewPlayer) {
 
 	//새로들어온 object를 CurrentObject에 할당
 	Player = Cast<APlayerCharacter>(NewPlayer);
+
 	if (UseSkillWidget != nullptr)
 		UseSkillWidget->BindPlayer(NewPlayer);
+
+	if (UseItemWidget != nullptr)
+		UseItemWidget->BindPlayer(NewPlayer);
 	//델리게이트를 통해 UpdateWidget함수가 호출될수 있도록 
 
 	Player->OnHpChanged.AddUObject(this, &UPlayerWidget::UpdateHpWidget);
-	//NewIrene->IreneUIManager->OnSoulUpdate.AddUObject(this, &UPlayerHudWidget::UpdateSoulGauge);
 
 	UpdateHpWidget();
 }
@@ -102,7 +105,11 @@ void UPlayerWidget::ToggleSkillBook()
 	if(SkillBook->GetVisibility()== ESlateVisibility::Hidden) SkillBook->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	else SkillBook->SetVisibility(ESlateVisibility::Hidden);
 }
-
+void UPlayerWidget::ToggleInventory()
+{
+	if (Inventory->GetVisibility() == ESlateVisibility::Hidden) Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	else Inventory->SetVisibility(ESlateVisibility::Hidden);
+}
 void UPlayerWidget::UseSkillCoolStart(int idx)
 {
 	if (UseSkillWidget != nullptr)
@@ -113,6 +120,18 @@ void UPlayerWidget::UseSkillCoolEnd(int idx)
 {
 	if(UseSkillWidget!=nullptr)
 	UseSkillWidget->OffWidget(idx);
+}
+
+void UPlayerWidget::UseItemCoolStart(int idx)
+{
+	if (UseItemWidget != nullptr)
+		UseItemWidget->OnWidget(idx);
+}
+
+void UPlayerWidget::UseItemCoolEnd(int idx)
+{
+	if (UseItemWidget != nullptr)
+		UseItemWidget->OffWidget(idx);
 }
 
 void UPlayerWidget::NativeConstruct()
@@ -135,9 +154,15 @@ void UPlayerWidget::NativeConstruct()
 	SkillBook->SetVisibility(ESlateVisibility::Hidden);
 	
 
+	Inventory = Cast<UUserWidget>(GetWidgetFromName(TEXT("BP_Inventory")));
+	Inventory->SetVisibility(ESlateVisibility::Hidden);
+	
+
 	PlayerHp.HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HP")));
 	PlayerHp.MaxHp = Cast<UTextBlock>(GetWidgetFromName(TEXT("MaxHp")));
 	PlayerHp.CurHp = Cast<UTextBlock>(GetWidgetFromName(TEXT("CurHp")));
 
 	UseSkillWidget = Cast<UUseSkillWidget>(GetWidgetFromName(TEXT("BP_PlayerUseSKill")));
+	UseItemWidget = Cast<UUseItemWidget>(GetWidgetFromName(TEXT("BP_PlayerUseItem")));
+
 }

@@ -67,7 +67,14 @@ protected:
 	void InputSkill_D();
 	void InputSkill_F();
 
+	void InputBattleItem_1();
+	void InputBattleItem_2();
+	void InputBattleItem_3();
+	void InputBattleItem_4();
+
 	void InputSkillBook();
+
+	void InputInventory();
 private:
 	bool bMoveInputPressed; // Input is bring pressed
 	bool bIsTouch; // Is it a touch device

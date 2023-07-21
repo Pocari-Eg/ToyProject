@@ -7,7 +7,7 @@
 #include "Item.generated.h"
 
 USTRUCT(Atomic, BluePrintType)
-struct FConsumablesItem
+struct FBattleItem
 {
 	GENERATED_BODY()
 
@@ -15,7 +15,7 @@ struct FConsumablesItem
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName Name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EConsumType Type;
+	EBattleType Type;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* Texture;
 

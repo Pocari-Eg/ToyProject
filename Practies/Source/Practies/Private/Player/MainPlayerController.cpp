@@ -51,7 +51,14 @@ void AMainPlayerController::SetupInputComponent()
 	InputComponent->BindAction("SkillF", IE_Released, this, &AMainPlayerController::InputSkill_F);
 
 
+	InputComponent->BindAction("BattleItem1", IE_Released, this, &AMainPlayerController::InputBattleItem_1);
+	InputComponent->BindAction("BattleItem2", IE_Released, this, &AMainPlayerController::InputBattleItem_2);
+	InputComponent->BindAction("BattleItem3", IE_Released, this, &AMainPlayerController::InputBattleItem_3);
+	InputComponent->BindAction("BattleItem4", IE_Released, this, &AMainPlayerController::InputBattleItem_4);
+
+	
 	InputComponent->BindAction("SkillBook", IE_Pressed, this, &AMainPlayerController::InputSkillBook);
+	InputComponent->BindAction("Inventory", IE_Pressed, this, &AMainPlayerController::InputInventory);
 
 	InputComponent->BindAction("Dodge", IE_Released, this, &AMainPlayerController::Dodge);
 
@@ -246,6 +253,8 @@ void AMainPlayerController::RotateAttack()
 	Player->Attack();
 }
 
+
+//Skill================================================
 void AMainPlayerController::InputSkill_Q()
 {
 	if (Player != nullptr)Player->SkillAttack(0);
@@ -286,11 +295,41 @@ void AMainPlayerController::InputSkill_F()
 	if (Player != nullptr)Player->SkillAttack(7);
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("F"));
 }
+
+
+//BattleItme========================================
+void AMainPlayerController::InputBattleItem_1()
+{
+	if (Player != nullptr)Player->UseBattleItem(0);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("1"));
+}
+void AMainPlayerController::InputBattleItem_2()
+{
+	if (Player != nullptr)Player->UseBattleItem(1);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("2"));
+}
+void AMainPlayerController::InputBattleItem_3()
+{
+	if (Player != nullptr)Player->UseBattleItem(2);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("3"));
+}
+void AMainPlayerController::InputBattleItem_4()
+{
+	if (Player != nullptr)Player->UseBattleItem(3);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("4"));
+}
 void AMainPlayerController::InputSkillBook()
 {
 	if (Player != nullptr)Player->ToggleSkillBook();
 
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("K"));
+}
+
+void AMainPlayerController::InputInventory()
+{
+	if (Player != nullptr)Player->ToggleInventory();
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("I"));
 }
 
 void AMainPlayerController::SetOnMouseWidget(bool Value)

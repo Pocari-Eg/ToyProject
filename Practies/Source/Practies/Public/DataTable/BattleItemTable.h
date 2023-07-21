@@ -4,16 +4,16 @@
 
 #include "Practies.h"
 #include "Engine/DataTable.h"
-#include "ConsumablesItemTable.generated.h"
+#include "BattleItemTable.generated.h"
 
 USTRUCT(BlueprintType)
-struct FConsumablesDataTable : public FTableRowBase
+struct FBattleItemDataTable : public FTableRowBase
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName Name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EConsumType Type;
+	EBattleType Type;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Texture;
 
