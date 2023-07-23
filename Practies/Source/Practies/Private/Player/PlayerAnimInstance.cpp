@@ -95,5 +95,5 @@ void UPlayerAnimInstance::AnimNotify_Death() const
 }
 void UPlayerAnimInstance::AnimNotify_SkillCheck() const
 {
-	OnSkillCheck.Broadcast();
+	OnSkillAttackCheck.Broadcast();
 }

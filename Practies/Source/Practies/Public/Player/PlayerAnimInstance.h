@@ -10,7 +10,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnNexAttackCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnAttackCheckDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnSkillCheckDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnSkillAttackCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnDeathDelegate);
 /**
  * 
@@ -25,7 +25,7 @@ public:
 	FOnNexAttackCheckDelegate OnNextAttackCheck;
 	FOnAttackCheckDelegate OnAttackCheck;
 	FOnDeathDelegate OnDeath;
-	FOnSkillCheckDelegate OnSkillCheck;
+	FOnSkillAttackCheckDelegate OnSkillAttackCheck;
 
 UPROPERTY(EditAnywhere,bluePrintreadwrite, category = Dodge)
 	bool bIsDodge;

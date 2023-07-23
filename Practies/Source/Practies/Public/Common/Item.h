@@ -15,9 +15,19 @@ struct FBattleItem
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName Name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EBattleType Type;
+	EBattleItemType Type;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* Texture;
+};
 
+USTRUCT(Atomic, BluePrintType)
+struct FRecoveryItem
+{
+	GENERATED_BODY()
 
+	public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Power;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CoolTime;
 };

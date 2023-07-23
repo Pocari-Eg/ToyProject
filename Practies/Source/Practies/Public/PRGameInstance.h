@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Player/Skill.h"
-#include "DataTable/SkillDetailTable.h"
 #include "DataTable/SkilltypeTable.h"
 #include "Common/Item.h"
 
@@ -26,8 +25,8 @@ private:
 	 UDataTable* SkillTypeData;
 	 UDataTable* SkillDetailData;
 
-	 UDataTable* FBattleData;
-	 //UDataTable* FBattleDetailData;
+	 UDataTable* BattleItemData;
+	 UDataTable* RecoveryItemData;
 
 	 TArray<int> SkillLevels;
 public:
@@ -73,12 +72,15 @@ public:
 
 	//Itemldata
 	FBattleItemDataTable* GetBattleItemData(int ItemCode);
-
+	FRecoveryItemDataTable* GetRecoveryItemData(FName ItemName);
 
 	
 
 	UFUNCTION(BluePrintCallable)
 	FBattleItem GetBattleItem(int ItemCode);
+	UFUNCTION(BluePrintCallable)
+	FRecoveryItem GetRecoveryItem(FName ItemName);
+
 	UFUNCTION(Blueprintcallable)
 	UTexture2D* GetItemImage(FBattleItem Item) { return Item.Texture; }
 };

@@ -67,7 +67,7 @@ public:
 UFUNCTION(BlueprintCallable)
 void AttackCheck(bool bisDebug,FTransform OwnerTransform, FVector OwnerFowardVector, int Damage);
 UFUNCTION(BlueprintCallable)
-void SkillCheck(bool bisDebug, FTransform OwnerTransform, FVector OwnerFowardVector, FSkillData SkillData);
+void SkillAttackCheck(bool bisDebug, FTransform OwnerTransform, FVector OwnerFowardVector, FSkillData SkillData);
 UFUNCTION(BlueprintCallable)
 void SetVisible(bool Set);
 		

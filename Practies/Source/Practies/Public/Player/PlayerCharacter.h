@@ -50,6 +50,8 @@ public:
 	class UPlayerAnimInstance* PlayerAnimInstance;
 	UPROPERTY(BlueprintReadWrite)
 	class UPlayerFSM* PlayerFSMInstance;
+
+	class UPRGameInstance* GameInstance;
 	//widget
 	UPROPERTY(BlueprintReadWrite)
 	class UPlayerWidget* PlayerHud;
@@ -63,7 +65,7 @@ public:
 	FOnHpChangedDelegate OnHpChanged;
 	TArray<FOnCoolChangedDelegate> OnSkillCoolChanged;
 	TArray<FOnCoolChangedDelegate> OnItemCoolChanged;
-	
+
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
@@ -89,8 +91,8 @@ private:
 
 
 	//item
-	TArray<int> UseItems;
-	TArray<FUseState> ItemState;
+	TArray<int> UseBattleItems;
+	TArray<FUseState> BattleItemState;
 
 	//common
 	float NewAngle;
@@ -182,7 +184,7 @@ public:
 	UFUNCTION()
 	void SkillAttackCheck();
 	UFUNCTION()
-	bool SkillCheck(int idx);
+	bool CheckSkill(int idx);
 
 	void CalcSkillCool(int idx,float DeltaTime);
 	//dodge
@@ -195,8 +197,8 @@ public:
 	//item
 	void UseBattleItem(int i);
 	UFUNCTION()
-	bool ItemCheck(int idx);
-	void CalcItemCool(int idx, float DeltaTime);
+	bool CheckBattleItem(int idx);
+	void CalcBattleItemCool(int idx, float DeltaTime);
 
 
 	//camera
@@ -225,7 +227,7 @@ public:
 	void InitAnimationDelegate();
 	void InitPlayerWidget();
 
-
+	void RecoveryHP(int32 Value);
 	void Death();
 
 	//event
@@ -245,6 +247,10 @@ public:
 	float GetCurSkillCool(int idx);
 
 	float GetCurItemCool(int idx);
+
+
+	//itemEffect
+	float UseRecoveryItem(FName ItemName);
 
 private:
 	//inti
@@ -301,7 +307,7 @@ public:
 	 void EraseUseSkill(int idx);
 
 
-	 void UsingBattleItem(int idx, int ItemCode);
+	 void SetBattleItemEffect(int idx, int ItemCode);
 	 void SetBattleItem(int idx, int ItemCode);
 	 void EraseBattleItme(int idx);
 

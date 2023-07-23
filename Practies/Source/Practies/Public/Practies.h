@@ -26,11 +26,13 @@ enum class EPState : uint8
     dodge UMETA(DisplayName = "DODGE"),
 };
 UENUM(BlueprintType)
-enum class EBattleType : uint8
+enum class EBattleItemType : uint8
 {
     
-    POTION UMETA(DisplayName = "POTION"),
-    THROW UMETA(DisplayName = "WALK"),
+    Recovery UMETA(DisplayName = "RECOVERY"),
+    Offense UMETA(DisplayName = "OFFENSE"),
+    Utility UMETA(DisplayName = "UTILITY"),
+    Buff UMETA(DisplayName = "BUFF"),
 };
 
 

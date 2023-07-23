@@ -160,8 +160,8 @@ APlayerCharacter::APlayerCharacter()
 
 
 	OnItemCoolChanged.SetNum(4);
-	ItemState.SetNum(4);
-	UseItems.Init(-1, 4);
+	BattleItemState.SetNum(4);
+	UseBattleItems.Init(-1, 4);
 }
 
 // Called when the game starts or when spawned
@@ -176,9 +176,8 @@ void APlayerCharacter::BeginPlay()
 	DodgeCurveInit();
 	RotationCurveInit();
 
-	auto Instance = Cast<UPRGameInstance>(GetGameInstance());
-	Instance->BindPlayer(this);
-	PlayerStat.HP = PlayerStat.MaxHP;
+	GameInstance->BindPlayer(this);
+	PlayerStat.HP = PlayerStat.MaxHP/2;
 	InitPlayerWidget();
 
 
@@ -208,10 +207,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 	if (SkillState[7].bIsEnabled == false && UseSkills[7] != -1)CalcSkillCool(7, DeltaTime);
 
 
-	if (ItemState[0].bIsEnabled == false && UseItems[0] != -1)CalcItemCool(0, DeltaTime);
-	if (ItemState[1].bIsEnabled == false && UseItems[1] != -1)CalcItemCool(1, DeltaTime);
-	if (ItemState[2].bIsEnabled == false && UseItems[2] != -1)CalcItemCool(2, DeltaTime);
-	if (ItemState[3].bIsEnabled == false && UseItems[3] != -1)CalcItemCool(3, DeltaTime);
+	if (BattleItemState[0].bIsEnabled == false && UseBattleItems[0] != -1)CalcBattleItemCool(0, DeltaTime);
+	if (BattleItemState[1].bIsEnabled == false && UseBattleItems[1] != -1)CalcBattleItemCool(1, DeltaTime);
+	if (BattleItemState[2].bIsEnabled == false && UseBattleItems[2] != -1)CalcBattleItemCool(2, DeltaTime);
+	if (BattleItemState[3].bIsEnabled == false && UseBattleItems[3] != -1)CalcBattleItemCool(3, DeltaTime);
 
 }
 
@@ -227,6 +226,7 @@ void APlayerCharacter::PostInitializeComponents()
 	SetWeaponVisible(false);
 	InitWeapon();
 
+	GameInstance = Cast<UPRGameInstance>(GetGameInstance());
 
 	InitAnimationDelegate();
 
@@ -374,7 +374,7 @@ void APlayerCharacter::InitAnimationDelegate()
 {
 	PlayerAnimInstance->OnMontageEnded.AddDynamic(this, &APlayerCharacter::OnAttackMontageEnded);
 	PlayerAnimInstance->OnAttackCheck.AddUObject(this, &APlayerCharacter::AttackCheck);
-	PlayerAnimInstance->OnSkillCheck.AddUObject(this, &APlayerCharacter::SkillAttackCheck);
+	PlayerAnimInstance->OnSkillAttackCheck.AddUObject(this, &APlayerCharacter::SkillAttackCheck);
 	PlayerAnimInstance->OnDeath.AddUObject(this, &APlayerCharacter::Death);
 
 	PlayerAnimInstance->OnNextAttackCheck.AddLambda([this]()->void {
@@ -398,7 +398,19 @@ void APlayerCharacter::InitPlayerWidget()
 	if (PlayerHud != nullptr)
 	{
 	  PlayerHud->BindPlayer(this);
+
+	  OnHpChanged.Broadcast();
 	}
+}
+
+void APlayerCharacter::RecoveryHP(int32 Value)
+{
+	PlayerStat.HP += Value;
+	if (PlayerStat.HP >= PlayerStat.MaxHP)
+	{
+		PlayerStat.HP = PlayerStat.MaxHP;
+	}
+	OnHpChanged.Broadcast();
 }
 
 void APlayerCharacter::Death()
@@ -474,7 +486,15 @@ float APlayerCharacter::GetCurSkillCool(int idx)
 }
 float APlayerCharacter::GetCurItemCool(int idx)
 {
-	return ItemState[idx].CurCool;
+	return BattleItemState[idx].CurCool;
+}
+float APlayerCharacter::UseRecoveryItem(FName ItemName)
+{
+	FRecoveryItem ItemData = GameInstance->GetRecoveryItem(ItemName);
+	RecoveryHP(ItemData.Power);
+
+	return ItemData.CoolTime;
+
 }
 void APlayerCharacter::PlayerInit()
 {
@@ -585,7 +605,7 @@ void APlayerCharacter::SkillAttack(int i)
 
 	if (GetPlayerState() != EPState::attack) {
 
-		if (SkillCheck(i))
+		if (CheckSkill(i))
 		{
 			ChangeState(UAttackState::GetInstance());
 			FSkill Data = GetSkillData(i,UseSkills[i]);
@@ -609,9 +629,9 @@ void APlayerCharacter::SkillAttack(int i)
 void APlayerCharacter::SkillAttackCheck()
 {
 	SetAttackTransform();
-	PlayerWeapon->SkillCheck(bIsDebug, AttackTransform, AttackForwardVector, SkillData);
+	PlayerWeapon->SkillAttackCheck(bIsDebug, AttackTransform, AttackForwardVector, SkillData);
 }
-bool APlayerCharacter::SkillCheck(int idx)
+bool APlayerCharacter::CheckSkill(int idx)
 {
 	if (UseSkills[idx] == -1)return false;
 
@@ -672,12 +692,12 @@ void APlayerCharacter::UseBattleItem(int i)
 
 	if (GetPlayerState() != EPState::attack) {
 
-		if (ItemCheck(i))
+		if (CheckBattleItem(i))
 		{
 			
-			UsingBattleItem(i, 1);
+			SetBattleItemEffect(i, UseBattleItems[i]);
 
-			ItemState[i].bIsEnabled = false;
+			BattleItemState[i].bIsEnabled = false;
 			PlayerHud->UseItemCoolStart(i);
 			OnItemCoolChanged[i].Execute(i);
 			TLOG_E(TEXT("UseItem"))
@@ -688,24 +708,24 @@ void APlayerCharacter::UseBattleItem(int i)
 
 	}
 }
-bool APlayerCharacter::ItemCheck(int idx)
+bool APlayerCharacter::CheckBattleItem(int idx)
 {
-	if (UseItems[idx] == -1)return false;
+	if (UseBattleItems[idx] == -1)return false;
 
-	if (ItemState[idx].bIsEnabled == false)return false;
+	if (BattleItemState[idx].bIsEnabled == false)return false;
 
 
 	return true;
 }
-void APlayerCharacter::CalcItemCool(int idx, float DeltaTime)
+void APlayerCharacter::CalcBattleItemCool(int idx, float DeltaTime)
 {
-	ItemState[idx].CurCool -= DeltaTime;
+	BattleItemState[idx].CurCool -= DeltaTime;
 
 	OnItemCoolChanged[idx].Execute(idx);
-	if (ItemState[idx].CurCool <= 0.0f)
+	if (BattleItemState[idx].CurCool <= 0.0f)
 	{
-		ItemState[idx].bIsEnabled = true;
-		ItemState[idx].CurCool = ItemState[idx].MaxCool;
+		BattleItemState[idx].bIsEnabled = true;
+		BattleItemState[idx].CurCool = BattleItemState[idx].MaxCool;
 
 		PlayerHud->UseItemCoolEnd(idx);
 	}
@@ -724,9 +744,9 @@ void APlayerCharacter::SetOnMouseWidget(bool Value)
 FSkill APlayerCharacter::GetSkillData(int idx, int SkillCode)
 {
 
-	auto Instance = Cast<UPRGameInstance>(GetGameInstance());
-	FSkill Data = Instance->GetSkill(SkillCode);
-	FSkillDetail Detail = Instance->GetSkillDetailData(Data.Name, SkillCode);
+	
+	FSkill Data = GameInstance->GetSkill(SkillCode);
+	FSkillDetail Detail = GameInstance->GetSkillDetailData(Data.Name, SkillCode);
 
 	SkillData.Damage = Detail.Damage;
 	SkillData.Angle = Detail.Angle;
@@ -751,34 +771,45 @@ void APlayerCharacter::EraseUseSkill(int idx)
 	UseSkills[idx] = -1;
 }
 
-void APlayerCharacter::UsingBattleItem(int idx, int ItemCode)
+void APlayerCharacter::SetBattleItemEffect(int idx, int ItemCode)
 {
 
-	//auto Instance = Cast<UPRGameInstance>(GetGameInstance());
-//	FBattleItem Data = Instance->GetBattleItem(ItemCode);
+	
+	FBattleItem Data = GameInstance->GetBattleItem(ItemCode);
 
-	//switch (Data.Type)
-	//{
+	switch (Data.Type)
+	{
+		case EBattleItemType::Recovery:
+			BattleItemState[idx].MaxCool=UseRecoveryItem(Data.Name);
+			break;
+		case EBattleItemType::Offense:
+			break;
+		case EBattleItemType::Utility:
+			break;
+		case EBattleItemType::Buff:
+			break;
+		default:
+			break;
 
-	//}
+	}
 
-	ItemState[idx].MaxCool =10.0f;
-	ItemState[idx].CurCool = ItemState[idx].MaxCool;
+
+	BattleItemState[idx].CurCool = BattleItemState[idx].MaxCool;
 
 
 }
 
 void APlayerCharacter::SetBattleItem(int idx, int ItemCode)
 {
-	ItemState[idx].CurCool = 0.0f;
-	ItemState[idx].bIsEnabled = true;
+	BattleItemState[idx].CurCool = 0.0f;
+	BattleItemState[idx].bIsEnabled = true;
 
-	UseItems[idx] = ItemCode;
+	UseBattleItems[idx] = ItemCode;
 }
 
 void APlayerCharacter::EraseBattleItme(int idx)
 {
-	UseItems[idx] = -1;
+	UseBattleItems[idx] = -1;
 }
 
 

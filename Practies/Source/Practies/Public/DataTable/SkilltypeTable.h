@@ -17,3 +17,17 @@ struct FSkillTable : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Montage;
 };
+
+USTRUCT(BlueprintType)
+struct FSkillDetailTable : public FTableRowBase
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Damage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Range;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Angle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CoolTime;
+};

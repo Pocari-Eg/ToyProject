@@ -148,9 +148,9 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 	}
 
 }
-void UWeaponComponent::SkillCheck(bool bisDebug, FTransform OwnerTransform, FVector OwnerFowardVector, FSkillData SkillData)
+void UWeaponComponent::SkillAttackCheck(bool bisDebug, FTransform OwnerTransform, FVector OwnerFowardVector, FSkillData SkillData)
 {
-	TLOG_E(TEXT("SkillCheck"));
+	TLOG_E(TEXT("SkillAttackCheck"));
 	if (bisDebug)
 	{
 		FTransform BottomLine = OwnerTransform;

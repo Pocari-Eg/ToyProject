@@ -16,8 +16,15 @@ UPRGameInstance::UPRGameInstance()
 	static ConstructorHelpers::FObjectFinder<UDataTable> DT_CONSUMDATA(TEXT("DataTable'/Game/DataTable/Item/BattleItemDataTable.BattleItemDataTable'"));
 	if (DT_SKILLDATA.Succeeded())
 	{
-		FBattleData = DT_CONSUMDATA.Object;
+		BattleItemData = DT_CONSUMDATA.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> DT_RECOVERY(TEXT("DataTable'/Game/DataTable/Item/RecoveryItemTable.RecoveryItemTable'"));
+	if (DT_RECOVERY.Succeeded())
+	{
+		RecoveryItemData = DT_RECOVERY.Object;
+	}
+
 
 	SkillLevels.Init(-1, 100);
 }
@@ -98,7 +105,12 @@ void UPRGameInstance::SetSkillLevel(int SkillCode, int Value)
 FBattleItemDataTable* UPRGameInstance::GetBattleItemData(int ItemCode)
 {
 
-	return FBattleData->FindRow<FBattleItemDataTable>(*FString::FromInt(ItemCode), TEXT(""));
+	return BattleItemData->FindRow<FBattleItemDataTable>(*FString::FromInt(ItemCode), TEXT(""));
+}
+
+FRecoveryItemDataTable* UPRGameInstance::GetRecoveryItemData(FName ItemName)
+{
+	return RecoveryItemData->FindRow<FRecoveryItemDataTable>(ItemName, TEXT(""));
 }
 
 FBattleItem UPRGameInstance::GetBattleItem(int ItemCode)
@@ -116,6 +128,17 @@ FBattleItem UPRGameInstance::GetBattleItem(int ItemCode)
 	NewItem.Type = ItemData->Type;
 
 	return NewItem;
+}
+
+FRecoveryItem UPRGameInstance::GetRecoveryItem(FName ItemName)
+{
+	auto ItemData = GetRecoveryItemData(ItemName);
+
+	FRecoveryItem Data;
+	Data.Power = ItemData->Power;
+	Data.CoolTime = ItemData->CoolTime;
+
+	return Data;
 }
 
 FSkillDetail UPRGameInstance::GetSkillDetailData(FName SkillName, int SkillCode)
