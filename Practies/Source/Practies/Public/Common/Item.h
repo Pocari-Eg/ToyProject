@@ -31,3 +31,19 @@ struct FRecoveryItem
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CoolTime;
 };
+
+USTRUCT(Atomic, BluePrintType)
+struct FOffenseItem
+{
+	GENERATED_BODY()
+
+	public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Power;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CoolTime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Radius;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Distance;
+};

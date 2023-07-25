@@ -28,3 +28,17 @@ struct FRecoveryItemDataTable : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CoolTime;
 };
+USTRUCT(BlueprintType)
+struct FOffenseItemDataTable : public FTableRowBase
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Power;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CoolTime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Radius;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Distance;
+};
+

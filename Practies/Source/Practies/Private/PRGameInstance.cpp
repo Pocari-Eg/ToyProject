@@ -24,7 +24,11 @@ UPRGameInstance::UPRGameInstance()
 	{
 		RecoveryItemData = DT_RECOVERY.Object;
 	}
-
+	static ConstructorHelpers::FObjectFinder<UDataTable> DT_OFFENSE(TEXT("DataTable'/Game/DataTable/Item/OffenseItemTable.OffenseItemTable'"));
+	if (DT_OFFENSE.Succeeded())
+	{
+		OffenseItemData = DT_OFFENSE.Object;
+	}
 
 	SkillLevels.Init(-1, 100);
 }
@@ -113,6 +117,11 @@ FRecoveryItemDataTable* UPRGameInstance::GetRecoveryItemData(FName ItemName)
 	return RecoveryItemData->FindRow<FRecoveryItemDataTable>(ItemName, TEXT(""));
 }
 
+FOffenseItemDataTable* UPRGameInstance::GetOffenseItemData(FName ItemName)
+{
+	return OffenseItemData->FindRow<FOffenseItemDataTable>(ItemName, TEXT(""));
+}
+
 FBattleItem UPRGameInstance::GetBattleItem(int ItemCode)
 {
 	auto ItemData = GetBattleItemData(ItemCode);
@@ -137,6 +146,19 @@ FRecoveryItem UPRGameInstance::GetRecoveryItem(FName ItemName)
 	FRecoveryItem Data;
 	Data.Power = ItemData->Power;
 	Data.CoolTime = ItemData->CoolTime;
+
+	return Data;
+}
+
+FOffenseItem UPRGameInstance::GetOffenseItem(FName ItemName)
+{
+	auto ItemData = GetOffenseItemData(ItemName);
+
+	FOffenseItem Data;
+	Data.Power = ItemData->Power;
+	Data.CoolTime = ItemData->CoolTime;
+	Data.Radius = ItemData->Radius;
+	Data.Distance = ItemData->Distance;
 
 	return Data;
 }

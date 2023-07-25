@@ -142,7 +142,9 @@ void AMainPlayerController::ZoomOut()
 void AMainPlayerController::OnSetAttackPressed()
 {
 	if (!bIsMouseOnWidget) {
-		bAttackInputPressed = true;
+		if (!Player->GetIsUsingBattleItem())
+			bAttackInputPressed = true;
+		else Player->UseOffenseItem();
 	}
 }
 

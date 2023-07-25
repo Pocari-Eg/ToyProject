@@ -27,6 +27,7 @@ private:
 
 	 UDataTable* BattleItemData;
 	 UDataTable* RecoveryItemData;
+	 UDataTable* OffenseItemData;
 
 	 TArray<int> SkillLevels;
 public:
@@ -73,13 +74,16 @@ public:
 	//Itemldata
 	FBattleItemDataTable* GetBattleItemData(int ItemCode);
 	FRecoveryItemDataTable* GetRecoveryItemData(FName ItemName);
-
+	FOffenseItemDataTable* GetOffenseItemData(FName ItemName);
 	
 
 	UFUNCTION(BluePrintCallable)
 	FBattleItem GetBattleItem(int ItemCode);
 	UFUNCTION(BluePrintCallable)
 	FRecoveryItem GetRecoveryItem(FName ItemName);
+	UFUNCTION(BluePrintCallable)
+	FOffenseItem GetOffenseItem(FName ItemName);
+
 
 	UFUNCTION(Blueprintcallable)
 	UTexture2D* GetItemImage(FBattleItem Item) { return Item.Texture; }

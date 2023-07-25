@@ -12,6 +12,7 @@
 
 #include "Common/Item.h"
 
+
 #include "Curves/CurveFloat.h"
 #include "Components/TimeLineComponent.h"
 #include "Widget/DamageWidgetActor.h"
@@ -144,7 +145,12 @@ private:
 	int32 MaxCombo;
 
 
+	//item
+	AActor* BattleItemDecal;
+	bool bIsDecalOn;
 
+	FName OffenseItemName;
+	int Offenseidx;
 #pragma endregion Variable
 
 
@@ -251,6 +257,14 @@ public:
 
 	//itemEffect
 	float UseRecoveryItem(FName ItemName);
+	void UseOffenseItem();
+
+
+	void OnItemDecal();
+	void FollowDecal();
+	void OffItemDecal();
+
+
 
 private:
 	//inti
@@ -310,6 +324,9 @@ public:
 	 void SetBattleItemEffect(int idx, int ItemCode);
 	 void SetBattleItem(int idx, int ItemCode);
 	 void EraseBattleItme(int idx);
+
+
+	 bool GetIsUsingBattleItem() { return bIsDecalOn;}
 
 };
 #pragma endregion GetSet

@@ -212,6 +212,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 	if (BattleItemState[2].bIsEnabled == false && UseBattleItems[2] != -1)CalcBattleItemCool(2, DeltaTime);
 	if (BattleItemState[3].bIsEnabled == false && UseBattleItems[3] != -1)CalcBattleItemCool(3, DeltaTime);
 
+
+
+	if (bIsDecalOn) {
+		FollowDecal();
+	}
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -496,6 +501,51 @@ float APlayerCharacter::UseRecoveryItem(FName ItemName)
 	return ItemData.CoolTime;
 
 }
+void APlayerCharacter::UseOffenseItem()
+{
+
+	FOffenseItem ItemData = GameInstance->GetOffenseItem(OffenseItemName);
+
+	BattleItemState[Offenseidx].bIsEnabled = false;
+	PlayerHud->UseItemCoolStart(Offenseidx);
+	OnItemCoolChanged[Offenseidx].Execute(Offenseidx);
+
+	BattleItemState[Offenseidx].MaxCool = ItemData.CoolTime;
+	BattleItemState[Offenseidx].CurCool = BattleItemState[Offenseidx].MaxCool;
+
+	OffItemDecal();
+
+}
+void APlayerCharacter::OnItemDecal()
+{
+	FVector HitLocation = FVector::ZeroVector;
+	FHitResult Hit;
+	GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	HitLocation = Hit.Location;
+	FName Path = TEXT("Blueprint'/Game/BattleItemDecal.BattleItemDecal_C'");
+	UClass* DecalClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *Path.ToString()));
+	BattleItemDecal = GetWorld()->SpawnActor<AActor>(DecalClass, HitLocation, FRotator::ZeroRotator);
+
+	bIsDecalOn = true;
+}
+void APlayerCharacter::FollowDecal()
+{
+	if (BattleItemDecal != nullptr)
+	{
+		FVector HitLocation = FVector::ZeroVector;
+		FHitResult Hit;
+		GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+		HitLocation = Hit.Location;
+		BattleItemDecal->SetActorLocation(HitLocation);
+	}
+}
+void APlayerCharacter::OffItemDecal()
+{
+	bIsDecalOn = false;
+	
+	BattleItemDecal->Destroy();
+	BattleItemDecal = nullptr;
+}
 void APlayerCharacter::PlayerInit()
 {
 	TLOG_W(TEXT("Player Init"));
@@ -696,10 +746,6 @@ void APlayerCharacter::UseBattleItem(int i)
 		{
 			
 			SetBattleItemEffect(i, UseBattleItems[i]);
-
-			BattleItemState[i].bIsEnabled = false;
-			PlayerHud->UseItemCoolStart(i);
-			OnItemCoolChanged[i].Execute(i);
 			TLOG_E(TEXT("UseItem"))
 		}
 		else {
@@ -780,9 +826,29 @@ void APlayerCharacter::SetBattleItemEffect(int idx, int ItemCode)
 	switch (Data.Type)
 	{
 		case EBattleItemType::Recovery:
+			BattleItemState[idx].bIsEnabled = false;
+			PlayerHud->UseItemCoolStart(idx);
+			OnItemCoolChanged[idx].Execute(idx);
 			BattleItemState[idx].MaxCool=UseRecoveryItem(Data.Name);
+			BattleItemState[idx].CurCool = BattleItemState[idx].MaxCool;
 			break;
 		case EBattleItemType::Offense:
+
+			if (GetIsUsingBattleItem())
+			{
+				if (Offenseidx == idx && OffenseItemName == Data.Name)
+				{
+					UseOffenseItem();
+				}
+			}
+			else
+			{
+				Offenseidx = idx;
+				OffenseItemName = Data.Name;
+				OnItemDecal();
+			}
+
+		
 			break;
 		case EBattleItemType::Utility:
 			break;
@@ -794,8 +860,13 @@ void APlayerCharacter::SetBattleItemEffect(int idx, int ItemCode)
 	}
 
 
-	BattleItemState[idx].CurCool = BattleItemState[idx].MaxCool;
 
+
+
+
+
+
+	
 
 }
 
