@@ -22,14 +22,10 @@ public:
 	float AttackAngle;
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
 	float AttackRange;
-	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
-	float AttackHeight;
-
 };
 USTRUCT(Atomic, BlueprintType)
 struct FSkillData
 {
-
 	GENERATED_BODY()
 	public:
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
@@ -38,9 +34,6 @@ struct FSkillData
 	float Angle;
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
 	float Range;
-	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
-	float Height;
-
 };
 UCLASS( ClassGroup=(Weapon), meta=(BlueprintSpawnableComponent) )
 class PRACTIES_API UWeaponComponent : public USceneComponent
@@ -76,7 +69,6 @@ void SetVisible(bool Set);
 	 Data.Damage = newdata.Damage;
 		Data.AttackAngle = newdata.AttackAngle;
 		Data.AttackRange = newdata.AttackRange;
-		Data.AttackHeight = newdata.AttackHeight;
 	}
 	FORCEINLINE FWeaponData GetWeaponData() { return Data; }
 		

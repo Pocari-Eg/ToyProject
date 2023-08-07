@@ -42,7 +42,6 @@ protected:
 	AMonsterAIController* MonsterAIController;
 	//
 	float ViewRange;
-	float ViewHeight;
 
 	FTransform AttackTransform;
 	FVector	AttackForwardVector;
@@ -113,14 +112,13 @@ public:
 	AMonsterAIController* GetAIController() { return MonsterAIController; }
 
 	void SetViewRange(float value) {  ViewRange= value; }
-	void SetViewHeight(float value) {  ViewHeight= value; }
 
 	float GetViewRange() { return ViewRange;}
-	float GetViewHeight() { return ViewHeight; }
+	float GetViewHeight() { return GetCapsuleComponent()->GetScaledCapsuleHalfHeight(); }
 
 	float GetAttackRange() { return WeaponData.AttackRange; }
-	float GetAttackHeight() { return WeaponData.AttackHeight; }
 	float GetAttackAngle() { return WeaponData.AttackAngle; }
+	float GetAttackHeight() { return GetCapsuleComponent()->GetScaledCapsuleHalfHeight(); }
 
 	float GetMaxSpawnDistance() { return MaxSpawnDistance; }
 

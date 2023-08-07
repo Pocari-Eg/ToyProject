@@ -24,6 +24,8 @@ UWeaponComponent::UWeaponComponent(const FObjectInitializer& ObjectInitializer):
 
 void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVector OwnerFowardVector,int Damage)
 {
+
+	float Height = Owner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.0f;
 	if (bisDebug)
 	{
 		FTransform BottomLine = OwnerTransform;
@@ -37,7 +39,7 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 
 
 		FTransform TopLine = BottomLine;
-		TopLine.SetLocation(TopLine.GetLocation() + FVector(0.0f, 0.0f, Data.AttackHeight));
+		TopLine.SetLocation(TopLine.GetLocation() + FVector(0.0f, 0.0f, Height));
 
 
 
@@ -55,50 +57,27 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 	AttackDirection.Normalize();
 
 
-	float HalfRadius = Data.AttackRange * 0.5;
-	FVector Center = OwnerTransform.GetLocation();
+	FVector Location = OwnerTransform.GetLocation();
 
+	TArray<FHitResult> HitResult;
+	FCollisionQueryParams Params(NAME_None, false, Owner);
+	FVector Box = FVector(Data.AttackRange, Data.AttackRange, Height);
 
-	FVector Box = FVector(Data.AttackRange, Data.AttackRange, Data.AttackHeight);
-	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams CollisionQueryParam(NAME_None, false, Owner);
-	bool bResult = GetWorld()->OverlapMultiByChannel( // 지정된 Collision FCollisionShape와 충돌한 액터 감지 
-		OverlapResults,
-		Center,
+	bool bResult = GetWorld()->SweepMultiByChannel(
+		HitResult,
+		Location,
+		Location+ ForwardVector* Data.AttackRange,
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel1,
-		FCollisionShape::MakeCapsule(Box),
-		CollisionQueryParam
-	);
+		FCollisionShape::MakeBox(Box),
+		Params);
+
+
 	if (bResult)
 	{
-
-			//플레이어 클래스 정보를 가져오고 OwnerController를 소유하고 있는가 확인
-			//STARRYLOG(Warning, TEXT("%s"), *OverlapResult.GetActor()->GetName());
-		
-				TArray<FHitResult> Hits;
-				TArray<AActor*> ActorsToIgnore;
-				bool bTraceResult;
-
-					bTraceResult = UKismetSystemLibrary::SphereTraceMulti(
-					GetWorld(),
-						OwnerTransform.GetLocation(), // SphereTrace 시작 위치
-						OwnerTransform.GetLocation(), // SphereTrace 종료 위치
-					Data.AttackRange,
-					ETraceTypeQuery::TraceTypeQuery4,
-					false,
-					ActorsToIgnore,
-					EDrawDebugTrace::None,
-					Hits,
-					true
-				);
-				
-				if (bTraceResult && !(nullptr == Owner))
-				{
-				//	auto HitActor = Cast<AActor>(Hits[0].GetActor());
-					for (int i=0;i<Hits.Num();i++)
+					for (int i=0;i< HitResult.Num();i++)
 					{
-						AActor* HitActor = Cast<AActor>(Hits[i].GetActor());
+						AActor* HitActor = Cast<AActor>(HitResult[i].GetActor());
 							if (HitActor != Owner) {
 								
                					FVector TargetDir = HitActor->GetActorLocation() - OwnerTransform.GetLocation();
@@ -143,14 +122,15 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 							}
 					}
 
-	
-		}
 	}
 
 }
 void UWeaponComponent::SkillAttackCheck(bool bisDebug, FTransform OwnerTransform, FVector OwnerFowardVector, FSkillData SkillData)
 {
 	TLOG_E(TEXT("SkillAttackCheck"));
+
+	float Height = Owner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.0f;
+
 	if (bisDebug)
 	{
 		FTransform BottomLine = OwnerTransform;
@@ -164,7 +144,7 @@ void UWeaponComponent::SkillAttackCheck(bool bisDebug, FTransform OwnerTransform
 
 
 		FTransform TopLine = BottomLine;
-		TopLine.SetLocation(TopLine.GetLocation() + FVector(0.0f, 0.0f, SkillData.Height));
+		TopLine.SetLocation(TopLine.GetLocation() + FVector(0.0f, 0.0f, Height));
 
 
 
@@ -182,95 +162,71 @@ void UWeaponComponent::SkillAttackCheck(bool bisDebug, FTransform OwnerTransform
 	AttackDirection.Normalize();
 
 
-	float HalfRadius = SkillData.Range * 0.5;
-	FVector Center = OwnerTransform.GetLocation();
 
+	FVector Box = FVector(SkillData.Range, SkillData.Range, Height);
+	FVector Location = OwnerTransform.GetLocation();
 
-	FVector Box = FVector(SkillData.Range, SkillData.Range, SkillData.Height);
-	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams CollisionQueryParam(NAME_None, false, Owner);
-	bool bResult = GetWorld()->OverlapMultiByChannel( // 지정된 Collision FCollisionShape와 충돌한 액터 감지 
-		OverlapResults,
-		Center,
+	TArray<FHitResult> HitResult;
+	FCollisionQueryParams Params(NAME_None, false, Owner);
+
+	bool bResult = GetWorld()->SweepMultiByChannel(
+		HitResult,
+		Location,
+		Location + ForwardVector * SkillData.Range,
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel1,
-		FCollisionShape::MakeCapsule(Box),
-		CollisionQueryParam
-	);
+		FCollisionShape::MakeBox(Box),
+		Params);
+
 	if (bResult)
 	{
-
-		//플레이어 클래스 정보를 가져오고 OwnerController를 소유하고 있는가 확인
-		//STARRYLOG(Warning, TEXT("%s"), *OverlapResult.GetActor()->GetName());
-
-		TArray<FHitResult> Hits;
-		TArray<AActor*> ActorsToIgnore;
-		bool bTraceResult;
-
-		bTraceResult = UKismetSystemLibrary::SphereTraceMulti(
-			GetWorld(),
-			OwnerTransform.GetLocation(), // SphereTrace 시작 위치
-			OwnerTransform.GetLocation(), // SphereTrace 종료 위치
-			SkillData.Range,
-			ETraceTypeQuery::TraceTypeQuery4,
-			false,
-			ActorsToIgnore,
-			EDrawDebugTrace::None,
-			Hits,
-			true
-		);
-
-		if (bTraceResult && !(nullptr == Owner))
-		{
+			
 			//	auto HitActor = Cast<AActor>(Hits[0].GetActor());
-			for (int i = 0; i < Hits.Num(); i++)
-			{
-				AActor* HitActor = Cast<AActor>(Hits[i].GetActor());
-				if (HitActor != Owner) {
+		for (int i = 0; i < HitResult.Num(); i++)
+		{
+			AActor* HitActor = Cast<AActor>(HitResult[i].GetActor());
+			if (HitActor != Owner) {
 
-					FVector TargetDir = HitActor->GetActorLocation() - OwnerTransform.GetLocation();
-					TargetDir = TargetDir.GetSafeNormal();
+				FVector TargetDir = HitActor->GetActorLocation() - OwnerTransform.GetLocation();
+				TargetDir = TargetDir.GetSafeNormal();
 
-					float Radian = FVector::DotProduct(AttackDirection, TargetDir);
-					//내적 결과값은 Cos{^-1}(A dot B / |A||B|)이기 때문에 아크코사인 함수를 사용해주고 Degree로 변환해준다.
-					float TargetAngle = FMath::RadiansToDegrees(FMath::Acos(Radian));
+				float Radian = FVector::DotProduct(AttackDirection, TargetDir);
+				//내적 결과값은 Cos{^-1}(A dot B / |A||B|)이기 때문에 아크코사인 함수를 사용해주고 Degree로 변환해준다.
+				float TargetAngle = FMath::RadiansToDegrees(FMath::Acos(Radian));
 
 
 
-					//TLOG_W(TEXT("TargetAngle : %f "), TargetAngle);
+				//TLOG_W(TEXT("TargetAngle : %f "), TargetAngle);
 
-					if (TargetAngle <= (SkillData.Angle * 0.5f))
+				if (TargetAngle <= (SkillData.Angle * 0.5f))
+				{
+
+
+					if (Cast<AMonster>(HitActor))
+					{
+						if (Cast<APlayerCharacter>(Owner)) {
+							auto Player = Cast<APlayerCharacter>(Owner);
+							if (i == 0)	Player->HitStopEvent();
+
+							//TLOG_E(TEXT("Attack Hit"));
+							GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Attack Hit"));
+							FDamageEvent DamageEvent;
+							HitActor->TakeDamage(SkillData.Damage, DamageEvent, Player->GetController(), Owner);
+							continue;
+						}
+					}
+					if (Cast<APlayerCharacter>(HitActor))
 					{
 
-
-						if (Cast<AMonster>(HitActor))
-						{
-							if (Cast<APlayerCharacter>(Owner)) {
-								auto Player = Cast<APlayerCharacter>(Owner);
-								if (i == 0)	Player->HitStopEvent();
-
-								//TLOG_E(TEXT("Attack Hit"));
-								GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Attack Hit"));
-								FDamageEvent DamageEvent;
-								HitActor->TakeDamage(SkillData.Damage, DamageEvent, Player->GetController(), Owner);
-								continue;
-							}
-						}
-						if (Cast<APlayerCharacter>(HitActor))
-						{
-
-							if (Cast<AMonster>(Owner)) {
-								auto Monster = Cast<AMonster>(Owner);
-								FDamageEvent DamageEvent;
-								HitActor->TakeDamage(SkillData.Damage, DamageEvent, Monster->GetController(), Owner);
-								continue;
-							}
+						if (Cast<AMonster>(Owner)) {
+							auto Monster = Cast<AMonster>(Owner);
+							FDamageEvent DamageEvent;
+							HitActor->TakeDamage(SkillData.Damage, DamageEvent, Monster->GetController(), Owner);
+							continue;
 						}
 					}
 				}
 			}
-
-
 		}
 	}
 }

@@ -53,13 +53,11 @@ AMutant::AMutant()
 
 
 	WeaponData.AttackAngle = 45.0;
-	WeaponData.AttackHeight = 100.0f;
 	WeaponData.AttackRange = 220;
 	WeaponData.Damage = 100.0f;
 
 
 	ViewRange = 300.0f;
-	ViewHeight = 200.0f;
 
 	MaxSpawnDistance = 1200.0f;
 }
