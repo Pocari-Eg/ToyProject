@@ -122,11 +122,11 @@ FOffenseItemDataTable* UPRGameInstance::GetOffenseItemData(FName ItemName)
 	return OffenseItemData->FindRow<FOffenseItemDataTable>(ItemName, TEXT(""));
 }
 
-FBattleItem UPRGameInstance::GetBattleItem(int ItemCode)
+FBattleItemData UPRGameInstance::GetBattleItem(int ItemCode)
 {
 	auto ItemData = GetBattleItemData(ItemCode);
 
-	FBattleItem NewItem;
+	FBattleItemData NewItem;
 	NewItem.Name = ItemData->Name;
 
 
@@ -139,22 +139,22 @@ FBattleItem UPRGameInstance::GetBattleItem(int ItemCode)
 	return NewItem;
 }
 
-FRecoveryItem UPRGameInstance::GetRecoveryItem(FName ItemName)
+FRecoveryItemData UPRGameInstance::GetRecoveryItem(FName ItemName)
 {
 	auto ItemData = GetRecoveryItemData(ItemName);
 
-	FRecoveryItem Data;
+	FRecoveryItemData Data;
 	Data.Power = ItemData->Power;
 	Data.CoolTime = ItemData->CoolTime;
 
 	return Data;
 }
 
-FOffenseItem UPRGameInstance::GetOffenseItem(FName ItemName)
+FOffenseItemData UPRGameInstance::GetOffenseItem(FName ItemName)
 {
 	auto ItemData = GetOffenseItemData(ItemName);
 
-	FOffenseItem Data;
+	FOffenseItemData Data;
 	Data.Power = ItemData->Power;
 	Data.CoolTime = ItemData->CoolTime;
 	Data.Radius = ItemData->Radius;

@@ -4,10 +4,10 @@
 
 #include "Practies.h"
 #include "Engine/Texture2D.h"
-#include "Item.generated.h"
+#include "ItemData.generated.h"
 
 USTRUCT(Atomic, BluePrintType)
-struct FBattleItem
+struct FBattleItemData
 {
 	GENERATED_BODY()
 
@@ -21,7 +21,7 @@ struct FBattleItem
 };
 
 USTRUCT(Atomic, BluePrintType)
-struct FRecoveryItem
+struct FRecoveryItemData
 {
 	GENERATED_BODY()
 
@@ -33,7 +33,7 @@ struct FRecoveryItem
 };
 
 USTRUCT(Atomic, BluePrintType)
-struct FOffenseItem
+struct FOffenseItemData
 {
 	GENERATED_BODY()
 

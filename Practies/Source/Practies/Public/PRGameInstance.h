@@ -6,7 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "Player/Skill.h"
 #include "DataTable/SkilltypeTable.h"
-#include "Common/Item.h"
+#include "Item/ItemData.h"
 
 #include "DataTable/BattleItemTable.h"
 #include "PRGameInstance.generated.h"
@@ -78,13 +78,13 @@ public:
 	
 
 	UFUNCTION(BluePrintCallable)
-	FBattleItem GetBattleItem(int ItemCode);
+	FBattleItemData GetBattleItem(int ItemCode);
 	UFUNCTION(BluePrintCallable)
-	FRecoveryItem GetRecoveryItem(FName ItemName);
+	FRecoveryItemData GetRecoveryItem(FName ItemName);
 	UFUNCTION(BluePrintCallable)
-	FOffenseItem GetOffenseItem(FName ItemName);
+	FOffenseItemData GetOffenseItem(FName ItemName);
 
 
 	UFUNCTION(Blueprintcallable)
-	UTexture2D* GetItemImage(FBattleItem Item) { return Item.Texture; }
+	UTexture2D* GetItemImage(FBattleItemData ItemData) { return ItemData.Texture; }
 };

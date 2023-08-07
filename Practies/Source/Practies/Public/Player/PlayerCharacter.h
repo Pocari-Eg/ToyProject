@@ -10,7 +10,7 @@
 #include "FSM/PlayerFSM.h"
 #include "WeaponComponent.h"
 
-#include "Common/Item.h"
+#include "Item/ItemData.h"
 
 
 #include "Curves/CurveFloat.h"
@@ -146,8 +146,8 @@ private:
 
 
 	//item
-	AActor* BattleItemDecal;
-	bool bIsDecalOn;
+	class AOffenseItem* CurOffenseItem;
+	bool bIsOffenseItemReady;
 
 	FName OffenseItemName;
 	int Offenseidx;
@@ -260,9 +260,9 @@ public:
 	void UseOffenseItem();
 
 
-	void OnItemDecal();
-	void FollowDecal();
-	void OffItemDecal();
+	void ReadyOffenseItem(FOffenseItemData ItemData);
+	void WaitOffenseItem();
+	void ClearOffenseItem();
 
 
 
@@ -326,7 +326,7 @@ public:
 	 void EraseBattleItme(int idx);
 
 
-	 bool GetIsUsingBattleItem() { return bIsDecalOn;}
+	 bool GetIsReadyOffenseItem() { return bIsOffenseItemReady;}
 
 };
 #pragma endregion GetSet

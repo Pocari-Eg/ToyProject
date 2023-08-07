@@ -16,6 +16,7 @@
 #include "Engine/DataTable.h"
 #include"Widget/PlayerWidget.h"
 #include"PRGameInstance.h"
+#include "Item/OffenseItem.h"
 
 #include "Engine/World.h"
 // Sets default values
@@ -214,8 +215,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 
 
-	if (bIsDecalOn) {
-		FollowDecal();
+	if (bIsOffenseItemReady) {
+		WaitOffenseItem();
 	}
 }
 
@@ -495,7 +496,7 @@ float APlayerCharacter::GetCurItemCool(int idx)
 }
 float APlayerCharacter::UseRecoveryItem(FName ItemName)
 {
-	FRecoveryItem ItemData = GameInstance->GetRecoveryItem(ItemName);
+	FRecoveryItemData ItemData = GameInstance->GetRecoveryItem(ItemName);
 	RecoveryHP(ItemData.Power);
 
 	return ItemData.CoolTime;
@@ -504,47 +505,50 @@ float APlayerCharacter::UseRecoveryItem(FName ItemName)
 void APlayerCharacter::UseOffenseItem()
 {
 
-	FOffenseItem ItemData = GameInstance->GetOffenseItem(OffenseItemName);
+	FOffenseItemData ItemData = GameInstance->GetOffenseItem(OffenseItemName);
 
 	BattleItemState[Offenseidx].bIsEnabled = false;
 	PlayerHud->UseItemCoolStart(Offenseidx);
 	OnItemCoolChanged[Offenseidx].Execute(Offenseidx);
-
 	BattleItemState[Offenseidx].MaxCool = ItemData.CoolTime;
 	BattleItemState[Offenseidx].CurCool = BattleItemState[Offenseidx].MaxCool;
 
-	OffItemDecal();
+	CurOffenseItem->Use();
+
+	ClearOffenseItem();
 
 }
-void APlayerCharacter::OnItemDecal()
+void APlayerCharacter::ReadyOffenseItem(FOffenseItemData ItemData)
 {
+	bIsOffenseItemReady = true;
+
 	FVector HitLocation = FVector::ZeroVector;
 	FHitResult Hit;
 	GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 	HitLocation = Hit.Location;
-	FName Path = TEXT("Blueprint'/Game/BattleItemDecal.BattleItemDecal_C'");
-	UClass* DecalClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *Path.ToString()));
-	BattleItemDecal = GetWorld()->SpawnActor<AActor>(DecalClass, HitLocation, FRotator::ZeroRotator);
 
-	bIsDecalOn = true;
+	FName Path = TEXT("Blueprint'/Game/Blueprint/Item/BP_OffenseItem.BP_OffenseItem_C'");
+	UClass* OffenseItemClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *Path.ToString()));
+	CurOffenseItem = GetWorld()->SpawnActor<AOffenseItem>(OffenseItemClass, HitLocation, FRotator::ZeroRotator);
+	CurOffenseItem->SetEffective(ItemData);
+
 }
-void APlayerCharacter::FollowDecal()
+void APlayerCharacter::WaitOffenseItem()
 {
-	if (BattleItemDecal != nullptr)
+	if (CurOffenseItem != nullptr)
 	{
 		FVector HitLocation = FVector::ZeroVector;
 		FHitResult Hit;
 		GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 		HitLocation = Hit.Location;
-		BattleItemDecal->SetActorLocation(HitLocation);
+		CurOffenseItem->SetActorLocation(HitLocation);
 	}
 }
-void APlayerCharacter::OffItemDecal()
+void APlayerCharacter::ClearOffenseItem()
 {
-	bIsDecalOn = false;
-	
-	BattleItemDecal->Destroy();
-	BattleItemDecal = nullptr;
+	bIsOffenseItemReady = false;
+	CurOffenseItem->Destroy();
+	CurOffenseItem = nullptr;
 }
 void APlayerCharacter::PlayerInit()
 {
@@ -821,7 +825,7 @@ void APlayerCharacter::SetBattleItemEffect(int idx, int ItemCode)
 {
 
 	
-	FBattleItem Data = GameInstance->GetBattleItem(ItemCode);
+	FBattleItemData Data = GameInstance->GetBattleItem(ItemCode);
 
 	switch (Data.Type)
 	{
@@ -834,7 +838,7 @@ void APlayerCharacter::SetBattleItemEffect(int idx, int ItemCode)
 			break;
 		case EBattleItemType::Offense:
 
-			if (GetIsUsingBattleItem())
+			if (GetIsReadyOffenseItem())
 			{
 				if (Offenseidx == idx && OffenseItemName == Data.Name)
 				{
@@ -845,7 +849,8 @@ void APlayerCharacter::SetBattleItemEffect(int idx, int ItemCode)
 			{
 				Offenseidx = idx;
 				OffenseItemName = Data.Name;
-				OnItemDecal();
+				FOffenseItemData ItemData = GameInstance->GetOffenseItem(OffenseItemName);
+				ReadyOffenseItem(ItemData);
 			}
 
 		
