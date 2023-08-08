@@ -72,6 +72,11 @@ void AMainPlayerController::OnSetDestinationPressed()
 {
 	if (!bIsMouseOnWidget) {
 		// We flag that the input is being pressed
+
+		if (Player->GetIsReadyOffenseItem())
+		{
+			Player->ClearOffenseItem();
+		}
 		bMoveInputPressed = true;
 		// Just in case the character was moving because of a previous short press we stop it
 	}
@@ -142,9 +147,7 @@ void AMainPlayerController::ZoomOut()
 void AMainPlayerController::OnSetAttackPressed()
 {
 	if (!bIsMouseOnWidget) {
-		if (!Player->GetIsReadyOffenseItem())
-			bAttackInputPressed = true;
-		else Player->UseOffenseItem();
+		bAttackInputPressed = true;
 	}
 }
 
@@ -157,8 +160,10 @@ void AMainPlayerController::OnSetAttackReleased()
 			if (AttackFollowTime < ShortPressThreshold)
 			{
 				StopMovement();
-
-				RotateAttack();
+				if (!Player->GetIsReadyOffenseItem())
+					RotateAttack();
+				else Player->ThrowOffenseItem();
+		
 			}
 		}
 	}
@@ -220,7 +225,10 @@ void AMainPlayerController::AttackClickCheck(float DeltaTime)
 				if (Player->GetPlayerState() != EPState::attack) {
 					StopMovement();
 				}
-				RotateAttack();
+				if (!Player->GetIsReadyOffenseItem())
+					RotateAttack();
+				else Player->ThrowOffenseItem();
+
 
 			}
 		}

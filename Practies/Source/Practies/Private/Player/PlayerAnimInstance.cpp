@@ -28,6 +28,13 @@ void UPlayerAnimInstance::PlaySkillMontage()
 
 }
 
+void UPlayerAnimInstance::PlayThrowMontage()
+{
+	Player->ChangeState(UAttackState::GetInstance());
+	Montage_Play(ThrowMontage, 1.0f);
+
+}
+
 
 void UPlayerAnimInstance::JumpToAttackMontageSecion(int32 NewSection)
 {
@@ -96,4 +103,8 @@ void UPlayerAnimInstance::AnimNotify_Death() const
 void UPlayerAnimInstance::AnimNotify_SkillCheck() const
 {
 	OnSkillAttackCheck.Broadcast();
+}
+void UPlayerAnimInstance::AnimNotify_Use() const
+{
+	OnThrow.Broadcast();
 }

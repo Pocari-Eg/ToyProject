@@ -151,6 +151,7 @@ private:
 
 	FName OffenseItemName;
 	int Offenseidx;
+	float MaxItemDistance;
 #pragma endregion Variable
 
 
@@ -325,6 +326,7 @@ public:
 	 void SetBattleItem(int idx, int ItemCode);
 	 void EraseBattleItme(int idx);
 
+	 void ThrowOffenseItem();
 
 	 bool GetIsReadyOffenseItem() { return bIsOffenseItemReady;}
 

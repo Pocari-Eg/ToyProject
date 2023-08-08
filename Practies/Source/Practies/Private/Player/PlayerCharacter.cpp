@@ -381,7 +381,10 @@ void APlayerCharacter::InitAnimationDelegate()
 	PlayerAnimInstance->OnAttackCheck.AddUObject(this, &APlayerCharacter::AttackCheck);
 	PlayerAnimInstance->OnSkillAttackCheck.AddUObject(this, &APlayerCharacter::SkillAttackCheck);
 	PlayerAnimInstance->OnDeath.AddUObject(this, &APlayerCharacter::Death);
+	PlayerAnimInstance->OnThrow.AddUObject(this, &APlayerCharacter::UseOffenseItem);
 
+
+	
 	PlayerAnimInstance->OnNextAttackCheck.AddLambda([this]()->void {
 		CanNextCombo = false;
 		if (IsComboInputOn)
@@ -521,6 +524,8 @@ void APlayerCharacter::ReadyOffenseItem(FOffenseItemData ItemData)
 {
 	bIsOffenseItemReady = true;
 
+
+	MaxItemDistance = ItemData.Distance;
 	FVector HitLocation = FVector::ZeroVector;
 	FHitResult Hit;
 	GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
@@ -536,10 +541,20 @@ void APlayerCharacter::WaitOffenseItem()
 {
 	if (CurOffenseItem != nullptr)
 	{
+	
+
 		FVector HitLocation = FVector::ZeroVector;
 		FHitResult Hit;
 		GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 		HitLocation = Hit.Location;
+
+		float distance = (HitLocation - GetActorLocation()).Size();
+		if(distance>=MaxItemDistance) {
+			FVector HitVector = HitLocation - GetActorLocation();
+			HitVector.Normalize();
+
+			HitLocation = GetActorLocation() + (HitVector * MaxItemDistance);
+		}
 		CurOffenseItem->SetActorLocation(HitLocation);
 	}
 }
@@ -841,7 +856,7 @@ void APlayerCharacter::SetBattleItemEffect(int idx, int ItemCode)
 			{
 				if (Offenseidx == idx && OffenseItemName == Data.Name)
 				{
-					UseOffenseItem();
+					ThrowOffenseItem();
 				}
 			}
 			else
@@ -887,5 +902,35 @@ void APlayerCharacter::EraseBattleItme(int idx)
 	UseBattleItems[idx] = -1;
 }
 
+void APlayerCharacter::ThrowOffenseItem()
+{
+	if (GetPlayerState() != EPState::attack) {
+		bIsOffenseItemReady = false;
+		FVector TargetLocation = CurOffenseItem->GetActorLocation();
 
+		FVector PlayerVec = GetActorForwardVector();
+		FVector HitVector = TargetLocation - GetActorLocation();
+
+		//클릭한 위치와 플레이어의 FrontVector 사이 각 계산
+		HitVector.Normalize();
+		PlayerVec.Normalize();
+		float Dot = FVector::DotProduct(PlayerVec, HitVector);
+		float Acos = FMath::Acos(Dot);
+		float Angle = FMath::RadiansToDegrees(Acos);
+
+
+		// 클릭한 위치가 플레이어의 FrontVector기준으로 좌,우 어느쪽인지 판별해서 
+		FVector Corss = FVector::CrossProduct(PlayerVec, HitVector);
+		float CheckDot = FVector::DotProduct(GetActorUpVector(), Corss);
+
+		//왼쪽이면 각도에 -를 붙여 넘겨줌 그렇지 않으면 왼쪽 오른쪽 둘다 양수 값이 넘어가 회전이 이상해짐
+		if (CheckDot < 0)Angle = -1.0f * Angle;
+
+
+		AddActorWorldRotation(FRotator(0.0f, Angle, 0.0f));
+
+
+		PlayerAnimInstance->PlayThrowMontage();
+	}
+}
 

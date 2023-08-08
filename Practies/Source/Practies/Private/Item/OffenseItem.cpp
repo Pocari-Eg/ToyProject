@@ -36,7 +36,7 @@ void AOffenseItem::SetEffective(FOffenseItemData ItemData)
 
 void AOffenseItem::Use()
 {
-		
+	EffectiveRad->SetVisibility(false);
 	TArray<FHitResult> HitResult;
 	FCollisionQueryParams Params(NAME_None, false, this);
 	bool bResult = GetWorld()->SweepMultiByChannel(
@@ -78,6 +78,12 @@ void AOffenseItem::Use()
 		}
 	}
 #endif
+
+
+	FName Path = TEXT("Blueprint'/Game/Effetc/BP_Explosion.BP_Explosion_C'");
+	UClass* ParticleClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *Path.ToString()));
+	GetWorld()->SpawnActor<AActor>(ParticleClass, GetActorLocation()+FVector(0.0f,20.0f,0.0f), FRotator::ZeroRotator);
+
 }
 
 // Called when the game starts or when spawned
