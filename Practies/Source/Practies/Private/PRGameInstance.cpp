@@ -181,7 +181,7 @@ FSkillDetail UPRGameInstance::GetSkillDetailData(FName SkillName, int32 SkillCod
 	 return NewDetail;
 }
 void UPRGameInstance::SetBattleItem(int32 idx, int32 ItemCode)
-{
+ {
 	Player->SetBattleItem(idx, ItemCode);
 }
 

@@ -6,8 +6,8 @@
 #include "GameFramework/Character.h"
 
 #include "CameraSetData.h"
-#include "StatData.h"
-#include "WeaponComponent.h"
+#include "Common/StatData.h"
+#include "Common/WeaponComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MonsterAIController.h"

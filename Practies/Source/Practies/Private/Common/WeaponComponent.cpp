@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "WeaponComponent.h"
+#include "Common/WeaponComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include"DebugAPI.h"
 #include "Kismet/KismetSystemLibrary.h"

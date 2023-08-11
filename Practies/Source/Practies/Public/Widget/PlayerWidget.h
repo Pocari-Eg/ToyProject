@@ -48,6 +48,8 @@ struct FHPWidgetData
 	class UTextBlock* CurHp;
 
 };
+
+class UInventoryWidget;
 UCLASS()
 class PRACTIES_API UPlayerWidget : public UUserWidget
 {
@@ -91,11 +93,18 @@ private:
 	UPROPERTY()
 	FMonsterWidgetData MonsterInfo;
 
+	UPROPERTY()
 	FHPWidgetData PlayerHp;
 
+	UPROPERTY()
 	UUserWidget* SkillBook;
-	UUserWidget* Inventory;
 
+	UPROPERTY()
+	UInventoryWidget* Inventory;
+
+	UPROPERTY()
 	UUseSkillWidget* UseSkillWidget;
+
+	UPROPERTY()
 	UUseItemWidget* UseItemWidget;
 };

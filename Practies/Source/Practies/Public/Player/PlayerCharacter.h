@@ -4,11 +4,11 @@
 
 #include "../Practies.h"
 #include "CameraSetData.h"
-#include "StatData.h"
+#include "Common/StatData.h"
 #include "Skill.h"
 #include "GameFramework/Character.h"
 #include "FSM/PlayerFSM.h"
-#include "WeaponComponent.h"
+#include "Common/WeaponComponent.h"
 
 #include "Item/ItemData.h"
 
@@ -25,6 +25,8 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnHpChangedDelegate);
 DECLARE_DELEGATE_OneParam(FOnCoolChangedDelegate,int32);
+
+
 UCLASS()
 class PRACTIES_API APlayerCharacter : public ACharacter
 {
@@ -73,6 +75,11 @@ private:
     FStatData PlayerStat;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
 	FWeaponData WeaponData;
+
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory, meta = (AllowPrivateAccess = "true"))
+	class UInventoryComp* PlayerInven;
 	
 	FSkillData SkillData;
 

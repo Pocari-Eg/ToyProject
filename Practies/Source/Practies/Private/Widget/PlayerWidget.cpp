@@ -2,7 +2,7 @@
 
 
 #include "Widget/PlayerWidget.h"
-
+#include "Widget/InventoryWidget.h"
 
 
 void UPlayerWidget::BindPlayer(class APlayerCharacter* NewPlayer) {
@@ -154,7 +154,7 @@ void UPlayerWidget::NativeConstruct()
 	SkillBook->SetVisibility(ESlateVisibility::Hidden);
 	
 
-	Inventory = Cast<UUserWidget>(GetWidgetFromName(TEXT("BP_Inventory")));
+	Inventory = Cast<UInventoryWidget>(GetWidgetFromName(TEXT("BP_Inventory")));
 	Inventory->SetVisibility(ESlateVisibility::Hidden);
 	
 

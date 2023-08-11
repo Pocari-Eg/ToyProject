@@ -7,16 +7,21 @@
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include"PRGameInstance.h"
+
+
 #include "Player/MainPlayerController.h"
 #include "Player/PlayerAnimInstance.h"
-#include "Components/WidgetComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/DataTable.h"
 #include"Widget/PlayerWidget.h"
-#include"PRGameInstance.h"
+
 #include "Item/OffenseItem.h"
+#include "Common/InventoryComp.h"
+
+#include "Components/WidgetComponent.h"
 
 #include "Engine/World.h"
 // Sets default values
@@ -92,6 +97,11 @@ APlayerCharacter::APlayerCharacter()
 		PlayerWeapon->MeshComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
 		PlayerWeapon->MeshComponent->SetupAttachment(GetMesh(), WeaponSocket);
     }
+
+
+	//inventory
+	PlayerInven = CreateDefaultSubobject<UInventoryComp>(TEXT("PlayerInven"));
+
 	//widget
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBP(TEXT("WidgetBlueprint'/Game/Blueprint/Player/BP_PlayerWidget.BP_PlayerWidget_C'"));
 	if (WidgetBP.Succeeded()) {
@@ -106,6 +116,8 @@ APlayerCharacter::APlayerCharacter()
 		DamageWidgetClass = DamageActor.Class;
 	}
 
+
+	
 	WeaponData.AttackAngle = 100.0f;
 	WeaponData.AttackRange = 150.0f;
 	WeaponData.Damage = 100.0f;
