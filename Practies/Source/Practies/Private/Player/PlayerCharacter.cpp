@@ -443,14 +443,14 @@ void APlayerCharacter::UnBindMonster()
 	PlayerHud->SetVisibleMonsterWidget(false);
 }
 
-void APlayerCharacter::OnDamageWidget(int Damage)
+void APlayerCharacter::OnDamageWidget(int32 Damage)
 {
 	FVector3d NewLocation = GetActorTransform().GetLocation();
 
 	FTransform NewTransform = GetActorTransform();
 
 	float NewY = FMath::FRandRange(10.0f, 20.0f);
-	int Ysign = UKismetMathLibrary::RandomInteger(2);
+	int32 Ysign = UKismetMathLibrary::RandomInteger(2);
 
 	if (Ysign == 1)NewY *= -1.0f;
 
@@ -475,7 +475,7 @@ void APlayerCharacter::UpDamageWidget()
 {
 	if (!DWidget.IsEmpty())
 	{
-		for (int i = 0; i < widgetsize; i++)
+		for (int32 i = 0; i < widgetsize; i++)
 		{
 			auto curwidget = *DWidget.Peek();
 			DWidget.Pop();
@@ -488,11 +488,11 @@ void APlayerCharacter::UpDamageWidget()
 	}
 }
 
-float APlayerCharacter::GetCurSkillCool(int idx)
+float APlayerCharacter::GetCurSkillCool(int32 idx)
 {
 	return SkillState[idx].CurCool;
 }
-float APlayerCharacter::GetCurItemCool(int idx)
+float APlayerCharacter::GetCurItemCool(int32 idx)
 {
 	return BattleItemState[idx].CurCool;
 }
@@ -667,7 +667,7 @@ void APlayerCharacter::FinishRotation()
 	Attack();
 }
 
-void APlayerCharacter::SkillAttack(int i)
+void APlayerCharacter::SkillAttack(int32 i)
 {
 	//나중에 i값으로 데이터테이블에서 값을 찾아 적용할 수 있도록 수정 할것
 
@@ -699,7 +699,7 @@ void APlayerCharacter::SkillAttackCheck()
 	SetAttackTransform();
 	PlayerWeapon->SkillAttackCheck(bIsDebug, AttackTransform, AttackForwardVector, SkillData);
 }
-bool APlayerCharacter::CheckSkill(int idx)
+bool APlayerCharacter::CheckSkill(int32 idx)
 {
 	if (UseSkills[idx] == -1)return false;
 
@@ -709,7 +709,7 @@ bool APlayerCharacter::CheckSkill(int idx)
 	return true;
 
 }
-void APlayerCharacter::CalcSkillCool(int idx, float DeltaTime)
+void APlayerCharacter::CalcSkillCool(int32 idx, float DeltaTime)
 {
 
 	SkillState[idx].CurCool -= DeltaTime;
@@ -753,7 +753,7 @@ void APlayerCharacter::FinishDodge()
 	PlayerAnimInstance->SetDodge(false);
 	bIsInvincible = false;
 }
-void APlayerCharacter::UseBattleItem(int i)
+void APlayerCharacter::UseBattleItem(int32 i)
 {
 
 	//나중에 i값으로 데이터테이블에서 값을 찾아 적용할 수 있도록 수정 할것
@@ -772,7 +772,7 @@ void APlayerCharacter::UseBattleItem(int i)
 
 	}
 }
-bool APlayerCharacter::CheckBattleItem(int idx)
+bool APlayerCharacter::CheckBattleItem(int32 idx)
 {
 	if (UseBattleItems[idx] == -1)return false;
 
@@ -781,7 +781,7 @@ bool APlayerCharacter::CheckBattleItem(int idx)
 
 	return true;
 }
-void APlayerCharacter::CalcBattleItemCool(int idx, float DeltaTime)
+void APlayerCharacter::CalcBattleItemCool(int32 idx, float DeltaTime)
 {
 	BattleItemState[idx].CurCool -= DeltaTime;
 
@@ -805,7 +805,7 @@ void APlayerCharacter::SetOnMouseWidget(bool Value)
 	PlayerController->SetOnMouseWidget(Value);
 }
 
-FSkill APlayerCharacter::GetSkillData(int idx, int SkillCode)
+FSkill APlayerCharacter::GetSkillData(int32 idx, int32 SkillCode)
 {
 
 	
@@ -822,20 +822,20 @@ FSkill APlayerCharacter::GetSkillData(int idx, int SkillCode)
 	return Data;
 }
 
-void APlayerCharacter::SetUseSkill(int idx, int SkillCode)
+void APlayerCharacter::SetUseSkill(int32 idx, int32 SkillCode)
 {
 	SkillState[idx].CurCool = 0.0f;
 	SkillState[idx].bIsEnabled = true;
 	UseSkills[idx] = SkillCode;
 }
 
-void APlayerCharacter::EraseUseSkill(int idx)
+void APlayerCharacter::EraseUseSkill(int32 idx)
 {
 
 	UseSkills[idx] = -1;
 }
 
-void APlayerCharacter::SetBattleItemEffect(int idx, int ItemCode)
+void APlayerCharacter::SetBattleItemEffect(int32 idx, int32 ItemCode)
 {
 
 	
@@ -889,7 +889,7 @@ void APlayerCharacter::SetBattleItemEffect(int idx, int ItemCode)
 
 }
 
-void APlayerCharacter::SetBattleItem(int idx, int ItemCode)
+void APlayerCharacter::SetBattleItem(int32 idx, int32 ItemCode)
 {
 	BattleItemState[idx].CurCool = 0.0f;
 	BattleItemState[idx].bIsEnabled = true;
@@ -897,7 +897,7 @@ void APlayerCharacter::SetBattleItem(int idx, int ItemCode)
 	UseBattleItems[idx] = ItemCode;
 }
 
-void APlayerCharacter::EraseBattleItme(int idx)
+void APlayerCharacter::EraseBattleItme(int32 idx)
 {
 	UseBattleItems[idx] = -1;
 }

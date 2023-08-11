@@ -20,7 +20,7 @@ protected:
 	// 위젯을 초기화
 	virtual void NativeOnInitialized() override;
 public:
-	void OnDamageWidget(int Damage);
+	void OnDamageWidget(int32 Damage);
 	UPROPERTY()
 	 UTextBlock* DamageText;
 };

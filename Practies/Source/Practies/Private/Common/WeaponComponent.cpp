@@ -22,7 +22,7 @@ UWeaponComponent::UWeaponComponent(const FObjectInitializer& ObjectInitializer):
 }
 
 
-void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVector OwnerFowardVector,int Damage)
+void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVector OwnerFowardVector,int32 Damage)
 {
 
 	float Height = Owner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.0f;
@@ -75,7 +75,7 @@ void UWeaponComponent::AttackCheck(bool bisDebug, FTransform OwnerTransform,FVec
 
 	if (bResult)
 	{
-					for (int i=0;i< HitResult.Num();i++)
+					for (int32 i=0;i< HitResult.Num();i++)
 					{
 						AActor* HitActor = Cast<AActor>(HitResult[i].GetActor());
 							if (HitActor != Owner) {
@@ -182,7 +182,7 @@ void UWeaponComponent::SkillAttackCheck(bool bisDebug, FTransform OwnerTransform
 	{
 			
 			//	auto HitActor = Cast<AActor>(Hits[0].GetActor());
-		for (int i = 0; i < HitResult.Num(); i++)
+		for (int32 i = 0; i < HitResult.Num(); i++)
 		{
 			AActor* HitActor = Cast<AActor>(HitResult[i].GetActor());
 			if (HitActor != Owner) {

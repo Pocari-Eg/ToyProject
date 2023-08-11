@@ -67,7 +67,7 @@ void AOffenseItem::Use()
 
 	if (bResult)
 	{
-		for (int i = 0; i < HitResult.Num(); i++)
+		for (int32 i = 0; i < HitResult.Num(); i++)
 		{
 			if (Cast<AMonster>(HitResult[i].GetActor())){
 

@@ -20,7 +20,7 @@ struct FSkill
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* Montage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int CurSkillLevel;
+	int32 CurSkillLevel;
 
 };
 USTRUCT(Atomic, BluePrintType)

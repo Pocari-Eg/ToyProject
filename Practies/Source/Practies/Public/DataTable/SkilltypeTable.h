@@ -23,11 +23,11 @@ struct FSkillDetailTable : public FTableRowBase
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Damage;
+	int32 Damage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Range;
+	int32 Range;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Angle;
+	int32 Angle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CoolTime;
 };

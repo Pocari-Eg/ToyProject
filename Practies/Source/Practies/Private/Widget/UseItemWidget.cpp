@@ -9,10 +9,10 @@
 void UUseItemWidget::BindPlayer(APlayerCharacter* Value)
 {
 	Player = Value;
-	for (int i = 0; i < 4; i++)Player->OnItemCoolChanged[i].BindUFunction(this,FName("ItemTimeUpdate"));
+	for (int32 i = 0; i < 4; i++)Player->OnItemCoolChanged[i].BindUFunction(this,FName("ItemTimeUpdate"));
 }
 
-void UUseItemWidget::OnWidget(int idx)
+void UUseItemWidget::OnWidget(int32 idx)
 {
 	StateWidget[idx].Texture->SetVisibility(ESlateVisibility::Visible);
 	StateWidget[idx].Time->SetVisibility(ESlateVisibility::Visible);
@@ -20,7 +20,7 @@ void UUseItemWidget::OnWidget(int idx)
 
 }
 
-void UUseItemWidget::OffWidget(int idx)
+void UUseItemWidget::OffWidget(int32 idx)
 {
 
 	StateWidget[idx].Texture->SetVisibility(ESlateVisibility::Hidden);
@@ -34,7 +34,7 @@ void UUseItemWidget::NativeConstruct()
 
 
 	StateWidget.SetNum(4);
-	for (int i = 0; i < 4; i++)
+	for (int32 i = 0; i < 4; i++)
 	{
 		FString TimeName ="Time"+ FString::FromInt(i + 1);
 		FString TextureName = "Texture" + FString::FromInt(i + 1);
@@ -52,7 +52,7 @@ void UUseItemWidget::ItemTimeUpdate(int32 idx)
 {
 	if (StateWidget[idx].Time != nullptr)
 	{
-		int curTime = Player->GetCurItemCool(idx);
+		int32 curTime = Player->GetCurItemCool(idx);
 
 
 		FText TimeText = FText::FromString(FString::FromInt(curTime));

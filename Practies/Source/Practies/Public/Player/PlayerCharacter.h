@@ -61,7 +61,7 @@ public:
 	class TSubclassOf<ADamageWidgetActor> DamageWidgetClass;
 
 	TQueue<ADamageWidgetActor*> DWidget;
-	int widgetsize = 0;
+	int32 widgetsize = 0;
 	//delegate
 	FOnHpChangedDelegate OnHpChanged;
 	TArray<FOnCoolChangedDelegate> OnSkillCoolChanged;
@@ -76,7 +76,7 @@ private:
 	
 	FSkillData SkillData;
 
-	TArray<int> UseSkills;
+	TArray<int32> UseSkills;
 	TArray<FUseState> SkillState;
 
 	//Ä«¸Þ¶ó
@@ -92,7 +92,7 @@ private:
 
 
 	//item
-	TArray<int> UseBattleItems;
+	TArray<int32> UseBattleItems;
 	TArray<FUseState> BattleItemState;
 
 	//common
@@ -150,7 +150,7 @@ private:
 	bool bIsOffenseItemReady;
 
 	FName OffenseItemName;
-	int Offenseidx;
+	int32 Offenseidx;
 	float MaxItemDistance;
 #pragma endregion Variable
 
@@ -187,13 +187,13 @@ public:
 	void FinishRotation();
 
 	UFUNCTION()
-	void SkillAttack(int i);
+	void SkillAttack(int32 i);
 	UFUNCTION()
 	void SkillAttackCheck();
 	UFUNCTION()
-	bool CheckSkill(int idx);
+	bool CheckSkill(int32 idx);
 
-	void CalcSkillCool(int idx,float DeltaTime);
+	void CalcSkillCool(int32 idx,float DeltaTime);
 	//dodge
 	void Dodge();
 	UFUNCTION()
@@ -202,10 +202,10 @@ public:
 	void FinishDodge();
 
 	//item
-	void UseBattleItem(int i);
+	void UseBattleItem(int32 i);
 	UFUNCTION()
-	bool CheckBattleItem(int idx);
-	void CalcBattleItemCool(int idx, float DeltaTime);
+	bool CheckBattleItem(int32 idx);
+	void CalcBattleItemCool(int32 idx, float DeltaTime);
 
 
 	//camera
@@ -247,13 +247,13 @@ public:
 	void BindMonster(AMonster* NewMonster);
 	void UnBindMonster();
 
-	void OnDamageWidget(int Damage);
+	void OnDamageWidget(int32 Damage);
 	void DeleteDamageWidget();
 	void UpDamageWidget();
 
-	float GetCurSkillCool(int idx);
+	float GetCurSkillCool(int32 idx);
 
-	float GetCurItemCool(int idx);
+	float GetCurItemCool(int32 idx);
 
 
 	//itemEffect
@@ -317,14 +317,14 @@ public:
 
 	 void SetOnMouseWidget(bool Value);
 
-	 FSkill GetSkillData(int idx,int SkillCode);
-	 void SetUseSkill(int idx, int SkillCode);
-	 void EraseUseSkill(int idx);
+	 FSkill GetSkillData(int32 idx,int32 SkillCode);
+	 void SetUseSkill(int32 idx, int32 SkillCode);
+	 void EraseUseSkill(int32 idx);
 
 
-	 void SetBattleItemEffect(int idx, int ItemCode);
-	 void SetBattleItem(int idx, int ItemCode);
-	 void EraseBattleItme(int idx);
+	 void SetBattleItemEffect(int32 idx, int32 ItemCode);
+	 void SetBattleItem(int32 idx, int32 ItemCode);
+	 void EraseBattleItme(int32 idx);
 
 	 void ThrowOffenseItem();
 

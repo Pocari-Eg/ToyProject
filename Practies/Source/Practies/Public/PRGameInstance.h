@@ -29,7 +29,7 @@ private:
 	 UDataTable* RecoveryItemData;
 	 UDataTable* OffenseItemData;
 
-	 TArray<int> SkillLevels;
+	 TArray<int32> SkillLevels;
 public:
 	UPRGameInstance();
 	void BindMonster2PlayerWidget(class AMonster* NewMonster);
@@ -43,23 +43,23 @@ public:
 	UFUNCTION(Blueprintcallable)
 	void SetMouseOnWidget(bool Value);
 	UFUNCTION(Blueprintcallable)
-	void SetPlayerUseSkill(int idx, int SkillCode);
+	void SetPlayerUseSkill(int32 idx, int32 SkillCode);
 	UFUNCTION(Blueprintcallable)
-	void ErasePlayerSkill(int idx);
+	void ErasePlayerSkill(int32 idx);
 
 	//skilldata
-	FSkillTable* GetSKillTypeData(int SkillCode);
-	FSkillDetail GetSkillDetailData(FName SkillName, int SkillCode);
+	FSkillTable* GetSKillTypeData(int32 SkillCode);
+	FSkillDetail GetSkillDetailData(FName SkillName, int32 SkillCode);
 
 
 
 	//skill 
 	UFUNCTION(BluePrintCallable)
-	FSkill GetSkill(int SkillCode);
+	FSkill GetSkill(int32 SkillCode);
 	UFUNCTION(Blueprintcallable)
-	int GetSkillLevel(int SkillCode);
+	int32 GetSkillLevel(int32 SkillCode);
 	UFUNCTION(Blueprintcallable)
-	void SetSkillLevel(int SkillCode,int Value);
+	void SetSkillLevel(int32 SkillCode,int32 Value);
 	UFUNCTION(Blueprintcallable)
 	UTexture2D* GetSkillImage(FSkill Skill) {return Skill.Texture; }
 
@@ -67,18 +67,18 @@ public:
 	//item
 
 	UFUNCTION(Blueprintcallable)
-	void SetBattleItem(int idx, int ItemCode);
+	void SetBattleItem(int32 idx, int32 ItemCode);
 	UFUNCTION(Blueprintcallable)
-	void EraseBattleItem(int idx);
+	void EraseBattleItem(int32 idx);
 
 	//Itemldata
-	FBattleItemDataTable* GetBattleItemData(int ItemCode);
+	FBattleItemDataTable* GetBattleItemData(int32 ItemCode);
 	FRecoveryItemDataTable* GetRecoveryItemData(FName ItemName);
 	FOffenseItemDataTable* GetOffenseItemData(FName ItemName);
 	
 
 	UFUNCTION(BluePrintCallable)
-	FBattleItemData GetBattleItem(int ItemCode);
+	FBattleItemData GetBattleItem(int32 ItemCode);
 	UFUNCTION(BluePrintCallable)
 	FRecoveryItemData GetRecoveryItem(FName ItemName);
 	UFUNCTION(BluePrintCallable)

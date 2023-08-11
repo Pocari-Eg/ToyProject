@@ -122,7 +122,7 @@ void AMonster::PlayHitAnimation()
 	MonsterAnimInstance->PlayHitMontage();
 }
 
-void AMonster::OnDamageWidget(int Damage)
+void AMonster::OnDamageWidget(int32 Damage)
 {
 	//z
 	//y
@@ -132,7 +132,7 @@ void AMonster::OnDamageWidget(int Damage)
 	FTransform NewTransform = GetActorTransform();
 
 	float NewY = FMath::FRandRange(10.0f, 20.0f);
-	int Ysign = UKismetMathLibrary::RandomInteger(2);
+	int32 Ysign = UKismetMathLibrary::RandomInteger(2);
 
 	if (Ysign == 1)NewY *= -1.0f;
 
@@ -229,7 +229,7 @@ void AMonster::UpDamageWidget()
 
 	if (!DWidget.IsEmpty())
 	{
-		for (int i = 0; i < widgetsize; i++)
+		for (int32 i = 0; i < widgetsize; i++)
 		{
 			auto curwidget = *DWidget.Peek();
 			DWidget.Pop();

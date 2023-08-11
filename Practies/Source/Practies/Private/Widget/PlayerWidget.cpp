@@ -110,25 +110,25 @@ void UPlayerWidget::ToggleInventory()
 	if (Inventory->GetVisibility() == ESlateVisibility::Hidden) Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	else Inventory->SetVisibility(ESlateVisibility::Hidden);
 }
-void UPlayerWidget::UseSkillCoolStart(int idx)
+void UPlayerWidget::UseSkillCoolStart(int32 idx)
 {
 	if (UseSkillWidget != nullptr)
 	UseSkillWidget->OnWidget(idx);
 }
 
-void UPlayerWidget::UseSkillCoolEnd(int idx)
+void UPlayerWidget::UseSkillCoolEnd(int32 idx)
 {
 	if(UseSkillWidget!=nullptr)
 	UseSkillWidget->OffWidget(idx);
 }
 
-void UPlayerWidget::UseItemCoolStart(int idx)
+void UPlayerWidget::UseItemCoolStart(int32 idx)
 {
 	if (UseItemWidget != nullptr)
 		UseItemWidget->OnWidget(idx);
 }
 
-void UPlayerWidget::UseItemCoolEnd(int idx)
+void UPlayerWidget::UseItemCoolEnd(int32 idx)
 {
 	if (UseItemWidget != nullptr)
 		UseItemWidget->OffWidget(idx);

@@ -9,16 +9,16 @@
 void UUseSkillWidget::BindPlayer(APlayerCharacter* Value)
 {
 	Player = Value;
-	for (int i = 0; i < 8; i++)Player->OnSkillCoolChanged[i].BindUFunction(this,FName("SkillTimeUpdate"));
+	for (int32 i = 0; i < 8; i++)Player->OnSkillCoolChanged[i].BindUFunction(this,FName("SkillTimeUpdate"));
 }
 
-void UUseSkillWidget::OnWidget(int idx)
+void UUseSkillWidget::OnWidget(int32 idx)
 {
 	StateWidget[idx].Texture->SetVisibility(ESlateVisibility::Visible);
 	StateWidget[idx].Time->SetVisibility(ESlateVisibility::Visible);
 }
 
-void UUseSkillWidget::OffWidget(int idx)
+void UUseSkillWidget::OffWidget(int32 idx)
 {
 
 	StateWidget[idx].Texture->SetVisibility(ESlateVisibility::Hidden);
@@ -31,7 +31,7 @@ void UUseSkillWidget::NativeConstruct()
 	UE_LOG(LogTemp, Warning, TEXT("PlayerHudInit"));
 
 	StateWidget.SetNum(8);
-	for (int i = 0; i < 8; i++)
+	for (int32 i = 0; i < 8; i++)
 	{
 		FString TimeName ="Time"+ FString::FromInt(i + 1);
 		FString TextureName = "Texture" + FString::FromInt(i + 1);
@@ -49,7 +49,7 @@ void UUseSkillWidget::SkillTimeUpdate(int32 idx)
 {
 	if (StateWidget[idx].Time != nullptr)
 	{
-		int curTime = Player->GetCurSkillCool(idx);
+		int32 curTime = Player->GetCurSkillCool(idx);
 
 
 		FText TimeText = FText::FromString(FString::FromInt(curTime));

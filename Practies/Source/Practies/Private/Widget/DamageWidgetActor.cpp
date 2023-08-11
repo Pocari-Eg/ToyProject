@@ -60,7 +60,7 @@ void ADamageWidgetActor::Tick(float DeltaTime)
 
 }
 
-void ADamageWidgetActor::OnDamageWidget(int Damage)
+void ADamageWidgetActor::OnDamageWidget(int32 Damage)
 {
 	 bIsOn = true;
 	 Time = 2.0f;

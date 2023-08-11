@@ -4,7 +4,7 @@
 #include "Widget/DamageWidget.h"
 #include "Practies.h"
 
-void UDamageWidget::OnDamageWidget(int Damage)
+void UDamageWidget::OnDamageWidget(int32 Damage)
 {
 
 	if (DamageText != nullptr) {

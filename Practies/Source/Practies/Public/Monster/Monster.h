@@ -65,7 +65,7 @@ public:
 	class TSubclassOf<ADamageWidgetActor> DamageWidgetClass;
 
 	TQueue<ADamageWidgetActor*> DWidget;
-	int widgetsize = 0;
+	int32 widgetsize = 0;
 
 //function	
 private:
@@ -99,7 +99,7 @@ public:
 	void PlayAttackAnimation();
 	void PlayHitAnimation();
 
-	void OnDamageWidget(int Damage);
+	void OnDamageWidget(int32 Damage);
 	UFUNCTION()
 	void MouseBegin(UPrimitiveComponent* Component);
 	UFUNCTION()

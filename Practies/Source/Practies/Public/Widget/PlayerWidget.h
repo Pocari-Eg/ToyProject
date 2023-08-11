@@ -70,12 +70,12 @@ public:
 	void ToggleSkillBook();
 	void ToggleInventory();
 
-	void UseSkillCoolStart(int idx);
-	void UseSkillCoolEnd(int idx);
+	void UseSkillCoolStart(int32 idx);
+	void UseSkillCoolEnd(int32 idx);
 
 
-	void UseItemCoolStart(int idx);
-	void UseItemCoolEnd(int idx);
+	void UseItemCoolStart(int32 idx);
+	void UseItemCoolEnd(int32 idx);
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;

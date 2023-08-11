@@ -17,7 +17,7 @@ struct FWeaponData
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere,blueprintreadwrite,category=data)
-	int Damage;
+	int32 Damage;
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
 	float AttackAngle;
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
@@ -29,7 +29,7 @@ struct FSkillData
 	GENERATED_BODY()
 	public:
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
-	int Damage;
+	int32 Damage;
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
 	float Angle;
 	UPROPERTY(EditAnywhere, blueprintreadwrite, category = data)
@@ -58,7 +58,7 @@ UPROPERTY()
 	//function
 public:
 UFUNCTION(BlueprintCallable)
-void AttackCheck(bool bisDebug,FTransform OwnerTransform, FVector OwnerFowardVector, int Damage);
+void AttackCheck(bool bisDebug,FTransform OwnerTransform, FVector OwnerFowardVector, int32 Damage);
 UFUNCTION(BlueprintCallable)
 void SkillAttackCheck(bool bisDebug, FTransform OwnerTransform, FVector OwnerFowardVector, FSkillData SkillData);
 UFUNCTION(BlueprintCallable)

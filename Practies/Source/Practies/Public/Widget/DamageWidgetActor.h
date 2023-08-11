@@ -39,7 +39,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 
-	void OnDamageWidget(int Damage);
+	void OnDamageWidget(int32 Damage);
 	void Bind(AActor* value,float MoveYvalue) { 
 		Owner = value;
 		MoveY = MoveYvalue;

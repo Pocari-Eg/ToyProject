@@ -34,8 +34,8 @@ private:
 public:
 	void BindPlayer(class APlayerCharacter* Value);
 
-	void OnWidget(int idx);
-	void OffWidget(int idx);
+	void OnWidget(int32 idx);
+	void OffWidget(int32 idx);
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;
