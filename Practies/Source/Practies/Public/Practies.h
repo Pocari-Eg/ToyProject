@@ -39,7 +39,7 @@ enum class EBattleItemType : uint8
 UENUM(BlueprintType)
 enum class ETileType : uint8
 {
-
     SKILL UMETA(DisplayName = "SKILL"),
     BATTLEITEM UMETA(DisplayName = "BATTLEITEM"),
 };
+

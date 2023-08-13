@@ -41,8 +41,6 @@ struct FUseState
 {
 	GENERATED_BODY()
 
-	public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaxCool;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CurCool;

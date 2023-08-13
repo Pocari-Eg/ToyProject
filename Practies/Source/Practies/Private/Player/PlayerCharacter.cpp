@@ -19,7 +19,9 @@
 #include"Widget/PlayerWidget.h"
 
 #include "Item/OffenseItem.h"
-#include "Common/InventoryComp.h"
+#include "Common/Inventory.h"
+#include "Common/InventoryManager.h"
+
 
 #include "Components/WidgetComponent.h"
 
@@ -99,8 +101,6 @@ APlayerCharacter::APlayerCharacter()
     }
 
 
-	//inventory
-	PlayerInven = CreateDefaultSubobject<UInventoryComp>(TEXT("PlayerInven"));
 
 	//widget
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBP(TEXT("WidgetBlueprint'/Game/Blueprint/Player/BP_PlayerWidget.BP_PlayerWidget_C'"));
@@ -172,8 +172,6 @@ APlayerCharacter::APlayerCharacter()
 
 
 	OnItemCoolChanged.SetNum(4);
-	BattleItemState.SetNum(4);
-	UseBattleItems.Init(-1, 4);
 }
 
 // Called when the game starts or when spawned
@@ -192,7 +190,13 @@ void APlayerCharacter::BeginPlay()
 	PlayerStat.HP = PlayerStat.MaxHP/2;
 	InitPlayerWidget();
 
+	Inventory= NewObject<UInventory>();
+	InventoryManager = NewObject<UInventoryManager>();
+	InventoryManager->Init(Inventory, PlayerHud->GetInventoryWidget(), PlayerHud->GetUseItemWidget());
 
+
+	InventoryManager->AddInven(1, 10);
+	InventoryManager->AddInven(2, 10);
 }
 
 // Called every frame
@@ -246,6 +250,8 @@ void APlayerCharacter::PostInitializeComponents()
 	GameInstance = Cast<UPRGameInstance>(GetGameInstance());
 
 	InitAnimationDelegate();
+
+
 
 
 }
@@ -576,6 +582,7 @@ void APlayerCharacter::ClearOffenseItem()
 	CurOffenseItem->Destroy();
 	CurOffenseItem = nullptr;
 }
+
 void APlayerCharacter::PlayerInit()
 {
 	TLOG_W(TEXT("Player Init"));
@@ -775,7 +782,7 @@ void APlayerCharacter::UseBattleItem(int32 i)
 		if (CheckBattleItem(i))
 		{
 			
-			SetBattleItemEffect(i, UseBattleItems[i]);
+			SetBattleItemEffect(i);
 			TLOG_E(TEXT("UseItem"))
 		}
 		else {
@@ -786,12 +793,8 @@ void APlayerCharacter::UseBattleItem(int32 i)
 }
 bool APlayerCharacter::CheckBattleItem(int32 idx)
 {
-	if (UseBattleItems[idx] == -1)return false;
 
-	if (BattleItemState[idx].bIsEnabled == false)return false;
-
-
-	return true;
+	return InventoryManager->GetIsEnableItem(idx);
 }
 void APlayerCharacter::CalcBattleItemCool(int32 idx, float DeltaTime)
 {
@@ -847,9 +850,10 @@ void APlayerCharacter::EraseUseSkill(int32 idx)
 	UseSkills[idx] = -1;
 }
 
-void APlayerCharacter::SetBattleItemEffect(int32 idx, int32 ItemCode)
+void APlayerCharacter::SetBattleItemEffect(int32 idx)
 {
 
+	int32 ItemCode = InventoryManager->GetInventory()->GetBattleItem(idx).ItemCode;
 	
 	FBattleItemData Data = GameInstance->GetBattleItem(ItemCode);
 
@@ -890,24 +894,8 @@ void APlayerCharacter::SetBattleItemEffect(int32 idx, int32 ItemCode)
 
 	}
 
-
-
-
-
-
-
-
-	
-
 }
 
-void APlayerCharacter::SetBattleItem(int32 idx, int32 ItemCode)
-{
-	BattleItemState[idx].CurCool = 0.0f;
-	BattleItemState[idx].bIsEnabled = true;
-
-	UseBattleItems[idx] = ItemCode;
-}
 
 void APlayerCharacter::EraseBattleItme(int32 idx)
 {
@@ -946,3 +934,21 @@ void APlayerCharacter::ThrowOffenseItem()
 	}
 }
 
+#pragma region Item
+void APlayerCharacter::SwapInvenItem(FTileData Insert, FTileData Base)
+{
+	InventoryManager->SwapInvenItem(Insert, Base);
+}
+void APlayerCharacter::SetInvenItem(FTileData Insert, FTileData Base)
+{
+	InventoryManager->SetInvenItem(Insert,Base);
+}
+void APlayerCharacter::SwapBattleItem(FTileData Insert, FTileData Base)
+{
+	InventoryManager->SwapBattleItem(Insert, Base);
+}
+void APlayerCharacter::SetBattleItem(FTileData Insert, FTileData Base)
+{
+	InventoryManager->SetBattleItem(Insert, Base);
+}
+#pragma endregion Item

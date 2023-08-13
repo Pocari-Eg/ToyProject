@@ -4,11 +4,13 @@
 #include "Widget/UseItemWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Item/ItemTile.h"
 #include "Player/PlayerCharacter.h"
 
 void UUseItemWidget::BindPlayer(APlayerCharacter* Value)
 {
 	Player = Value;
+	for (int32 i = 0; i < 4; i++)BattleItemTiles[i]->SetUseTile(i);
 	for (int32 i = 0; i < 4; i++)Player->OnItemCoolChanged[i].BindUFunction(this,FName("ItemTimeUpdate"));
 }
 
@@ -25,6 +27,11 @@ void UUseItemWidget::OffWidget(int32 idx)
 
 	StateWidget[idx].Texture->SetVisibility(ESlateVisibility::Hidden);
 	StateWidget[idx].Time->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UUseItemWidget::Set(FTileData Data)
+{
+	BattleItemTiles[Data.Index]->SetItem(Data.Code, Data.Quantity);
 }
 
 void UUseItemWidget::NativeConstruct()
@@ -44,6 +51,16 @@ void UUseItemWidget::NativeConstruct()
 
 		StateWidget[i].Texture->SetVisibility(ESlateVisibility::Hidden);
 		StateWidget[i].Time->SetVisibility(ESlateVisibility::Hidden);
+	};
+
+
+	BattleItemTiles.SetNum(4);
+	for (int32 i = 0; i < 4; i++)
+	{
+		FString TileName =  FString::FromInt(i + 1);
+
+		BattleItemTiles[i] = Cast<UItemTile>(GetWidgetFromName(*TileName));
+
 	};
 
 }

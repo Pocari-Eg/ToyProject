@@ -78,6 +78,9 @@ public:
 
 	void UseItemCoolStart(int32 idx);
 	void UseItemCoolEnd(int32 idx);
+
+	UUseItemWidget* GetUseItemWidget() { return UseItemWidget; }
+	UInventoryWidget* GetInventoryWidget() { return InventoryWidget; }
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;
@@ -100,7 +103,7 @@ private:
 	UUserWidget* SkillBook;
 
 	UPROPERTY()
-	UInventoryWidget* Inventory;
+	UInventoryWidget* InventoryWidget;
 
 	UPROPERTY()
 	UUseSkillWidget* UseSkillWidget;

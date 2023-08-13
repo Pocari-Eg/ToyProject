@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../Practies.h"
+#include "Practies.h"
 #include "CameraSetData.h"
 #include "Common/StatData.h"
 #include "Skill.h"
@@ -48,6 +48,12 @@ private:
 	TSubclassOf<class UUserWidget> PlayerWidgetBP;
 
 
+	//inventory;
+	UPROPERTY()
+	class UInventoryManager* InventoryManager;
+	UPROPERTY()
+	class UInventory* Inventory;
+
 public:
 	UPROPERTY(BlueprintReadWrite)
 	class UPlayerAnimInstance* PlayerAnimInstance;
@@ -76,10 +82,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStat, meta = (AllowPrivateAccess = "true"))
 	FWeaponData WeaponData;
 
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory, meta = (AllowPrivateAccess = "true"))
-	class UInventoryComp* PlayerInven;
 	
 	FSkillData SkillData;
 
@@ -98,9 +100,7 @@ private:
 	bool bIsDebug;
 
 
-	//item
-	TArray<int32> UseBattleItems;
-	TArray<FUseState> BattleItemState;
+
 
 	//common
 	float NewAngle;
@@ -273,7 +273,13 @@ public:
 	void ClearOffenseItem();
 
 
+	//IventoryControl
+	void SwapInvenItem(FTileData Insert, FTileData Base);
+	void SetInvenItem(FTileData Insert, FTileData Base);
 
+
+	void SwapBattleItem(FTileData Insert, FTileData Base);
+    void SetBattleItem(FTileData Insert, FTileData Base);
 private:
 	//inti
 	void PlayerInit();
@@ -329,13 +335,12 @@ public:
 	 void EraseUseSkill(int32 idx);
 
 
-	 void SetBattleItemEffect(int32 idx, int32 ItemCode);
-	 void SetBattleItem(int32 idx, int32 ItemCode);
+	 void SetBattleItemEffect(int32 idx);
 	 void EraseBattleItme(int32 idx);
 
 	 void ThrowOffenseItem();
 
-	 bool GetIsReadyOffenseItem() { return bIsOffenseItemReady;}
+	 bool GetIsReadyOffenseItem() {return bIsOffenseItemReady;}
 
 };
 #pragma endregion GetSet

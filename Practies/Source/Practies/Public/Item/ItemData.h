@@ -47,3 +47,30 @@ struct FOffenseItemData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Distance;
 };
+
+USTRUCT(Atomic, BluePrintType)
+struct FTileData
+{
+	GENERATED_BODY()
+
+	public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Index;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Code;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Quantity;
+
+};
+USTRUCT(Atomic, BluePrintType)
+struct FItmeUseState
+{
+	GENERATED_BODY()
+
+	float MaxCool;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurCool;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsEnabled;
+
+};

@@ -107,8 +107,8 @@ void UPlayerWidget::ToggleSkillBook()
 }
 void UPlayerWidget::ToggleInventory()
 {
-	if (Inventory->GetVisibility() == ESlateVisibility::Hidden) Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-	else Inventory->SetVisibility(ESlateVisibility::Hidden);
+	if (InventoryWidget->GetVisibility() == ESlateVisibility::Hidden) InventoryWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	else InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 void UPlayerWidget::UseSkillCoolStart(int32 idx)
 {
@@ -154,8 +154,8 @@ void UPlayerWidget::NativeConstruct()
 	SkillBook->SetVisibility(ESlateVisibility::Hidden);
 	
 
-	Inventory = Cast<UInventoryWidget>(GetWidgetFromName(TEXT("BP_Inventory")));
-	Inventory->SetVisibility(ESlateVisibility::Hidden);
+	InventoryWidget = Cast<UInventoryWidget>(GetWidgetFromName(TEXT("BP_Inventory")));
+	InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 	
 
 	PlayerHp.HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HP")));

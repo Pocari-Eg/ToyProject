@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Item/ItemData.h"
 #include "Blueprint/UserWidget.h"
 #include "UseItemWidget.generated.h"
 
@@ -17,6 +17,8 @@ public:
 	class UTextBlock* Time;
 
 };
+
+class UItemTile;
 UCLASS()
 class PRACTIES_API UUseItemWidget : public UUserWidget
 {
@@ -27,7 +29,9 @@ private:
 
 	UPROPERTY()
 	TArray<FItemStateWidget> StateWidget;
+	TArray<UItemTile*> BattleItemTiles;
 
+private:
 	UFUNCTION()
 	void ItemTimeUpdate(int32 idx);
 
@@ -36,6 +40,8 @@ public:
 
 	void OnWidget(int32 idx);
 	void OffWidget(int32 idx);
+
+	void Set(FTileData Data);
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;
