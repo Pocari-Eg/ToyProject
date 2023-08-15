@@ -33,6 +33,8 @@ void UInventoryWidget::UpdateQuantity(int32 index,int32 Num)
 		FText QuantityText = FText::FromString(FString::FromInt(Num));
 		Quantity[index]->SetText(QuantityText);
 	}
+
+	ItemTiles[index]->SetQuantity(Num);
 }
 
 void UInventoryWidget::NativeConstruct()

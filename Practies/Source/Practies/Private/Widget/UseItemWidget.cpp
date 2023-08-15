@@ -26,7 +26,7 @@ void UUseItemWidget::OffWidget(int32 index)
 
 	StateWidget[index].Texture->SetVisibility(ESlateVisibility::Hidden);
 	StateWidget[index].Time->SetVisibility(ESlateVisibility::Hidden);
-	StateWidget[index].Quantity->SetVisibility(ESlateVisibility::Hidden);
+
 
 }
 
@@ -41,11 +41,13 @@ void UUseItemWidget::Clear(int32 index)
 {
 	BattleItemTiles[index]->SetEmpty();
 	OffWidget(index);
+	StateWidget[index].Quantity->SetVisibility(ESlateVisibility::Hidden);
 }
 void UUseItemWidget::UpdateQuantity(int32 index,int32 Num)
 {
 	FText QuantityText = FText::FromString(FString::FromInt(Num));
 	StateWidget[index].Quantity->SetText(QuantityText);
+	BattleItemTiles[index]->SetQuantity(Num);
 }
 void UUseItemWidget::NativeConstruct()
 {

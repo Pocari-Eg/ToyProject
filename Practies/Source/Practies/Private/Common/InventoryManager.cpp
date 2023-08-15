@@ -42,6 +42,7 @@ void UInventoryManager::SetInvenItem(FItemTileData Insert, FItemTileData Base)
 
 void UInventoryManager::SwapInvenItem(FItemTileData Insert, FItemTileData Base)
 {
+
 	Inventory->SetItem(FItemTileData{ Base.index,Insert.Code,Insert.Quantity });
 	InventoryWidget->Set(FItemTileData{ Base.index,Insert.Code,Insert.Quantity });
 
@@ -89,6 +90,7 @@ bool UInventoryManager::GetIsBattleItemEmpty(int32 index)
 }
 void UInventoryManager::SwapBattleItem(FItemTileData Insert, FItemTileData Base)
 {
+	if (!Inventory->GetIsBattleItemEnable(Insert.index) || !Inventory->GetIsBattleItemEnable(Base.index)) return;
 	Inventory->SetBattleItem(FItemTileData{ Base.index,Insert.Code,Insert.Quantity ,true });
 	BattleItemWidget->Set(FItemTileData{ Base.index,Insert.Code,Insert.Quantity ,true });
 
@@ -99,8 +101,10 @@ void UInventoryManager::SwapBattleItem(FItemTileData Insert, FItemTileData Base)
 
 void UInventoryManager::ClearBattleItemTile(int32 index)
 {
-	Inventory->ClearBattleItem(index);
-	BattleItemWidget->Clear(index);
+	if (Inventory->GetIsState(index)->bIsEnabled == true) {
+		Inventory->ClearBattleItem(index);
+		BattleItemWidget->Clear(index);
+	}
 }
 
 void UInventoryManager::DecBattleItem(int32 index, int32 num)

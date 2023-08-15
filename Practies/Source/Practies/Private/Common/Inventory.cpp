@@ -27,7 +27,6 @@ void UInventory::Init(int32 Amount)
 
 void UInventory::SetItem(FItemTileData TileData)
 {
-
 	int32 index = TileData.index;
 	InventoryData[index].ItemCode = TileData.Code;
 	InventoryData[index].Quantity = TileData.Quantity;
@@ -41,9 +40,6 @@ void UInventory::SetItem(FItemTileData TileData)
 void UInventory::ClearItem(int32 index)
 {
 	if (index != -1) {
-		if (InventoryData[index].ItemCode > 0) {
-			InvenItemIndex[InventoryData[index].ItemCode] = 0;
-		}
 		InventoryData[index].ItemCode = -1;
 		InventoryData[index].Quantity = -1;
 		bIsInvenEmpty[index] = true;
@@ -105,13 +101,12 @@ FInventoryUnit UInventory::GetItem(int32 index)
 
 void UInventory::SetBattleItem(FItemTileData TileData)
 {
+
+
 	int32 index = TileData.index;
 	BattleItemData[index].ItemCode = TileData.Code;
 	BattleItemData[index].Quantity = TileData.Quantity;
-
-
 	bIsBattleEmpty[TileData.index] = false;
-
 	BattleItemState[index].CurCool = 0.0f;
 	BattleItemState[index].bIsEnabled = true;
 }

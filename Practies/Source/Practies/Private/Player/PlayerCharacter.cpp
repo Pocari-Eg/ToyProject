@@ -795,7 +795,7 @@ void APlayerCharacter::UseBattleItem(int32 i)
 
 	if (GetPlayerState() != EPState::attack) {
 
-		if (!CheckBattleItem(i))
+		if (CheckBattleItem(i))
 		{
 			
 			SetBattleItemEffect(i);
@@ -809,8 +809,9 @@ void APlayerCharacter::UseBattleItem(int32 i)
 }
 bool APlayerCharacter::CheckBattleItem(int32 index)
 {
+	if (!InventoryManager->GetIsBattleItemEmpty(index) && InventoryManager->GetItemState(index)->bIsEnabled)return true;
 
-	return InventoryManager->GetIsBattleItemEmpty(index);
+	return false;
 }
 void APlayerCharacter::CalcBattleItemCool(int32 index, float DeltaTime)
 {
