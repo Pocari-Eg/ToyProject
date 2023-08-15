@@ -25,40 +25,121 @@ void UInventoryManager::Init(UInventory* Inven, UInventoryWidget* InvenWidget, U
 
 void UInventoryManager::AddInven(int32 ItemCode,int32 ItemCount)
 {
-	Inventory->SetItem(FTileData{ Lastidx, ItemCode, ItemCount });
-	InventoryWidget->Set(FTileData{ Lastidx, ItemCode, ItemCount });
+	Inventory->SetItem(FItemTileData{ Lastidx, ItemCode, ItemCount });
+	InventoryWidget->Set(FItemTileData{ Lastidx, ItemCode, ItemCount });
 	Lastidx++;
 }
 
-void UInventoryManager::SetInvenItem(FTileData Insert, FTileData Base)
+void UInventoryManager::SetInvenItem(FItemTileData Insert, FItemTileData Base)
 {
-	Inventory->SetItem(FTileData{Base.Index,Insert.Code,Insert.Quantity});
-	InventoryWidget->Set(FTileData{ Base.Index,Insert.Code,Insert.Quantity});
+	Inventory->SetItem(FItemTileData{Base.index,Insert.Code,Insert.Quantity});
+	InventoryWidget->Set(FItemTileData{ Base.index,Insert.Code,Insert.Quantity});
 
-	Inventory->ClearItem(Insert.Index);
-	InventoryWidget->Clear(Insert.Index);
+	Inventory->ClearItem(Insert.index);
+	InventoryWidget->Clear(Insert.index);
     
 }
 
-void UInventoryManager::SwapInvenItem(FTileData Insert, FTileData Base)
+void UInventoryManager::SwapInvenItem(FItemTileData Insert, FItemTileData Base)
 {
-	Inventory->SetItem(FTileData{ Base.Index,Insert.Code,Insert.Quantity });
-	InventoryWidget->Set(FTileData{ Base.Index,Insert.Code,Insert.Quantity });
+	Inventory->SetItem(FItemTileData{ Base.index,Insert.Code,Insert.Quantity });
+	InventoryWidget->Set(FItemTileData{ Base.index,Insert.Code,Insert.Quantity });
 
-	Inventory->SetItem(FTileData{ Insert.Index,Base.Code,Base.Quantity });
-	InventoryWidget->Set(FTileData{ Insert.Index,Base.Code,Base.Quantity });
+	Inventory->SetItem(FItemTileData{ Insert.index,Base.Code,Base.Quantity });
+	InventoryWidget->Set(FItemTileData{ Insert.index,Base.Code,Base.Quantity });
 }
-void UInventoryManager::SetBattleItem(FTileData Insert, FTileData Base)
+void UInventoryManager::SetBattleItem(FItemTileData Insert, FItemTileData Base)
 {
-	Inventory->SetItem(FTileData{ Base.Index,Insert.Code,Insert.Quantity });
-	BattleItemWidget->Set(FTileData{Base.Index,Insert.Code,Insert.Quantity});
+
+	if (Inventory->GetIsBattleItemEnable(Base.index) == false&& Inventory->GetIsBattleItemEmpty(Base.index)==false)
+	{
+		return;
+	}
+
+	for (int i = 0; i < MAX_BATTLEITEM; i++)
+	{
+		if (Inventory->GetBattleItem(i).ItemCode == Insert.Code) {
+
+			if (Inventory->GetIsBattleItemEnable(i) == false)
+			{
+				return;
+			}
+			Inventory->ClearBattleItem(i);
+			BattleItemWidget->Clear(i);
+		}
+	}
+	int32 Invenindex = Inventory->GetIndex(Insert.Code);
+	int32 Quantity = Inventory->GetItem(Invenindex).Quantity;
+
+	Inventory->SetBattleItem(FItemTileData{ Base.index,Insert.Code,Quantity,true });
+	BattleItemWidget->Set(FItemTileData{Base.index,Insert.Code,Quantity,true });
+}
+
+FItemUseState* UInventoryManager::GetItemState(int32 index)
+{
+	 return Inventory->GetIsState(index);
 }
 bool UInventoryManager::GetIsEnableItem(int32 index)
 {
 	return Inventory->GetIsBattleItemEnable(index);
 }
-void UInventoryManager::SwapBattleItem(FTileData Insert, FTileData Base)
+bool UInventoryManager::GetIsBattleItemEmpty(int32 index)
 {
+	return Inventory->GetIsBattleItemEmpty(index);
+}
+void UInventoryManager::SwapBattleItem(FItemTileData Insert, FItemTileData Base)
+{
+	Inventory->SetBattleItem(FItemTileData{ Base.index,Insert.Code,Insert.Quantity ,true });
+	BattleItemWidget->Set(FItemTileData{ Base.index,Insert.Code,Insert.Quantity ,true });
+
+	Inventory->SetBattleItem(FItemTileData{ Insert.index,Base.Code,Base.Quantity,true });
+	BattleItemWidget->Set(FItemTileData{ Insert.index,Base.Code,Base.Quantity,true });
 }
 
 
+void UInventoryManager::ClearBattleItemTile(int32 index)
+{
+	Inventory->ClearBattleItem(index);
+	BattleItemWidget->Clear(index);
+}
+
+void UInventoryManager::DecBattleItem(int32 index, int32 num)
+{
+	Inventory->DecBattleItem(index, num);
+	BattleItemWidget->UpdateQuantity(index,Inventory->GetBattleItem(index).Quantity);
+
+	int32 ItemCode = Inventory->GetBattleItem(index).ItemCode;
+	int32 InvenIndex = Inventory->GetIndex(ItemCode);
+	Inventory->DecItem(InvenIndex, num);
+	InventoryWidget->UpdateQuantity(InvenIndex, Inventory->GetItem(InvenIndex).Quantity);
+
+
+	if (Inventory->GetBattleItem(index).Quantity == 0)
+	{
+		ClearBattleItemTile(index);
+
+	}
+
+	if (Inventory->GetItem(InvenIndex).Quantity == 0)
+	{
+		Inventory->ClearItem(InvenIndex);
+		InventoryWidget->Clear(InvenIndex);
+
+	}
+}
+
+void UInventoryManager::IncItem(int32 itemCode, int32 num)
+{
+	Inventory->IncItem(itemCode, num);
+	int32 InvenIndex = Inventory->GetIndex(itemCode);
+	InventoryWidget->UpdateQuantity(InvenIndex, Inventory->GetItem(InvenIndex).Quantity);
+	for (int i = 0; i < MAX_BATTLEITEM; i++)
+	{
+		if (Inventory->GetBattleItem(i).ItemCode == itemCode)
+		{
+			BattleItemWidget->UpdateQuantity(i, Inventory->GetBattleItem(i).Quantity);
+		}
+	}
+
+
+}

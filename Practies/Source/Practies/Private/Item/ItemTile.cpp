@@ -11,21 +11,18 @@ void UItemTile::NativeConstruct()
 
 	ItemIcon = Cast<UImage>(GetWidgetFromName(TEXT("Icon")));
 }
-void UItemTile::SetItem(int32 NewCode,int32 Num)
+void UItemTile::SetItem(int32 NewCode,int32 Num,bool bIsBattle)
 {
 	SetItemCode(NewCode);
 	auto Instance = Cast<UPRGameInstance>(GetGameInstance());
 	auto Item = Instance->GetBattleItem(CurTile.Code);
 	ItemIcon->SetBrushFromTexture(Instance->GetItemImage(Item));
 	ItemIcon->SetColorAndOpacity(FLinearColor::White);
+    
+	SetbIsBattleTile(bIsBattle);
+	SetbIsEmpty(false);
 
-	bIsEmpty = false;
-
-	CurTile.Quantity = Num;
-	if (bIsBattleTile)
-	{	
-		Instance->SetBattleItem(CurTile.Index, CurTile.Code);
-	}
+	SetQuantity(Num);
 }
 
 void UItemTile::SetEmpty()
@@ -34,37 +31,41 @@ void UItemTile::SetEmpty()
 	ItemIcon->SetBrushFromTexture(nullptr);
 	ItemIcon->SetColorAndOpacity(FLinearColor::Transparent);
 
-	bIsEmpty = true;
-	if (bIsBattleTile)
-	{
-		Instance->EraseBattleItem(CurTile.Index);
-	}
+	SetbIsEmpty(true);
 }
 
-void UItemTile::SetUseTile(int32 Index)
+void UItemTile::SetUseTile(int32 index)
 {
 	SetEmpty();
 	SetbIsBattleTile(true);
-	SetTileIndex(Index);
+	SetTileIndex(index);
 }
 
-void UItemTile::ItemDropCheck(FTileData DropTile)
+void UItemTile::ItemDropCheck(FItemTileData DropTile)
 {
 	auto Instance = Cast<UPRGameInstance>(GetGameInstance());
-	if (bIsBattleTile)
+	if (GetbIsBattleTile())
 	{
-		if (bIsEmpty)
+		if (GetbIsEmpty())
 		{
 			//setBattle
 			Instance->GetPlayer()->SetBattleItem(DropTile, CurTile);
 		}
 		else {
 			//swap
-			
+			if (DropTile.bIsBattleTile)
+			{
+				Instance->GetPlayer()->SwapBattleItem(DropTile, CurTile);
+			}
+			else {
+				Instance->GetPlayer()->SetBattleItem(DropTile, CurTile);
+			}
+
+
 		}
 	}
 	else {
-		if (bIsEmpty)
+		if (GetbIsEmpty())
 		{
 			//set
 			Instance->GetPlayer()->SetInvenItem(DropTile, CurTile);
@@ -77,10 +78,10 @@ void UItemTile::ItemDropCheck(FTileData DropTile)
 
 }
 
-void UItemTile::Init(int32 Index)
+void UItemTile::Init(int32 index)
 {
-	bIsEmpty = true;
-	bIsBattleTile = false;
-	CurTile.Index = Index;
-	CurTile.Code = -1;
+	SetbIsEmpty(true);
+	SetbIsBattleTile(false);
+	SetTileIndex(index);
+	SetItemCode(-1);
 }

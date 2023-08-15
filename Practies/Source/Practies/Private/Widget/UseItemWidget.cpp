@@ -14,26 +14,39 @@ void UUseItemWidget::BindPlayer(APlayerCharacter* Value)
 	for (int32 i = 0; i < 4; i++)Player->OnItemCoolChanged[i].BindUFunction(this,FName("ItemTimeUpdate"));
 }
 
-void UUseItemWidget::OnWidget(int32 idx)
+void UUseItemWidget::OnWidget(int32 index)
 {
-	StateWidget[idx].Texture->SetVisibility(ESlateVisibility::Visible);
-	StateWidget[idx].Time->SetVisibility(ESlateVisibility::Visible);
+	StateWidget[index].Texture->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	StateWidget[index].Time->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	StateWidget[index].Quantity->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+}
 
+void UUseItemWidget::OffWidget(int32 index)
+{
+
+	StateWidget[index].Texture->SetVisibility(ESlateVisibility::Hidden);
+	StateWidget[index].Time->SetVisibility(ESlateVisibility::Hidden);
+	StateWidget[index].Quantity->SetVisibility(ESlateVisibility::Hidden);
 
 }
 
-void UUseItemWidget::OffWidget(int32 idx)
+void UUseItemWidget::Set(FItemTileData Data)
 {
-
-	StateWidget[idx].Texture->SetVisibility(ESlateVisibility::Hidden);
-	StateWidget[idx].Time->SetVisibility(ESlateVisibility::Hidden);
+	BattleItemTiles[Data.index]->SetItem(Data.Code, Data.Quantity,Data.bIsBattleTile);
+	UpdateQuantity(Data.index, Data.Quantity);
+	StateWidget[Data.index].Quantity->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	
 }
-
-void UUseItemWidget::Set(FTileData Data)
+void UUseItemWidget::Clear(int32 index)
 {
-	BattleItemTiles[Data.Index]->SetItem(Data.Code, Data.Quantity);
+	BattleItemTiles[index]->SetEmpty();
+	OffWidget(index);
 }
-
+void UUseItemWidget::UpdateQuantity(int32 index,int32 Num)
+{
+	FText QuantityText = FText::FromString(FString::FromInt(Num));
+	StateWidget[index].Quantity->SetText(QuantityText);
+}
 void UUseItemWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -45,12 +58,15 @@ void UUseItemWidget::NativeConstruct()
 	{
 		FString TimeName ="Time"+ FString::FromInt(i + 1);
 		FString TextureName = "Texture" + FString::FromInt(i + 1);
+		FString  QuantityName = "Q" + FString::FromInt(i + 1);
 
 		StateWidget[i].Texture = Cast<UImage>(GetWidgetFromName(*TextureName));
 		StateWidget[i].Time= Cast<UTextBlock>(GetWidgetFromName(*TimeName));
+		StateWidget[i].Quantity = Cast<UTextBlock>(GetWidgetFromName(*QuantityName));
 
 		StateWidget[i].Texture->SetVisibility(ESlateVisibility::Hidden);
 		StateWidget[i].Time->SetVisibility(ESlateVisibility::Hidden);
+		StateWidget[i].Quantity -> SetVisibility(ESlateVisibility::Hidden);
 	};
 
 
@@ -65,14 +81,14 @@ void UUseItemWidget::NativeConstruct()
 
 }
 
-void UUseItemWidget::ItemTimeUpdate(int32 idx)
+void UUseItemWidget::ItemTimeUpdate(int32 index)
 {
-	if (StateWidget[idx].Time != nullptr)
+	if (StateWidget[index].Time != nullptr)
 	{
-		int32 curTime = Player->GetCurItemCool(idx);
+		int32 curTime = Player->GetCurItemCool(index);
 
 
 		FText TimeText = FText::FromString(FString::FromInt(curTime));
-		StateWidget[idx].Time->SetText(TimeText);
+		StateWidget[index].Time->SetText(TimeText);
 	}
 }

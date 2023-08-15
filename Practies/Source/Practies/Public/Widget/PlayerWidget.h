@@ -72,15 +72,18 @@ public:
 	void ToggleSkillBook();
 	void ToggleInventory();
 
-	void UseSkillCoolStart(int32 idx);
-	void UseSkillCoolEnd(int32 idx);
+	void UseSkillCoolStart(int32 index);
+	void UseSkillCoolEnd(int32 index);
 
 
-	void UseItemCoolStart(int32 idx);
-	void UseItemCoolEnd(int32 idx);
+	void UseItemCoolStart(int32 index);
+	void UseItemCoolEnd(int32 index);
 
 	UUseItemWidget* GetUseItemWidget() { return UseItemWidget; }
 	UInventoryWidget* GetInventoryWidget() { return InventoryWidget; }
+
+	UFUNCTION(Blueprintcallable)
+	void ClearBattleItemTile(int32 index);
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;

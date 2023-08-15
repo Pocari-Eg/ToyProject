@@ -198,9 +198,9 @@ public:
 	UFUNCTION()
 	void SkillAttackCheck();
 	UFUNCTION()
-	bool CheckSkill(int32 idx);
+	bool CheckSkill(int32 index);
 
-	void CalcSkillCool(int32 idx,float DeltaTime);
+	void CalcSkillCool(int32 index,float DeltaTime);
 	//dodge
 	void Dodge();
 	UFUNCTION()
@@ -211,8 +211,8 @@ public:
 	//item
 	void UseBattleItem(int32 i);
 	UFUNCTION()
-	bool CheckBattleItem(int32 idx);
-	void CalcBattleItemCool(int32 idx, float DeltaTime);
+	bool CheckBattleItem(int32 index);
+	void CalcBattleItemCool(int32 index, float DeltaTime);
 
 
 	//camera
@@ -258,9 +258,9 @@ public:
 	void DeleteDamageWidget();
 	void UpDamageWidget();
 
-	float GetCurSkillCool(int32 idx);
+	float GetCurSkillCool(int32 index);
 
-	float GetCurItemCool(int32 idx);
+	float GetCurItemCool(int32 index);
 
 
 	//itemEffect
@@ -274,12 +274,12 @@ public:
 
 
 	//IventoryControl
-	void SwapInvenItem(FTileData Insert, FTileData Base);
-	void SetInvenItem(FTileData Insert, FTileData Base);
+	void SwapInvenItem(FItemTileData Insert, FItemTileData Base);
+	void SetInvenItem(FItemTileData Insert, FItemTileData Base);
 
 
-	void SwapBattleItem(FTileData Insert, FTileData Base);
-    void SetBattleItem(FTileData Insert, FTileData Base);
+	void SwapBattleItem(FItemTileData Insert, FItemTileData Base);
+    void SetBattleItem(FItemTileData Insert, FItemTileData Base);
 private:
 	//inti
 	void PlayerInit();
@@ -330,18 +330,19 @@ public:
 
 	 void SetOnMouseWidget(bool Value);
 
-	 FSkill GetSkillData(int32 idx,int32 SkillCode);
-	 void SetUseSkill(int32 idx, int32 SkillCode);
-	 void EraseUseSkill(int32 idx);
+	 FSkill GetSkillData(int32 index,int32 SkillCode);
+	 void SetUseSkill(int32 index, int32 SkillCode);
+	 void EraseUseSkill(int32 index);
 
 
-	 void SetBattleItemEffect(int32 idx);
-	 void EraseBattleItme(int32 idx);
+	 void SetBattleItemEffect(int32 index);
 
 	 void ThrowOffenseItem();
 
 	 bool GetIsReadyOffenseItem() {return bIsOffenseItemReady;}
 
+
+	 void ClearBattleItemTile(int32 index);
 };
 #pragma endregion GetSet
 

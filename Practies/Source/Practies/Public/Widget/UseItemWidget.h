@@ -15,7 +15,8 @@ public:
 	class UImage* Texture;
 	UPROPERTY()
 	class UTextBlock* Time;
-
+	UPROPERTY()
+	class UTextBlock* Quantity;
 };
 
 class UItemTile;
@@ -30,18 +31,20 @@ private:
 	UPROPERTY()
 	TArray<FItemStateWidget> StateWidget;
 	TArray<UItemTile*> BattleItemTiles;
-
 private:
 	UFUNCTION()
-	void ItemTimeUpdate(int32 idx);
+	void ItemTimeUpdate(int32 index);
 
 public:
 	void BindPlayer(class APlayerCharacter* Value);
 
-	void OnWidget(int32 idx);
-	void OffWidget(int32 idx);
+	void OnWidget(int32 index);
+	void OffWidget(int32 index);
 
-	void Set(FTileData Data);
+	void Set(FItemTileData Data);
+	void Clear(int32 index);
+
+	void UpdateQuantity(int32 index,int32 Num);
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;

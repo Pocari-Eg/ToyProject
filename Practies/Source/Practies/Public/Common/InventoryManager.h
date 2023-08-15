@@ -29,13 +29,18 @@ public:
 
 	//인벤토리에 빈곳에 아이템 추가
 	void AddInven(int32 ItemCode, int32 ItemCount);
-	void SetInvenItem(FTileData Insert, FTileData Base);
-	void SwapInvenItem(FTileData Insert, FTileData Base);
-	void SwapBattleItem(FTileData Insert, FTileData Base);
-	void SetBattleItem(FTileData Insert, FTileData Base);
+	void SetInvenItem(FItemTileData Insert, FItemTileData Base);
+	void SwapInvenItem(FItemTileData Insert, FItemTileData Base);
+	void SwapBattleItem(FItemTileData Insert, FItemTileData Base);
+	void SetBattleItem(FItemTileData Insert, FItemTileData Base);
+	void ClearBattleItemTile(int32 index);
 
+	void DecBattleItem(int32 index, int32 num);
+	void IncItem(int32 itemCode, int32 num);
 
 	UInventory* GetInventory() { return Inventory; }
+	FItemUseState* GetItemState(int32 index);
 
-	bool GetIsEnableItem(int32 Index);
+	bool GetIsEnableItem(int32 index);
+	bool GetIsBattleItemEmpty(int32 index);
 };

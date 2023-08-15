@@ -196,7 +196,7 @@ void APlayerCharacter::BeginPlay()
 
 
 	InventoryManager->AddInven(1, 10);
-	InventoryManager->AddInven(2, 10);
+	InventoryManager->AddInven(2, 2);
 }
 
 // Called every frame
@@ -223,10 +223,23 @@ void APlayerCharacter::Tick(float DeltaTime)
 	if (SkillState[7].bIsEnabled == false && UseSkills[7] != -1)CalcSkillCool(7, DeltaTime);
 
 
-	if (BattleItemState[0].bIsEnabled == false && UseBattleItems[0] != -1)CalcBattleItemCool(0, DeltaTime);
-	if (BattleItemState[1].bIsEnabled == false && UseBattleItems[1] != -1)CalcBattleItemCool(1, DeltaTime);
-	if (BattleItemState[2].bIsEnabled == false && UseBattleItems[2] != -1)CalcBattleItemCool(2, DeltaTime);
-	if (BattleItemState[3].bIsEnabled == false && UseBattleItems[3] != -1)CalcBattleItemCool(3, DeltaTime);
+	if (InventoryManager->GetIsBattleItemEmpty(0) == false)
+	{
+		if (InventoryManager->GetItemState(0)->bIsEnabled == false)CalcBattleItemCool(0, DeltaTime);
+
+	}
+	if (InventoryManager->GetIsBattleItemEmpty(1) == false)
+	{
+		if (InventoryManager->GetItemState(1)->bIsEnabled == false)CalcBattleItemCool(1, DeltaTime);
+	}
+	if (InventoryManager->GetIsBattleItemEmpty(2) == false)
+	{
+		if (InventoryManager->GetItemState(2)->bIsEnabled == false)CalcBattleItemCool(2, DeltaTime);
+	}
+	if (InventoryManager->GetIsBattleItemEmpty(3) == false)
+	{
+		if (InventoryManager->GetItemState(3)->bIsEnabled == false)CalcBattleItemCool(3, DeltaTime);
+	}
 
 
 
@@ -506,13 +519,15 @@ void APlayerCharacter::UpDamageWidget()
 	}
 }
 
-float APlayerCharacter::GetCurSkillCool(int32 idx)
+float APlayerCharacter::GetCurSkillCool(int32 index)
 {
-	return SkillState[idx].CurCool;
+	return SkillState[index].CurCool;
+	
 }
-float APlayerCharacter::GetCurItemCool(int32 idx)
+float APlayerCharacter::GetCurItemCool(int32 index)
 {
-	return BattleItemState[idx].CurCool;
+	
+	return InventoryManager->GetItemState(index)->CurCool;
 }
 float APlayerCharacter::UseRecoveryItem(FName ItemName)
 {
@@ -526,15 +541,18 @@ void APlayerCharacter::UseOffenseItem()
 {
 
 	FOffenseItemData ItemData = GameInstance->GetOffenseItem(OffenseItemName);
+	auto ItemState = InventoryManager->GetItemState(Offenseidx);
 
-	BattleItemState[Offenseidx].bIsEnabled = false;
-	PlayerHud->UseItemCoolStart(Offenseidx);
-	OnItemCoolChanged[Offenseidx].Execute(Offenseidx);
-	BattleItemState[Offenseidx].MaxCool = ItemData.CoolTime;
-	BattleItemState[Offenseidx].CurCool = BattleItemState[Offenseidx].MaxCool;
+	ItemState->bIsEnabled = false;
+
+	ItemState->MaxCool = ItemData.CoolTime;
+	ItemState->CurCool = ItemState->MaxCool;
 
 	CurOffenseItem->Use();
-
+	if (!InventoryManager->GetIsBattleItemEmpty(Offenseidx)) {
+		PlayerHud->UseItemCoolStart(Offenseidx);
+		OnItemCoolChanged[Offenseidx].Execute(Offenseidx);
+	}
 	ClearOffenseItem();
 
 }
@@ -559,9 +577,7 @@ void APlayerCharacter::WaitOffenseItem()
 {
 	if (CurOffenseItem != nullptr)
 	{
-	
-
-		FVector HitLocation = FVector::ZeroVector;
+			FVector HitLocation = FVector::ZeroVector;
 		FHitResult Hit;
 		GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 		HitLocation = Hit.Location;
@@ -718,27 +734,27 @@ void APlayerCharacter::SkillAttackCheck()
 	SetAttackTransform();
 	PlayerWeapon->SkillAttackCheck(bIsDebug, AttackTransform, AttackForwardVector, SkillData);
 }
-bool APlayerCharacter::CheckSkill(int32 idx)
+bool APlayerCharacter::CheckSkill(int32 index)
 {
-	if (UseSkills[idx] == -1)return false;
+	if (UseSkills[index] == -1)return false;
 
-	if (SkillState[idx].bIsEnabled == false)return false;
+	if (SkillState[index].bIsEnabled == false)return false;
 
 
 	return true;
 
 }
-void APlayerCharacter::CalcSkillCool(int32 idx, float DeltaTime)
+void APlayerCharacter::CalcSkillCool(int32 index, float DeltaTime)
 {
 
-	SkillState[idx].CurCool -= DeltaTime;
+	SkillState[index].CurCool -= DeltaTime;
 
-	OnSkillCoolChanged[idx].Execute(idx);
-	if (SkillState[idx].CurCool <=0.0f)
+	OnSkillCoolChanged[index].Execute(index);
+	if (SkillState[index].CurCool <=0.0f)
 	{
-		SkillState[idx].bIsEnabled = true;
-		SkillState[idx].CurCool = SkillState[idx].MaxCool;
-		PlayerHud->UseSkillCoolEnd(idx);
+		SkillState[index].bIsEnabled = true;
+		SkillState[index].CurCool = SkillState[index].MaxCool;
+		PlayerHud->UseSkillCoolEnd(index);
 	}
 }
 
@@ -779,7 +795,7 @@ void APlayerCharacter::UseBattleItem(int32 i)
 
 	if (GetPlayerState() != EPState::attack) {
 
-		if (CheckBattleItem(i))
+		if (!CheckBattleItem(i))
 		{
 			
 			SetBattleItemEffect(i);
@@ -791,22 +807,24 @@ void APlayerCharacter::UseBattleItem(int32 i)
 
 	}
 }
-bool APlayerCharacter::CheckBattleItem(int32 idx)
+bool APlayerCharacter::CheckBattleItem(int32 index)
 {
 
-	return InventoryManager->GetIsEnableItem(idx);
+	return InventoryManager->GetIsBattleItemEmpty(index);
 }
-void APlayerCharacter::CalcBattleItemCool(int32 idx, float DeltaTime)
+void APlayerCharacter::CalcBattleItemCool(int32 index, float DeltaTime)
 {
-	BattleItemState[idx].CurCool -= DeltaTime;
 
-	OnItemCoolChanged[idx].Execute(idx);
-	if (BattleItemState[idx].CurCool <= 0.0f)
+	auto ItemState = InventoryManager->GetItemState(index);
+	ItemState->CurCool -= DeltaTime;
+
+	OnItemCoolChanged[index].Execute(index);
+	if (ItemState->CurCool <= 0.0f)
 	{
-		BattleItemState[idx].bIsEnabled = true;
-		BattleItemState[idx].CurCool = BattleItemState[idx].MaxCool;
+		ItemState->bIsEnabled = true;
+		ItemState->CurCool = ItemState->MaxCool;
 
-		PlayerHud->UseItemCoolEnd(idx);
+		PlayerHud->UseItemCoolEnd(index);
 	}
 }
 float APlayerCharacter::GetHpRatio()
@@ -820,7 +838,7 @@ void APlayerCharacter::SetOnMouseWidget(bool Value)
 	PlayerController->SetOnMouseWidget(Value);
 }
 
-FSkill APlayerCharacter::GetSkillData(int32 idx, int32 SkillCode)
+FSkill APlayerCharacter::GetSkillData(int32 index, int32 SkillCode)
 {
 
 	
@@ -831,76 +849,76 @@ FSkill APlayerCharacter::GetSkillData(int32 idx, int32 SkillCode)
 	SkillData.Angle = Detail.Angle;
 	SkillData.Range = Detail.Range;
 
-	SkillState[idx].MaxCool = Detail.CoolTime;
-	SkillState[idx].CurCool = SkillState[idx].MaxCool;
+	SkillState[index].MaxCool = Detail.CoolTime;
+	SkillState[index].CurCool = SkillState[index].MaxCool;
 
 	return Data;
 }
 
-void APlayerCharacter::SetUseSkill(int32 idx, int32 SkillCode)
+void APlayerCharacter::SetUseSkill(int32 index, int32 SkillCode)
 {
-	SkillState[idx].CurCool = 0.0f;
-	SkillState[idx].bIsEnabled = true;
-	UseSkills[idx] = SkillCode;
+	SkillState[index].CurCool = 0.0f;
+	SkillState[index].bIsEnabled = true;
+	UseSkills[index] = SkillCode;
 }
 
-void APlayerCharacter::EraseUseSkill(int32 idx)
+void APlayerCharacter::EraseUseSkill(int32 index)
 {
 
-	UseSkills[idx] = -1;
+	UseSkills[index] = -1;
 }
 
-void APlayerCharacter::SetBattleItemEffect(int32 idx)
+void APlayerCharacter::SetBattleItemEffect(int32 index)
 {
 
-	int32 ItemCode = InventoryManager->GetInventory()->GetBattleItem(idx).ItemCode;
-	
+	int32 ItemCode = InventoryManager->GetInventory()->GetBattleItem(index).ItemCode;
+	auto ItemState = InventoryManager->GetItemState(index);
+
 	FBattleItemData Data = GameInstance->GetBattleItem(ItemCode);
 
 	switch (Data.Type)
 	{
-		case EBattleItemType::Recovery:
-			BattleItemState[idx].bIsEnabled = false;
-			PlayerHud->UseItemCoolStart(idx);
-			OnItemCoolChanged[idx].Execute(idx);
-			BattleItemState[idx].MaxCool=UseRecoveryItem(Data.Name);
-			BattleItemState[idx].CurCool = BattleItemState[idx].MaxCool;
-			break;
-		case EBattleItemType::Offense:
+	case EBattleItemType::Recovery:
+		ItemState->bIsEnabled = false;
+		ItemState->MaxCool = UseRecoveryItem(Data.Name);
+		ItemState->CurCool = ItemState->MaxCool;
 
-			if (GetIsReadyOffenseItem())
-			{
-				if (Offenseidx == idx && OffenseItemName == Data.Name)
-				{
-					ThrowOffenseItem();
-				}
-			}
-			else
-			{
-				Offenseidx = idx;
-				OffenseItemName = Data.Name;
-				FOffenseItemData ItemData = GameInstance->GetOffenseItem(OffenseItemName);
-				ReadyOffenseItem(ItemData);
-			}
 
-		
-			break;
-		case EBattleItemType::Utility:
-			break;
-		case EBattleItemType::Buff:
-			break;
-		default:
-			break;
+		if (!InventoryManager->GetIsBattleItemEmpty(index)) {
+			PlayerHud->UseItemCoolStart(index);
+			OnItemCoolChanged[index].Execute(index);
+		}
+		InventoryManager->DecBattleItem(index, 1);
+		break;
+	case EBattleItemType::Offense:
+
+		if (GetIsReadyOffenseItem())
+		{
+			if (Offenseidx == index && OffenseItemName == Data.Name)
+			{
+				ThrowOffenseItem();
+			}
+		}
+		else
+		{
+			Offenseidx = index;
+			OffenseItemName = Data.Name;
+			FOffenseItemData ItemData = GameInstance->GetOffenseItem(OffenseItemName);
+			ReadyOffenseItem(ItemData);
+		}
+		break;
+	case EBattleItemType::Utility:
+		break;
+	case EBattleItemType::Buff:
+		break;
+	default:
+		break;
 
 	}
 
 }
 
 
-void APlayerCharacter::EraseBattleItme(int32 idx)
-{
-	UseBattleItems[idx] = -1;
-}
 
 void APlayerCharacter::ThrowOffenseItem()
 {
@@ -929,26 +947,32 @@ void APlayerCharacter::ThrowOffenseItem()
 
 		AddActorWorldRotation(FRotator(0.0f, Angle, 0.0f));
 
-
+		InventoryManager->DecBattleItem(Offenseidx, 1);
 		PlayerAnimInstance->PlayThrowMontage();
 	}
 }
 
 #pragma region Item
-void APlayerCharacter::SwapInvenItem(FTileData Insert, FTileData Base)
+void APlayerCharacter::SwapInvenItem(FItemTileData Insert, FItemTileData Base)
 {
 	InventoryManager->SwapInvenItem(Insert, Base);
 }
-void APlayerCharacter::SetInvenItem(FTileData Insert, FTileData Base)
+void APlayerCharacter::SetInvenItem(FItemTileData Insert, FItemTileData Base)
 {
 	InventoryManager->SetInvenItem(Insert,Base);
 }
-void APlayerCharacter::SwapBattleItem(FTileData Insert, FTileData Base)
+void APlayerCharacter::SwapBattleItem(FItemTileData Insert, FItemTileData Base)
 {
 	InventoryManager->SwapBattleItem(Insert, Base);
 }
-void APlayerCharacter::SetBattleItem(FTileData Insert, FTileData Base)
+void APlayerCharacter::SetBattleItem(FItemTileData Insert, FItemTileData Base)
 {
 	InventoryManager->SetBattleItem(Insert, Base);
 }
+void APlayerCharacter::ClearBattleItemTile(int32 index)
+{
+	InventoryManager->ClearBattleItemTile(index);
+}
+
+
 #pragma endregion Item

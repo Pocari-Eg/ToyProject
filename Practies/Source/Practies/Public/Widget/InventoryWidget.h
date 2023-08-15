@@ -12,15 +12,18 @@
 class APlayerCharacter;
 
 class UItemTile;
+class UTextBlock;
 UCLASS()
 class PRACTIES_API UInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
-TArray<UItemTile*> ItemTiles;
+ TArray<UItemTile*> ItemTiles;
+ TArray<UTextBlock*> Quantity;
 public:
-	void Set(FTileData Data);
-	void Clear(int32 Index);
+	void Set(FItemTileData Data);
+	void Clear(int32 index);
 	void Init(int32 Amount);
+	void UpdateQuantity(int32 index,int32 Num);
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;

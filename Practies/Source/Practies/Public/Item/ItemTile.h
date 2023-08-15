@@ -18,9 +18,7 @@ class PRACTIES_API UItemTile : public UUserWidget
 	GENERATED_BODY()
 	
 private:
-	//플레이어가 편의 사용하도록 세팅되어있는 타일인가
-	UPROPERTY(VisibleAnywhere,Category="ItemTile")
-	bool bIsBattleTile;
+
 	//비어있는 타일인가
 	UPROPERTY(VisibleAnywhere, Category = "ItemTile")
 	bool bIsEmpty;
@@ -30,30 +28,30 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "ItemTile")
 	 UImage* ItemIcon;
 	UPROPERTY(VisibleAnywhere, Category = "ItemTile")
-	FTileData CurTile;
+	FItemTileData CurTile;
 protected:
 	// 위젯을 초기화
 	virtual void NativeConstruct() override;
 public:
 
 	UFUNCTION(Blueprintcallable)
-	void SetItem(int32 NewCode, int32 Num);
+	void SetItem(int32 NewCode, int32 Num, bool bIsBattle);
 	UFUNCTION(Blueprintcallable)
 	void SetEmpty();
 	UFUNCTION(Blueprintcallable)
-	void SetUseTile(int32 Index);
+	void SetUseTile(int32 index);
 
 	UFUNCTION(Blueprintcallable)
-	void ItemDropCheck(FTileData DropTile);
+	void ItemDropCheck(FItemTileData DropTile);
 
-	void Init(int32 Index);
+	void Init(int32 index);
 
 #pragma region GetSet	
 	//get set
 	UFUNCTION(Blueprintcallable)
-	void SetbIsBattleTile(bool value){bIsBattleTile=value;}
+	void SetbIsBattleTile(bool value){ CurTile.bIsBattleTile=value;}
 	UFUNCTION(Blueprintcallable)
-	bool GetbISInUse() { return bIsBattleTile; }
+	bool GetbIsBattleTile() { return CurTile.bIsBattleTile; }
 
 	UFUNCTION(Blueprintcallable)
 	void SetbIsEmpty(bool value) { bIsEmpty = value; }
@@ -61,9 +59,9 @@ public:
 	bool GetbIsEmpty() { return bIsEmpty; }
 
 	UFUNCTION(Blueprintcallable)
-	void SetTileIndex(int32 value) { CurTile.Index = value; }
+	void SetTileIndex(int32 value) { CurTile.index = value; }
 	UFUNCTION(Blueprintcallable)
-	int32 GetTileIndex() { return CurTile.Index; }
+	int32 GetTileIndex() { return CurTile.index; }
 
 	UFUNCTION(Blueprintcallable)
 	void SetItemCode(int32 value) { CurTile.Code = value; }
@@ -76,9 +74,9 @@ public:
 	int32 GetQuantity() { return CurTile.Quantity; }
 
 	UFUNCTION(Blueprintcallable)
-	void SetTileData(FTileData value) { CurTile = value; }
+	void SetTileData(FItemTileData value) { CurTile = value; }
 	UFUNCTION(Blueprintcallable)
-	FTileData GetTileData() { return CurTile; }
+	FItemTileData GetTileData() { return CurTile; }
 
 	UFUNCTION(Blueprintcallable)
 	void SetItemIcon(UImage* value) { ItemIcon = value; }

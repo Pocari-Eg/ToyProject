@@ -14,41 +14,60 @@ void UInventory::Init(int32 Amount)
 {
 	InventoryData.SetNum(Amount);
 	bIsInvenEmpty.SetNum(Amount);
+	InvenItemIndex.SetNum(Amount);
 
-	 BattleItemData.SetNum(4);
-    bIsBattleEmpty.SetNum(4);
+    BattleItemData.SetNum(MAX_BATTLEITEM);
+    bIsBattleEmpty.SetNum(MAX_BATTLEITEM);
+	BattleItemState.SetNum(MAX_BATTLEITEM);
+	for (int i = 0; i < Amount; i++)ClearItem(i);
+
+	for (int i = 0; i < MAX_BATTLEITEM; i++)ClearBattleItem(i);
 
 }
 
-void UInventory::SetItem(FTileData TileData)
+void UInventory::SetItem(FItemTileData TileData)
 {
 
-	int32 index = TileData.Index;
+	int32 index = TileData.index;
 	InventoryData[index].ItemCode = TileData.Code;
 	InventoryData[index].Quantity = TileData.Quantity;
 
-	bIsInvenEmpty[TileData.Index] = false;
+	bIsInvenEmpty[TileData.index] = false;
 	
-
+	InvenItemIndex[TileData.Code] = index;
 }
 	
 
 void UInventory::ClearItem(int32 index)
 {
+	if (index != -1) {
+		if (InventoryData[index].ItemCode > 0) {
+			InvenItemIndex[InventoryData[index].ItemCode] = 0;
+		}
+		InventoryData[index].ItemCode = -1;
+		InventoryData[index].Quantity = -1;
+		bIsInvenEmpty[index] = true;
+	}
 
-	InventoryData[index].ItemCode = -1;
-	InventoryData[index].Quantity = -1;
-	bIsInvenEmpty[index] = true;
-	
 }
 
 
-void UInventory::IncItem(int32 index, int32 num)
+void UInventory::IncItem(int32 itemCode, int32 num)
 {
+
+	int32 index = InvenItemIndex[itemCode];
 
 	if (!bIsInvenEmpty[index]) InventoryData[index].Quantity += num;
 	else {
 		TLOG_E(TEXT("This InventoryData Is Empty"));
+	}
+
+	for (int i = 0; i < MAX_BATTLEITEM; i++)
+	{
+		if (BattleItemData[i].ItemCode == itemCode)
+		{
+			IncBattleItem(i, num);
+		}
 	}
 
 }
@@ -63,10 +82,7 @@ void UInventory::DecItem(int32 index, int32 num)
 		else 
 		{
 			InventoryData[index].Quantity -= num;
-			if (InventoryData[index].Quantity -= num == 0)
-			{
-				ClearItem(index);
-			}
+
 		}
 	}
 	else {
@@ -87,13 +103,14 @@ FInventoryUnit UInventory::GetItem(int32 index)
 }
 
 
-void UInventory::SetBattleItem(FTileData TileData)
+void UInventory::SetBattleItem(FItemTileData TileData)
 {
-	int32 index = TileData.Index;
+	int32 index = TileData.index;
 	BattleItemData[index].ItemCode = TileData.Code;
 	BattleItemData[index].Quantity = TileData.Quantity;
 
-	bIsBattleEmpty[TileData.Index] = false;
+
+	bIsBattleEmpty[TileData.index] = false;
 
 	BattleItemState[index].CurCool = 0.0f;
 	BattleItemState[index].bIsEnabled = true;
@@ -109,9 +126,9 @@ void UInventory::ClearBattleItem(int32 index)
 }
 
 //Battle
-FInventoryUnit UInventory::GetBattleItem(int32 Index)
+FInventoryUnit UInventory::GetBattleItem(int32 index)
 {
-	if (!bIsBattleEmpty[Index]) return BattleItemData[Index];
+	if (!bIsBattleEmpty[index]) return BattleItemData[index];
 	else {
 		TLOG_E(TEXT("This BattleItemData Is Empty"));
 		return FInventoryUnit();
@@ -136,11 +153,7 @@ void UInventory::DecBattleItem(int32 index, int32 num)
 		}
 		else
 		{
-			BattleItemData[index].Quantity -= num;
-			if (BattleItemData[index].Quantity -= num == 0)
-			{
-				ClearBattleItem(index);
-			}
+			BattleItemData[index].Quantity -= num;	
 		}
 	}
 	else {

@@ -62,14 +62,14 @@ void UPRGameInstance::SetMouseOnWidget(bool Value)
 	Player->SetOnMouseWidget(Value);
 }
 
-void UPRGameInstance::SetPlayerUseSkill(int32 idx, int32 SkillCode)
+void UPRGameInstance::SetPlayerUseSkill(int32 index, int32 SkillCode)
 {
-	Player->SetUseSkill(idx, SkillCode);
+	Player->SetUseSkill(index, SkillCode);
 }
 
-void UPRGameInstance::ErasePlayerSkill(int32 idx)
+void UPRGameInstance::ErasePlayerSkill(int32 index)
 {
-	Player->EraseUseSkill(idx);
+	Player->EraseUseSkill(index);
 }
 FSkillTable* UPRGameInstance::GetSKillTypeData(int32 SkillCode)
 {
@@ -122,6 +122,10 @@ FOffenseItemDataTable* UPRGameInstance::GetOffenseItemData(FName ItemName)
 	return OffenseItemData->FindRow<FOffenseItemDataTable>(ItemName, TEXT(""));
 }
 
+void UPRGameInstance::ClearBattleItem(int32 index)
+{
+	Player->ClearBattleItemTile(index);
+}
 FBattleItemData UPRGameInstance::GetBattleItem(int32 ItemCode)
 {
 	auto ItemData = GetBattleItemData(ItemCode);
@@ -180,12 +184,4 @@ FSkillDetail UPRGameInstance::GetSkillDetailData(FName SkillName, int32 SkillCod
 	NewDetail.CoolTime = SkillDetailData->FindRow<FSkillDetailTable>(*FString::FromInt(SkillLevel), TEXT(""))->CoolTime;
 	 return NewDetail;
 }
-void UPRGameInstance::SetBattleItem(int32 idx, int32 ItemCode)
- {
-	Player->SetBattleItem(idx, ItemCode);
-}
 
-void UPRGameInstance::EraseBattleItem(int32 idx)
-{
-	Player->EraseBattleItme(idx);
-}

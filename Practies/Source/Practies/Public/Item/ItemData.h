@@ -49,21 +49,23 @@ struct FOffenseItemData
 };
 
 USTRUCT(Atomic, BluePrintType)
-struct FTileData
+struct FItemTileData
 {
 	GENERATED_BODY()
 
 	public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Index;
+	int32 index;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Code;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Quantity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsBattleTile;
 
 };
 USTRUCT(Atomic, BluePrintType)
-struct FItmeUseState
+struct FItemUseState
 {
 	GENERATED_BODY()
 

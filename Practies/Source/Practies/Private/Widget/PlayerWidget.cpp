@@ -110,28 +110,33 @@ void UPlayerWidget::ToggleInventory()
 	if (InventoryWidget->GetVisibility() == ESlateVisibility::Hidden) InventoryWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	else InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 }
-void UPlayerWidget::UseSkillCoolStart(int32 idx)
+void UPlayerWidget::UseSkillCoolStart(int32 index)
 {
 	if (UseSkillWidget != nullptr)
-	UseSkillWidget->OnWidget(idx);
+	UseSkillWidget->OnWidget(index);
 }
 
-void UPlayerWidget::UseSkillCoolEnd(int32 idx)
+void UPlayerWidget::UseSkillCoolEnd(int32 index)
 {
 	if(UseSkillWidget!=nullptr)
-	UseSkillWidget->OffWidget(idx);
+	UseSkillWidget->OffWidget(index);
 }
 
-void UPlayerWidget::UseItemCoolStart(int32 idx)
+void UPlayerWidget::UseItemCoolStart(int32 index)
 {
 	if (UseItemWidget != nullptr)
-		UseItemWidget->OnWidget(idx);
+		UseItemWidget->OnWidget(index);
 }
 
-void UPlayerWidget::UseItemCoolEnd(int32 idx)
+void UPlayerWidget::UseItemCoolEnd(int32 index)
 {
 	if (UseItemWidget != nullptr)
-		UseItemWidget->OffWidget(idx);
+		UseItemWidget->OffWidget(index);
+}
+
+void UPlayerWidget::ClearBattleItemTile(int32 index)
+{
+	Player->ClearBattleItemTile(index);
 }
 
 void UPlayerWidget::NativeConstruct()
